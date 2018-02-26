@@ -1,13 +1,5 @@
 apply plugin: 'jacoco'
 
-android {
-    buildTypes {
-        debug {
-            testCoverageEnabled true
-        }
-    }
-}
-
 jacoco {
     toolVersion = versions.jacoco
     version = versions.jacoco

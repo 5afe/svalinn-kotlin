@@ -7,7 +7,7 @@ android:
     - tools
 
     # The BuildTools version used by your project
-    - build-tools-27.0.1
+    - build-tools-27.0.3
 
     # The SDK version used to compile your project
     - android-27
@@ -22,7 +22,7 @@ cache:
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+  - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
 
 before_install:
   # Install SDK license so Android Gradle plugin can install deps.
@@ -32,7 +32,7 @@ before_install:
 
 script:
   - . ./ci/prepare_env.sh
-  - ./gradlew check assemble --stacktrace
+  - ./ci/build.sh
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -f '*TestCoverage.xml'
