@@ -1,0 +1,52 @@
+language: android
+
+android:
+  components:
+    - tools
+    - platform-tools
+    - tools
+
+    # The BuildTools version used by your project
+    - build-tools-27.0.1
+
+    # The SDK version used to compile your project
+    - android-27
+
+    - extra-android-m2repository
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+before_install:
+  # Decrypt secrets tar
+  - openssl aes-256-cbc -K $encrypted_867b4f7f2a7b_key -iv $encrypted_867b4f7f2a7b_iv
+    -in secrets.tar.enc -out secrets.tar -d
+  # Extract secrets
+  - tar xvf secrets.tar
+  # Install SDK license so Android Gradle plugin can install deps.
+  - mkdir "$ANDROID_HOME/licenses" || true
+  - echo "8933bad161af4178b1185d1a37fbf41ea5269c55" >> "$ANDROID_HOME/licenses/android-sdk-license"
+  - echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> "$ANDROID_HOME/licenses/android-sdk-license"
+
+script:
+  - . ./ci/prepare_env.sh
+  - ./gradlew check assemble --stacktrace
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -f '*TestCoverage.xml'
+
+deploy:
+  provider: releases
+  api_key: "${GITHUB_API_KEY}"
+  file_glob: true
+  file: ./*/build/libs/*.aar
+  skip_cleanup: true
+  on:
+    tags: true
