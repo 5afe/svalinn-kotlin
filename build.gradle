@@ -40,10 +40,6 @@ subprojects {
                     targetSdkVersion 27
                 }
 
-                buildTypes {
-                    dev {
-                    }
-                }
                 lintOptions {
                     abortOnError false
                 }

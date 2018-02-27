@@ -6,7 +6,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
-    implementation project(":accounts:base")
+    implementation project(":accounts-base")
     implementation project(':crypto')
     implementation project(':android-common')
     implementation project(':mnemonic')
