@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply from: '../../buildsystem/coverageReport.gradle'
+apply from: '../buildsystem/coverageReport.gradle'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -21,7 +21,7 @@ dependencies {
     // one bundled in the android.jar
     testImplementation "junit:junit:$versions.junit"
 
-    implementation project(":accounts:base")
+    implementation project(":accounts-base")
     implementation project(":crypto")
     implementation project(':android-common')
     implementation project(":mnemonic")
