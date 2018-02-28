@@ -41,7 +41,7 @@ deploy:
   provider: releases
   api_key: "${GITHUB_API_KEY}"
   file_glob: true
-  file: ./*/build/libs/*.aar
+  file: ./*/build/outputs/aar/*.aar
   skip_cleanup: true
   on:
     tags: true
