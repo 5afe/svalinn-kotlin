@@ -23,6 +23,9 @@ fun String.decimalAsBigIntegerOrNull() = nullOnThrow { this.decimalAsBigInteger(
 
 fun ByteArray.asBigInteger() = BigInteger(1, this)
 
+fun BigInteger.toHexString() =
+    this.toString(16).addHexPrefix()
+
 fun BigInteger.asEthereumAddressStringOrNull() = nullOnThrow { this.asEthereumAddressString() }
 fun BigInteger.asEthereumAddressString(): String {
     if (!isValidEthereumAddress()) throw InvalidAddressException(this)
