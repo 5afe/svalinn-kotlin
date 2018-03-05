@@ -51,15 +51,18 @@ class RpcEthereumRepository(
         ethereumRpcApi.receipt(
             JsonRpcRequest(
                 method = "eth_getTransactionReceipt",
-                params = arrayListOf(receiptHash)
+                params = listOf(receiptHash)
             )
         ).map {
-            TransactionReceipt(
-                it.result.status,
-                it.result.transactionHash,
-                it.result.contractAddress,
-                it.result.logs.map { TransactionReceipt.Event(it.logIndex, it.data, it.topics) }
-            )
+            it.result?.let {
+                TransactionReceipt(
+                    it.status,
+                    it.transactionHash,
+                    it.contractAddress,
+                    it.logs.map { TransactionReceipt.Event(it.logIndex, it.data, it.topics) }
+                )
+            } ?: throw TransactionReceiptNotFound()
+
         }
 
     override fun getTransactionParameters(
@@ -73,10 +76,13 @@ class RpcEthereumRepository(
         val gasPriceRequest = EthGasPrice(1)
         val nonceRequest = EthGetTransactionCount(from, 2)
         return bulk(listOf(estimateRequest, gasPriceRequest, nonceRequest)).map {
+            val estimate = estimateRequest.result() ?: throw IllegalStateException()
+            val price = gasPriceRequest.result() ?: throw IllegalStateException()
+            val nonce = nonceRequest.result() ?: throw IllegalStateException()
             val adjustedGas = BigDecimal.valueOf(1.4)
-                .multiply(BigDecimal(estimateRequest.result())).setScale(0, BigDecimal.ROUND_UP)
+                .multiply(BigDecimal(estimate)).setScale(0, BigDecimal.ROUND_UP)
                 .unscaledValue()
-            TransactionParameters(adjustedGas, gasPriceRequest.result()!!, nonceRequest.result()!!)
+            TransactionParameters(adjustedGas, price, nonce)
         }
     }
 }

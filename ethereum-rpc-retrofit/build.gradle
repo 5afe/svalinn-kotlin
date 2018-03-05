@@ -6,12 +6,6 @@ apply from: '../buildsystem/coverageReport.gradle'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-android {
-    defaultConfig {
-        buildConfigField javaTypes.STRING, "BLOCKCHAIN_NET_URL", asString(getKey("BLOCKCHAIN_NET_URL", "https://rinkeby.infura.io"))
-    }
-}
-
 dependencies {
     implementation project(":ethereum-rpc")
 

@@ -9,10 +9,6 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface RetrofitEthereumRpcApi : EthereumRpcApi {
-    companion object {
-        const val BASE_URL: String = BuildConfig.BLOCKCHAIN_NET_URL
-    }
-
     @POST("/")
     override fun receipt(@Body jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcTransactionReceiptResult>
 
