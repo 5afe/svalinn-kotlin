@@ -7,7 +7,6 @@ import pm.gnosis.ethereum.models.TransactionReceipt
 import pm.gnosis.ethereum.rpc.models.*
 import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
-import pm.gnosis.utils.asEthereumAddressString
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -69,11 +68,10 @@ class RpcEthereumRepository(
         value: Wei?,
         data: String?
     ): Observable<TransactionParameters> {
-        val fromHex = from.asEthereumAddressString()
         val tx = Transaction(address = to, value = value, data = data)
-        val estimateRequest = EthEstimateGas(fromHex, tx, 0)
+        val estimateRequest = EthEstimateGas(from, tx, 0)
         val gasPriceRequest = EthGasPrice(1)
-        val nonceRequest = EthGetTransactionCount(fromHex, 2)
+        val nonceRequest = EthGetTransactionCount(from, 2)
         return bulk(listOf(estimateRequest, gasPriceRequest, nonceRequest)).map {
             val adjustedGas = BigDecimal.valueOf(1.4)
                 .multiply(BigDecimal(estimateRequest.result())).setScale(0, BigDecimal.ROUND_UP)
@@ -90,7 +88,6 @@ private fun <T> EthRequest<T>.toRpcRequest() =
         is EthEstimateGas -> RpcEstimateGasRequest(this)
         is EthGasPrice -> RpcGasPriceRequest(this)
         is EthGetTransactionCount -> RpcTransactionCountRequest(this)
-        is EthSendRawTransaction -> RpcSendRawTransaction(this)
         is EthSendRawTransaction -> RpcSendRawTransaction(this)
         else -> throw IllegalArgumentException()
     }

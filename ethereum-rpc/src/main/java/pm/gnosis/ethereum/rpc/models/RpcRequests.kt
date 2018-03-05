@@ -93,7 +93,7 @@ class RpcTransactionCountRequest(raw: EthGetTransactionCount) :
     override fun request() =
         JsonRpcRequest(
             method = FUNCTION_GET_TRANSACTION_COUNT,
-            params = arrayListOf(raw.from, BLOCK_PENDING)
+            params = arrayListOf(raw.from.asEthereumAddressString(), BLOCK_PENDING)
         )
 
     override fun parse(response: JsonRpcResult) {
