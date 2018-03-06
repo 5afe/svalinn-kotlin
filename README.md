@@ -59,6 +59,18 @@ Crypto specific module for key generation, signing and hashing.
 implementation 'com.github.gnosis:svalinn-kotlin:crypto:<version>'
 ```
 
+**Ethereum Modules**
+
+Modules for easy interaction with the Ethereum blockchain
+
+[More info](ethereum/README.md)
+
+```
+implementation 'com.github.gnosis:svalinn-kotlin:ethereum:<version>'
+implementation 'com.github.gnosis:svalinn-kotlin:ethereum-rpc:<version>'
+implementation 'com.github.gnosis:svalinn-kotlin:ethereum-rpc-retrofit:<version>'
+```
+
 **Mnemonic Module**
 
 Implementation of BIP39 for mnemonic phrase generation. Words need to be provided by the user in the core module by implementing the `WordListProvider` interface.

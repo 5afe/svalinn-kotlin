@@ -52,3 +52,5 @@ class EthEstimateGas(
 class EthGetTransactionCount(val from: BigInteger, id: Int = 0) : EthRequest<BigInteger>(id)
 
 class EthSendRawTransaction(val signedData: String, id: Int = 0) : EthRequest<String>(id)
+
+class TransactionReceiptNotFound: NoSuchElementException()

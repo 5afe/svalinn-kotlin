@@ -34,7 +34,7 @@ data class JsonRpcTransactionReceiptResult(
     @Json(name = "id") val id: Int,
     @Json(name = "jsonrpc") val jsonRpc: String,
     @Json(name = "error") val error: JsonRpcError? = null,
-    @Json(name = "result") val result: TransactionReceipt
+    @Json(name = "result") val result: TransactionReceipt?
 ) {
     data class TransactionReceipt(
         @Json(name = "status") val status: BigInteger?,

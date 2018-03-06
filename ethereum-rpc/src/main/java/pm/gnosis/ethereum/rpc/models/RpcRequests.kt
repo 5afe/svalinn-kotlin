@@ -8,6 +8,7 @@ import pm.gnosis.ethereum.rpc.EthereumRpcApi.Companion.FUNCTION_ESTIMATE_GAS
 import pm.gnosis.ethereum.rpc.EthereumRpcApi.Companion.FUNCTION_GAS_PRICE
 import pm.gnosis.ethereum.rpc.EthereumRpcApi.Companion.FUNCTION_GET_BALANCE
 import pm.gnosis.ethereum.rpc.EthereumRpcApi.Companion.FUNCTION_GET_TRANSACTION_COUNT
+import pm.gnosis.ethereum.rpc.EthereumRpcApi.Companion.FUNCTION_SEND_RAW_TRANSACTION
 import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
 import pm.gnosis.utils.asEthereumAddressString
@@ -16,7 +17,7 @@ import pm.gnosis.utils.hexAsBigIntegerOrNull
 import pm.gnosis.utils.toHexString
 import java.math.BigInteger
 
-sealed class RpcRequest<out T>(val raw: T) {
+sealed class RpcRequest<out T: EthRequest<*>>(val raw: T) {
     abstract fun request(): JsonRpcRequest
     abstract fun parse(response: JsonRpcResult)
 }
@@ -108,8 +109,8 @@ class RpcTransactionCountRequest(raw: EthGetTransactionCount) :
 class RpcSendRawTransaction(raw: EthSendRawTransaction) : RpcRequest<EthSendRawTransaction>(raw) {
     override fun request() =
         JsonRpcRequest(
-            method = FUNCTION_CALL,
-            params = listOf(raw.signedData, BLOCK_LATEST)
+            method = FUNCTION_SEND_RAW_TRANSACTION,
+            params = listOf(raw.signedData)
         )
 
     override fun parse(response: JsonRpcResult) {
