@@ -9,7 +9,7 @@ import java.math.BigInteger
 
 interface EthereumRepository {
 
-    fun <R : EthRequest<*>> bulk(requests: List<R>): Observable<List<R>>
+    fun <R : BulkRequest> request(bulk: R): Observable<R>
 
     fun <R : EthRequest<*>> request(request: R): Observable<R>
 
@@ -19,10 +19,37 @@ interface EthereumRepository {
 
     fun getTransactionReceipt(receiptHash: String): Observable<TransactionReceipt>
 
-    fun getTransactionParameters(from: BigInteger, to: BigInteger, value: Wei? = null, data: String? = null): Observable<TransactionParameters>
+    fun getTransactionParameters(
+        from: BigInteger,
+        to: BigInteger,
+        value: Wei? = null,
+        data: String? = null
+    ): Observable<TransactionParameters>
 }
 
-abstract class EthRequest<T>(val id: Int) {
+open class BulkRequest(val requests: List<EthRequest<*>>) {
+    constructor(vararg requests: EthRequest<*>) : this(requests.toList())
+}
+
+open class MappingBulkRequest<out T>(
+    private val mappedRequests: List<MappedRequest<*, T>>
+) : BulkRequest(mappedRequests.map { it.request }) {
+
+    constructor(vararg requests: MappedRequest<*, T>) : this(requests.toList())
+
+    fun mapped(): List<T> = mappedRequests.map { it.mapped() }
+}
+
+class MappedRequest<I, out T>(
+    val request: EthRequest<I>,
+    private val mapper: (I?) -> T
+) {
+    fun mapped(): T {
+        return mapper(request.result())
+    }
+}
+
+sealed class EthRequest<T>(val id: Int) {
     var response: Response<T>? = null
 
     fun result(): T? = (response as? Response.Success)?.data
@@ -53,4 +80,4 @@ class EthGetTransactionCount(val from: BigInteger, id: Int = 0) : EthRequest<Big
 
 class EthSendRawTransaction(val signedData: String, id: Int = 0) : EthRequest<String>(id)
 
-class TransactionReceiptNotFound: NoSuchElementException()
+class TransactionReceiptNotFound : NoSuchElementException()

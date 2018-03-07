@@ -1,7 +1,6 @@
 package pm.gnosis.ethereum.rpc.models
 
 import com.squareup.moshi.Json
-import java.lang.IllegalStateException
 import java.math.BigInteger
 
 data class JsonRpcRequest(
@@ -16,14 +15,7 @@ data class JsonRpcResult(
     @Json(name = "jsonrpc") val jsonRpc: String,
     @Json(name = "error") val error: JsonRpcError? = null,
     @Json(name = "result") val result: String
-) {
-    fun checkedResult(): String {
-        error?.let {
-            throw ErrorResultException(it.message)
-        }
-        return result
-    }
-}
+)
 
 data class JsonRpcError(
     @Json(name = "code") val code: Int,
@@ -49,5 +41,3 @@ data class JsonRpcTransactionReceiptResult(
         )
     }
 }
-
-class ErrorResultException(msg: String) : IllegalStateException(msg)

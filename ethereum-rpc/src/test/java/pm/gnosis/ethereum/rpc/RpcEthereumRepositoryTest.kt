@@ -60,7 +60,7 @@ class RpcEthereumRepositoryTest {
             )
 
         val tx = Transaction(BigInteger.TEN, value = Wei.ether("0.001"))
-        val requests = listOf(
+        val bulk = BulkRequest(
             EthCall(BigInteger.ONE, tx, 0),
             EthBalance(BigInteger.ONE, 1),
             EthGasPrice(2),
@@ -68,24 +68,24 @@ class RpcEthereumRepositoryTest {
             EthSendRawTransaction("some_signed_data", 4)
         )
 
-        val testObserver = TestObserver<List<EthRequest<*>>>()
-        repository.bulk(requests).subscribe(testObserver)
+        val testObserver = TestObserver<BulkRequest>()
+        repository.request(bulk).subscribe(testObserver)
 
-        testObserver.assertResult(requests)
+        testObserver.assertResult(bulk)
 
-        assertEquals(EthRequest.Response.Success("0x"), requests[0].response)
-        assertEquals(EthRequest.Response.Success(Wei.ether("1")), requests[1].response)
+        assertEquals(EthRequest.Response.Success("0x"), bulk.requests[0].response)
+        assertEquals(EthRequest.Response.Success(Wei.ether("1")), bulk.requests[1].response)
         assertEquals(
             EthRequest.Response.Success(Wei.ether("0.000000001").value),
-            requests[2].response
+            bulk.requests[2].response
         )
-        assertEquals(EthRequest.Response.Success("0x0a".hexAsBigInteger()), requests[3].response)
+        assertEquals(EthRequest.Response.Success("0x0a".hexAsBigInteger()), bulk.requests[3].response)
         assertEquals(
             EthRequest.Response.Success("0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1"),
-            requests[4].response
+            bulk.requests[4].response
         )
 
-        then(apiMock).should().post(requests.map { it.toRpcRequest().request() })
+        then(apiMock).should().post(bulk.requests.map { it.toRpcRequest().request() })
         then(apiMock).shouldHaveNoMoreInteractions()
     }
 
@@ -104,16 +104,17 @@ class RpcEthereumRepositoryTest {
             )
 
         val tx = Transaction(BigInteger.TEN, value = Wei.ether("0.001"))
-        val requests = listOf(
+        val bulk = BulkRequest(
             EthCall(BigInteger.ONE, tx, 0),
             EthSendRawTransaction("some_signed_data", 0)
         )
 
-        val testObserver = TestObserver<List<EthRequest<*>>>()
-        repository.bulk(requests).subscribe(testObserver)
+        val testObserver = TestObserver<BulkRequest>()
+        repository.request(bulk).subscribe(testObserver)
 
-        testObserver.assertResult(requests)
+        testObserver.assertResult(bulk)
 
+        val requests = bulk.requests
         assertNull("First request should be overwritten by second request", requests[0].response)
         assertEquals(
             EthRequest.Response.Success("0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1"),
@@ -138,17 +139,18 @@ class RpcEthereumRepositoryTest {
             )
 
         val tx = Transaction(BigInteger.TEN, value = Wei.ether("0.001"))
-        val requests = listOf(
+        val bulk = BulkRequest(
             EthCall(BigInteger.ONE, tx, 0),
             EthBalance(BigInteger.ONE, 1),
             EthSendRawTransaction("some_signed_data", 2)
         )
 
-        val testObserver = TestObserver<List<EthRequest<*>>>()
-        repository.bulk(requests).subscribe(testObserver)
+        val testObserver = TestObserver<BulkRequest>()
+        repository.request(bulk).subscribe(testObserver)
 
-        testObserver.assertResult(requests)
+        testObserver.assertResult(bulk)
 
+        val requests = bulk.requests
         assertEquals(EthRequest.Response.Success("0x"), requests[0].response)
         assertEquals(EthRequest.Response.Success(Wei.ether("1")), requests[1].response)
         assertEquals(
