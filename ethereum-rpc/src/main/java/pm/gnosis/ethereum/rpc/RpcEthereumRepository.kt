@@ -14,12 +14,12 @@ class RpcEthereumRepository(
     private val ethereumRpcApi: EthereumRpcApi
 ) : EthereumRepository {
 
-    override fun <R : EthRequest<*>> bulk(requests: List<R>): Observable<List<R>> =
-        Observable.fromCallable { requests.associate { it.id to it.toRpcRequest() } }
+    override fun <R : BulkRequest> request(bulk: R): Observable<R> =
+        Observable.fromCallable { bulk.requests.associate { it.id to it.toRpcRequest() } }
             .flatMap { rpcRequests ->
                 ethereumRpcApi.post(rpcRequests.values.map { it.request() })
                     .map { it.forEach { rpcRequests[it.id]?.parse(it) } }
-                    .map { requests }
+                    .map { bulk }
             }
 
     override fun <R : EthRequest<*>> request(request: R): Observable<R> =
@@ -75,7 +75,7 @@ class RpcEthereumRepository(
         val estimateRequest = EthEstimateGas(from, tx, 0)
         val gasPriceRequest = EthGasPrice(1)
         val nonceRequest = EthGetTransactionCount(from, 2)
-        return bulk(listOf(estimateRequest, gasPriceRequest, nonceRequest)).map {
+        return request(BulkRequest(estimateRequest, gasPriceRequest, nonceRequest)).map {
             val estimate = estimateRequest.result() ?: throw IllegalStateException()
             val price = gasPriceRequest.result() ?: throw IllegalStateException()
             val nonce = nonceRequest.result() ?: throw IllegalStateException()
