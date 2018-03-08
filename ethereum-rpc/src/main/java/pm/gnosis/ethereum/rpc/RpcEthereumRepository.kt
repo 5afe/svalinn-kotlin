@@ -11,7 +11,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 class RpcEthereumRepository(
-    private val ethereumRpcApi: EthereumRpcApi
+    private val ethereumRpcApi: EthereumRpcConnector
 ) : EthereumRepository {
 
     override fun <R : BulkRequest> request(bulk: R): Observable<R> =

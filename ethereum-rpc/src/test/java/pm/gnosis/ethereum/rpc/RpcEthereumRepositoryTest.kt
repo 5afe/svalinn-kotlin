@@ -32,7 +32,7 @@ class RpcEthereumRepositoryTest {
     val rule = ImmediateSchedulersRule()
 
     @Mock
-    private lateinit var apiMock: EthereumRpcApi
+    private lateinit var apiMock: EthereumRpcConnector
 
     private lateinit var repository: RpcEthereumRepository
 

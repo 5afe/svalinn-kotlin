@@ -1,14 +1,14 @@
 package pm.gnosis.ethereum.rpc.models
 
 import pm.gnosis.ethereum.*
-import pm.gnosis.ethereum.rpc.EthereumRpcApi.Companion.BLOCK_LATEST
-import pm.gnosis.ethereum.rpc.EthereumRpcApi.Companion.BLOCK_PENDING
-import pm.gnosis.ethereum.rpc.EthereumRpcApi.Companion.FUNCTION_CALL
-import pm.gnosis.ethereum.rpc.EthereumRpcApi.Companion.FUNCTION_ESTIMATE_GAS
-import pm.gnosis.ethereum.rpc.EthereumRpcApi.Companion.FUNCTION_GAS_PRICE
-import pm.gnosis.ethereum.rpc.EthereumRpcApi.Companion.FUNCTION_GET_BALANCE
-import pm.gnosis.ethereum.rpc.EthereumRpcApi.Companion.FUNCTION_GET_TRANSACTION_COUNT
-import pm.gnosis.ethereum.rpc.EthereumRpcApi.Companion.FUNCTION_SEND_RAW_TRANSACTION
+import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.BLOCK_LATEST
+import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.BLOCK_PENDING
+import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.FUNCTION_CALL
+import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.FUNCTION_ESTIMATE_GAS
+import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.FUNCTION_GAS_PRICE
+import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.FUNCTION_GET_BALANCE
+import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.FUNCTION_GET_TRANSACTION_COUNT
+import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.FUNCTION_SEND_RAW_TRANSACTION
 import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
 import pm.gnosis.utils.asEthereumAddressString
@@ -29,7 +29,8 @@ class RpcCallRequest(raw: EthCall) : RpcRequest<EthCall>(raw) {
             params = listOf(
                 raw.transaction.toCallParams(raw.from?.asEthereumAddressStringOrNull()),
                 BLOCK_LATEST
-            )
+            ),
+            id = raw.id
         )
 
     override fun parse(response: JsonRpcResult) {
@@ -43,7 +44,8 @@ class RpcBalanceRequest(raw: EthBalance) : RpcRequest<EthBalance>(raw) {
     override fun request() =
         JsonRpcRequest(
             method = FUNCTION_GET_BALANCE,
-            params = listOf(raw.address.asEthereumAddressString(), BLOCK_LATEST)
+            params = listOf(raw.address.asEthereumAddressString(), BLOCK_LATEST),
+            id = raw.id
         )
 
     override fun parse(response: JsonRpcResult) {
@@ -62,7 +64,8 @@ class RpcEstimateGasRequest(raw: EthEstimateGas) : RpcRequest<EthEstimateGas>(ra
             params = listOf(
                 raw.transaction.toCallParams(raw.from?.asEthereumAddressStringOrNull()),
                 BLOCK_LATEST
-            )
+            ),
+            id = raw.id
         )
 
     override fun parse(response: JsonRpcResult) {
@@ -77,7 +80,8 @@ class RpcEstimateGasRequest(raw: EthEstimateGas) : RpcRequest<EthEstimateGas>(ra
 class RpcGasPriceRequest(raw: EthGasPrice) : RpcRequest<EthGasPrice>(raw) {
     override fun request() =
         JsonRpcRequest(
-            method = FUNCTION_GAS_PRICE
+            method = FUNCTION_GAS_PRICE,
+            id = raw.id
         )
 
     override fun parse(response: JsonRpcResult) {
@@ -94,7 +98,8 @@ class RpcTransactionCountRequest(raw: EthGetTransactionCount) :
     override fun request() =
         JsonRpcRequest(
             method = FUNCTION_GET_TRANSACTION_COUNT,
-            params = arrayListOf(raw.from.asEthereumAddressString(), BLOCK_PENDING)
+            params = arrayListOf(raw.from.asEthereumAddressString(), BLOCK_PENDING),
+            id = raw.id
         )
 
     override fun parse(response: JsonRpcResult) {
@@ -110,7 +115,8 @@ class RpcSendRawTransaction(raw: EthSendRawTransaction) : RpcRequest<EthSendRawT
     override fun request() =
         JsonRpcRequest(
             method = FUNCTION_SEND_RAW_TRANSACTION,
-            params = listOf(raw.signedData)
+            params = listOf(raw.signedData),
+            id = raw.id
         )
 
     override fun parse(response: JsonRpcResult) {

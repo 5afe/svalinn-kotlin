@@ -5,7 +5,7 @@ import pm.gnosis.ethereum.rpc.models.JsonRpcRequest
 import pm.gnosis.ethereum.rpc.models.JsonRpcResult
 import pm.gnosis.ethereum.rpc.models.JsonRpcTransactionReceiptResult
 
-interface EthereumRpcApi {
+interface EthereumRpcConnector {
 
     companion object {
         const val BLOCK_EARLIEST = "earliest"
