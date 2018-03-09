@@ -50,7 +50,7 @@ class ERC67Parser {
 
 fun Transaction.erc67String(): String {
     val stringBuilder = StringBuilder("${ERC67Parser.SCHEMA}${address.asEthereumAddressString()}")
-    val queryParams = kotlin.collections.mutableListOf<String>()
+    val queryParams = mutableListOf<String>()
     value?.let { queryParams.add("${ERC67Parser.VALUE_KEY}${it.value}") }
     gas?.let { queryParams.add("${ERC67Parser.GAS_KEY}$it") }
     gasPrice?.let { queryParams.add("${ERC67Parser.GAS_PRICE_KEY}$it") }
