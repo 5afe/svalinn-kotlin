@@ -32,14 +32,7 @@ class RpcEthereumRepository(
 
     override fun getBalance(address: BigInteger): Observable<Wei> =
         request(EthBalance(address))
-            .map {
-                val resp = it.response
-                when (resp) {
-                    is EthRequest.Response.Failure -> throw RequestFailedException(resp.error)
-                    is EthRequest.Response.Success -> resp.data
-                    null -> throw RequestFailedException("Could not retrieve balance!")
-                }
-            }
+            .map { it.checkedResult() }
 
     override fun sendRawTransaction(signedTransactionData: String): Observable<String> =
         request(EthSendRawTransaction(signedTransactionData))
