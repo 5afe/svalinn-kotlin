@@ -45,14 +45,22 @@ subprojects {
                 }
             }
 
-            task sourceJar(type: Jar) {
-                from android.sourceSets.main.java.srcDirs
-                classifier "sources"
+            task androidSourcesJar(type: Jar) {
+                from android.sourceSets.main.java.source
+                classifier = 'sources'
+            }
+
+            artifacts {
+                archives androidSourcesJar
             }
         } else {
-            task sourcesJar(type: Jar) {
+            task sourcesJar(type: Jar, dependsOn:classes) {
                 from sourceSets.main.allSource
-                classifier 'sources'
+                classifier = 'sources'
+            }
+
+            artifacts {
+                archives sourcesJar
             }
         }
     }
