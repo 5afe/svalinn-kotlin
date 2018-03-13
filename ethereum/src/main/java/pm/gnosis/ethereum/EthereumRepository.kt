@@ -97,6 +97,6 @@ class EthSendRawTransaction(val signedData: String, id: Int = 0) : EthRequest<St
 
 class TransactionReceiptNotFound : NoSuchElementException()
 
-class RequestFailedException(msg: String?): RuntimeException(msg)
+class RequestFailedException(msg: String? = null): RuntimeException(msg)
 
-class RequestNotExecutedException(msg: String?): RuntimeException(msg)
+class RequestNotExecutedException(msg: String? = null): RuntimeException(msg)

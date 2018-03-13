@@ -35,7 +35,7 @@ class RpcEthereumRepository(
             .map {
                 val resp = it.response
                 when (resp) {
-                    is EthRequest.Response.Failure -> throw IllegalArgumentException(resp.error)
+                    is EthRequest.Response.Failure -> throw RequestFailedException(resp.error)
                     is EthRequest.Response.Success -> resp.data
                     null -> throw RequestFailedException("Could not retrieve balance!")
                 }
@@ -44,7 +44,7 @@ class RpcEthereumRepository(
     override fun sendRawTransaction(signedTransactionData: String): Observable<String> =
         request(EthSendRawTransaction(signedTransactionData))
             .map {
-                it.result() ?: throw RequestFailedException("Could not send raw transaction")
+                it.checkedResult("Could not send raw transaction")
             }
 
     override fun getTransactionReceipt(receiptHash: String): Observable<TransactionReceipt> =
