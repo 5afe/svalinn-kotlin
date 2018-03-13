@@ -32,19 +32,12 @@ class RpcEthereumRepository(
 
     override fun getBalance(address: BigInteger): Observable<Wei> =
         request(EthBalance(address))
-            .map {
-                val resp = it.response
-                when (resp) {
-                    is EthRequest.Response.Failure -> throw IllegalArgumentException(resp.error)
-                    is EthRequest.Response.Success -> resp.data
-                    null -> throw IllegalStateException()
-                }
-            }
+            .map { it.checkedResult() }
 
     override fun sendRawTransaction(signedTransactionData: String): Observable<String> =
         request(EthSendRawTransaction(signedTransactionData))
             .map {
-                it.result() ?: throw IllegalStateException()
+                it.checkedResult("Could not send raw transaction")
             }
 
     override fun getTransactionReceipt(receiptHash: String): Observable<TransactionReceipt> =
@@ -76,9 +69,9 @@ class RpcEthereumRepository(
         val gasPriceRequest = EthGasPrice(1)
         val nonceRequest = EthGetTransactionCount(from, 2)
         return request(BulkRequest(estimateRequest, gasPriceRequest, nonceRequest)).map {
-            val estimate = estimateRequest.result() ?: throw IllegalStateException()
-            val price = gasPriceRequest.result() ?: throw IllegalStateException()
-            val nonce = nonceRequest.result() ?: throw IllegalStateException()
+            val estimate = estimateRequest.checkedResult("Could not retrieve estimate")
+            val price = gasPriceRequest.checkedResult("Could not retrieve gas price")
+            val nonce = nonceRequest.checkedResult("Could not retrieve nonce")
             val adjustedGas = BigDecimal.valueOf(1.4)
                 .multiply(BigDecimal(estimate)).setScale(0, BigDecimal.ROUND_UP)
                 .unscaledValue()

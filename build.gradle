@@ -44,6 +44,24 @@ subprojects {
                     abortOnError false
                 }
             }
+
+            task androidSourcesJar(type: Jar) {
+                from android.sourceSets.main.java.source
+                classifier = 'sources'
+            }
+
+            artifacts {
+                archives androidSourcesJar
+            }
+        } else {
+            task sourcesJar(type: Jar, dependsOn:classes) {
+                from sourceSets.main.allSource
+                classifier = 'sources'
+            }
+
+            artifacts {
+                archives sourcesJar
+            }
         }
     }
 }

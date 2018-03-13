@@ -79,7 +79,10 @@ class RpcEthereumRepositoryTest {
             EthRequest.Response.Success(Wei.ether("0.000000001").value),
             bulk.requests[2].response
         )
-        assertEquals(EthRequest.Response.Success("0x0a".hexAsBigInteger()), bulk.requests[3].response)
+        assertEquals(
+            EthRequest.Response.Success("0x0a".hexAsBigInteger()),
+            bulk.requests[3].response
+        )
         assertEquals(
             EthRequest.Response.Success("0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1"),
             bulk.requests[4].response
@@ -242,7 +245,7 @@ class RpcEthereumRepositoryTest {
         val testObserver = TestObserver<Wei>()
         repository.getBalance(BigInteger.ONE).subscribe(testObserver)
 
-        testObserver.assertError { it is IllegalArgumentException && it.message == "eth_getBalance should never error" }
+        testObserver.assertError { it is RequestFailedException && it.message == "eth_getBalance should never error" }
 
         then(apiMock).should().post(EthBalance(BigInteger.ONE).toRpcRequest().request())
         then(apiMock).shouldHaveNoMoreInteractions()
@@ -279,7 +282,9 @@ class RpcEthereumRepositoryTest {
         val testObserver = TestObserver<String>()
         repository.sendRawTransaction("0xSomeSignedManager").subscribe(testObserver)
 
-        testObserver.assertError { it is IllegalStateException }
+        testObserver.assertError {
+            it is RequestFailedException &&
+                    it.message == "revert; But I won't tell you why (Could not send raw transaction)" }
 
         then(apiMock).should()
             .post(EthSendRawTransaction("0xSomeSignedManager").toRpcRequest().request())
@@ -394,11 +399,13 @@ class RpcEthereumRepositoryTest {
             )
         )
 
-        then(apiMock).should().post(listOf(
-            EthEstimateGas(BigInteger.TEN, transaction, 0).toRpcRequest().request(),
-            EthGasPrice(1).toRpcRequest().request(),
-            EthGetTransactionCount(BigInteger.TEN, 2).toRpcRequest().request()
-        ))
+        then(apiMock).should().post(
+            listOf(
+                EthEstimateGas(BigInteger.TEN, transaction, 0).toRpcRequest().request(),
+                EthGasPrice(1).toRpcRequest().request(),
+                EthGetTransactionCount(BigInteger.TEN, 2).toRpcRequest().request()
+            )
+        )
         then(apiMock).shouldHaveNoMoreInteractions()
     }
 
@@ -415,13 +422,15 @@ class RpcEthereumRepositoryTest {
             transaction.data
         ).subscribe(testObserver)
 
-        testObserver.assertError { it is IllegalStateException }
+        testObserver.assertError { it is RequestFailedException }
 
-        then(apiMock).should().post(listOf(
-            EthEstimateGas(BigInteger.TEN, transaction, 0).toRpcRequest().request(),
-            EthGasPrice(1).toRpcRequest().request(),
-            EthGetTransactionCount(BigInteger.TEN, 2).toRpcRequest().request()
-        ))
+        then(apiMock).should().post(
+            listOf(
+                EthEstimateGas(BigInteger.TEN, transaction, 0).toRpcRequest().request(),
+                EthGasPrice(1).toRpcRequest().request(),
+                EthGetTransactionCount(BigInteger.TEN, 2).toRpcRequest().request()
+            )
+        )
         then(apiMock).shouldHaveNoMoreInteractions()
     }
 
