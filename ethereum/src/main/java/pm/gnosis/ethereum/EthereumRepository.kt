@@ -54,6 +54,21 @@ sealed class EthRequest<T>(val id: Int) {
 
     fun result(): T? = (response as? Response.Success)?.data
 
+    @Throws(RequestFailedException::class, RequestNotExecutedException::class)
+    fun checkedResult(errorMsg: String? = null): T =
+        response.let {
+            when(it) {
+                is EthRequest.Response.Success ->
+                    it.data
+                is EthRequest.Response.Failure -> {
+                    val msg = it.error + (errorMsg?.let {" ($it)"} ?: "")
+                    throw RequestFailedException(msg)
+                }
+                null ->
+                    throw RequestNotExecutedException(errorMsg)
+            }
+        }
+
     sealed class Response<T> {
         data class Success<T>(val data: T) : Response<T>()
         data class Failure<T>(val error: String) : Response<T>()
@@ -81,3 +96,7 @@ class EthGetTransactionCount(val from: BigInteger, id: Int = 0) : EthRequest<Big
 class EthSendRawTransaction(val signedData: String, id: Int = 0) : EthRequest<String>(id)
 
 class TransactionReceiptNotFound : NoSuchElementException()
+
+class RequestFailedException(msg: String?): RuntimeException(msg)
+
+class RequestNotExecutedException(msg: String?): RuntimeException(msg)

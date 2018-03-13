@@ -415,7 +415,7 @@ class RpcEthereumRepositoryTest {
             transaction.data
         ).subscribe(testObserver)
 
-        testObserver.assertError { it is IllegalStateException }
+        testObserver.assertError { it is RequestFailedException }
 
         then(apiMock).should().post(listOf(
             EthEstimateGas(BigInteger.TEN, transaction, 0).toRpcRequest().request(),

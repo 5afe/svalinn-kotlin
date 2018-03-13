@@ -44,6 +44,16 @@ subprojects {
                     abortOnError false
                 }
             }
+
+            task sourceJar(type: Jar) {
+                from android.sourceSets.main.java.srcDirs
+                classifier "sources"
+            }
+        } else {
+            task sourcesJar(type: Jar) {
+                from sourceSets.main.allSource
+                classifier 'sources'
+            }
         }
     }
 }

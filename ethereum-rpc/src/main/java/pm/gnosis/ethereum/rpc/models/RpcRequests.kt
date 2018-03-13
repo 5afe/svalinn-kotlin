@@ -62,9 +62,7 @@ class RpcEstimateGasRequest(raw: EthEstimateGas) : RpcRequest<EthEstimateGas>(ra
         JsonRpcRequest(
             method = FUNCTION_ESTIMATE_GAS,
             params = listOf(
-                raw.transaction.toCallParams(raw.from?.asEthereumAddressStringOrNull()),
-                BLOCK_LATEST
-            ),
+                raw.transaction.toCallParams(raw.from?.asEthereumAddressStringOrNull())),
             id = raw.id
         )
 

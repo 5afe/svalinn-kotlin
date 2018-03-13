@@ -108,7 +108,7 @@ class RpcRequestTest {
             TestCase(
                 RpcEstimateGasRequest(EthEstimateGas(BigInteger.ONE, TEST_TX, id = 1)),
                 "eth_estimateGas",
-                listOf(TEST_CALL_PARAMS, "latest"),
+                listOf(TEST_CALL_PARAMS),
                 rpcResult(Wei.ether("0.002").value.toHexString(), id = 1),
                 EthRequest.Response.Success(Wei.ether("0.002").value),
                 1
@@ -116,14 +116,14 @@ class RpcRequestTest {
             TestCase(
                 RpcEstimateGasRequest(EthEstimateGas(BigInteger.ONE, TEST_TX)),
                 "eth_estimateGas",
-                listOf(TEST_CALL_PARAMS, "latest"),
+                listOf(TEST_CALL_PARAMS),
                 rpcResult(error = "Some Error"),
                 EthRequest.Response.Failure<BigInteger>("Some Error")
             ),
             TestCase(
                 RpcEstimateGasRequest(EthEstimateGas(BigInteger.ONE, TEST_TX)),
                 "eth_estimateGas",
-                listOf(TEST_CALL_PARAMS, "latest"),
+                listOf(TEST_CALL_PARAMS),
                 rpcResult("Invalid Number"),
                 EthRequest.Response.Failure<BigInteger>("Invalid estimate!")
             ),
