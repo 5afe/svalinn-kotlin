@@ -1,5 +1,6 @@
 # Svalinn Android
 
+[![Jitpack](https://jitpack.io/v/gnosis/svalinn-kotlin.svg)](https://jitpack.io/#gnosis/svalinn-kotlin)
 [![Build Status](https://travis-ci.org/gnosis/svalinn-kotlin.svg?branch=master)](https://travis-ci.org/gnosis/svalinn-kotlin)
 [![codecov](https://codecov.io/gh/gnosis/svalinn-kotlin/branch/master/graph/badge.svg)](https://codecov.io/gh/gnosis/svalinn-kotlin)
 
@@ -14,6 +15,8 @@
 This is a collection of libraries that should make development of apps that interact with Ethereum easier. **Some functionality should be moved to [Kethereum](https://github.com/walleth/kethereum)**
 
 ### Download
+
+Follow instructions on https://jitpack.io/#gnosis/svalinn-kotlin
 
 In your Gradle file:
 
