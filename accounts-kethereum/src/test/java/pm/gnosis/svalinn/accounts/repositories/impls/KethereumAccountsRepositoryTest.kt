@@ -16,7 +16,6 @@ import pm.gnosis.models.Wei
 import pm.gnosis.svalinn.accounts.base.models.Signature
 import pm.gnosis.svalinn.accounts.data.db.AccountDao
 import pm.gnosis.svalinn.accounts.data.db.AccountsDatabase
-import pm.gnosis.svalinn.accounts.repositories.impls.KethereumAccountsRepository
 import pm.gnosis.svalinn.accounts.repositories.impls.models.db.AccountDb
 import pm.gnosis.svalinn.accounts.utils.rlp
 import pm.gnosis.svalinn.common.PreferencesManager
