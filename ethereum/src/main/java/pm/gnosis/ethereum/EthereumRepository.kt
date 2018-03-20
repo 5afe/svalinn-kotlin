@@ -57,11 +57,11 @@ sealed class EthRequest<T>(val id: Int) {
     @Throws(RequestFailedException::class, RequestNotExecutedException::class)
     fun checkedResult(errorMsg: String? = null): T =
         response.let {
-            when(it) {
+            when (it) {
                 is EthRequest.Response.Success ->
                     it.data
                 is EthRequest.Response.Failure -> {
-                    val msg = it.error + (errorMsg?.let {" ($it)"} ?: "")
+                    val msg = it.error + (errorMsg?.let { " ($it)" } ?: "")
                     throw RequestFailedException(msg)
                 }
                 null ->
@@ -78,10 +78,12 @@ sealed class EthRequest<T>(val id: Int) {
 class EthCall(
     val from: BigInteger? = null,
     val transaction: Transaction? = null,
-    id: Int = 0
+    id: Int = 0,
+    val block: Block = Block.PENDING
 ) : EthRequest<String>(id)
 
-class EthBalance(val address: BigInteger, id: Int = 0) : EthRequest<Wei>(id)
+class EthBalance(val address: BigInteger, id: Int = 0, val block: Block = Block.PENDING) :
+    EthRequest<Wei>(id)
 
 class EthGasPrice(id: Int = 0) : EthRequest<BigInteger>(id)
 
@@ -91,12 +93,29 @@ class EthEstimateGas(
     id: Int = 0
 ) : EthRequest<BigInteger>(id)
 
-class EthGetTransactionCount(val from: BigInteger, id: Int = 0) : EthRequest<BigInteger>(id)
+class EthGetTransactionCount(val from: BigInteger, id: Int = 0, val block: Block = Block.PENDING) :
+    EthRequest<BigInteger>(id)
 
 class EthSendRawTransaction(val signedData: String, id: Int = 0) : EthRequest<String>(id)
 
 class TransactionReceiptNotFound : NoSuchElementException()
 
-class RequestFailedException(msg: String? = null): RuntimeException(msg)
+class RequestFailedException(msg: String? = null) : RuntimeException(msg)
 
-class RequestNotExecutedException(msg: String? = null): RuntimeException(msg)
+class RequestNotExecutedException(msg: String? = null) : RuntimeException(msg)
+
+sealed class Block {
+    companion object {
+        val PENDING = BlockPending()
+        val LATEST = BlockLatest()
+        val EARLIEST = BlockEarliest()
+    }
+}
+
+class BlockNumber(val number: BigInteger) : Block()
+
+class BlockEarliest internal constructor(): Block()
+
+class BlockLatest internal constructor() : Block()
+
+class BlockPending internal constructor() : Block()
