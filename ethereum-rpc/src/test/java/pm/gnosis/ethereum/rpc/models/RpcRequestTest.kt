@@ -3,10 +3,10 @@ package pm.gnosis.ethereum.rpc.models
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import pm.gnosis.ethereum.*
+import pm.gnosis.model.Solidity
 import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
 import pm.gnosis.utils.asEthereumAddressString
-import pm.gnosis.utils.asEthereumAddressStringOrNull
 import pm.gnosis.utils.toHexString
 import java.math.BigInteger
 
@@ -44,7 +44,7 @@ class RpcRequestTest {
             JsonRpcResult(id, "2.0", error?.let { JsonRpcError(23, it) }, result)
 
         private val TEST_TX = Transaction(
-            BigInteger.TEN,
+            Solidity.Address(BigInteger.TEN),
             value = Wei.ether("1"),
             data = "0x42cde4e8",
             nonce = BigInteger.valueOf(42),
@@ -53,8 +53,8 @@ class RpcRequestTest {
         )
 
         private val TEST_CALL_PARAMS = TransactionCallParams(
-            from = BigInteger.ONE.asEthereumAddressStringOrNull(),
-            to = BigInteger.TEN.asEthereumAddressStringOrNull(),
+            from = Solidity.Address(BigInteger.ONE).asEthereumAddressString(),
+            to = Solidity.Address(BigInteger.TEN).asEthereumAddressString(),
             value = Wei.ether("1").value.toHexString(),
             data = "0x42cde4e8",
             nonce = BigInteger.valueOf(42).toHexString(),
@@ -65,7 +65,7 @@ class RpcRequestTest {
         private val TEST_CASES = listOf(
             // Call
             TestCase(
-                RpcCallRequest(EthCall(BigInteger.ONE, TEST_TX, id = 10)),
+                RpcCallRequest(EthCall(Solidity.Address(BigInteger.ONE), TEST_TX, id = 10)),
                 "eth_call",
                 listOf(TEST_CALL_PARAMS, "pending"),
                 rpcResult("0x01", id = 10),
@@ -73,7 +73,7 @@ class RpcRequestTest {
                 10
             ),
             TestCase(
-                RpcCallRequest(EthCall(BigInteger.ONE, TEST_TX, id = 10, block = Block.PENDING)),
+                RpcCallRequest(EthCall(Solidity.Address(BigInteger.ONE), TEST_TX, id = 10, block = Block.PENDING)),
                 "eth_call",
                 listOf(TEST_CALL_PARAMS, "pending"),
                 rpcResult("0x01", id = 10),
@@ -81,7 +81,7 @@ class RpcRequestTest {
                 10
             ),
             TestCase(
-                RpcCallRequest(EthCall(BigInteger.ONE, TEST_TX, id = 10, block = Block.LATEST)),
+                RpcCallRequest(EthCall(Solidity.Address(BigInteger.ONE), TEST_TX, id = 10, block = Block.LATEST)),
                 "eth_call",
                 listOf(TEST_CALL_PARAMS, "latest"),
                 rpcResult("0x01", id = 10),
@@ -89,7 +89,7 @@ class RpcRequestTest {
                 10
             ),
             TestCase(
-                RpcCallRequest(EthCall(BigInteger.ONE, TEST_TX, id = 10, block = Block.EARLIEST)),
+                RpcCallRequest(EthCall(Solidity.Address(BigInteger.ONE), TEST_TX, id = 10, block = Block.EARLIEST)),
                 "eth_call",
                 listOf(TEST_CALL_PARAMS, "earliest"),
                 rpcResult("0x01", id = 10),
@@ -99,7 +99,7 @@ class RpcRequestTest {
             TestCase(
                 RpcCallRequest(
                     EthCall(
-                        BigInteger.ONE, TEST_TX, id = 10, block = BlockNumber(
+                        Solidity.Address(BigInteger.ONE), TEST_TX, id = 10, block = BlockNumber(
                             BigInteger.TEN
                         )
                     )
@@ -111,7 +111,7 @@ class RpcRequestTest {
                 10
             ),
             TestCase(
-                RpcCallRequest(EthCall(BigInteger.ONE, TEST_TX)),
+                RpcCallRequest(EthCall(Solidity.Address(BigInteger.ONE), TEST_TX)),
                 "eth_call",
                 listOf(TEST_CALL_PARAMS, "pending"),
                 rpcResult(error = "Some Error"),
@@ -120,33 +120,33 @@ class RpcRequestTest {
 
             // GetBalance
             TestCase(
-                RpcBalanceRequest(EthBalance(BigInteger.ONE, id = 1)),
+                RpcBalanceRequest(EthBalance(Solidity.Address(BigInteger.ONE), id = 1)),
                 "eth_getBalance",
-                listOf(BigInteger.ONE.asEthereumAddressString(), "pending"),
+                listOf(Solidity.Address(BigInteger.ONE).asEthereumAddressString(), "pending"),
                 rpcResult(Wei.ether("1").value.toHexString(), id = 1),
                 EthRequest.Response.Success(Wei.ether("1")),
                 1
             ),
             TestCase(
-                RpcBalanceRequest(EthBalance(BigInteger.ONE, id = 1, block = Block.PENDING)),
+                RpcBalanceRequest(EthBalance(Solidity.Address(BigInteger.ONE), id = 1, block = Block.PENDING)),
                 "eth_getBalance",
-                listOf(BigInteger.ONE.asEthereumAddressString(), "pending"),
+                listOf(Solidity.Address(BigInteger.ONE).asEthereumAddressString(), "pending"),
                 rpcResult(Wei.ether("1").value.toHexString(), id = 1),
                 EthRequest.Response.Success(Wei.ether("1")),
                 1
             ),
             TestCase(
-                RpcBalanceRequest(EthBalance(BigInteger.ONE, id = 1, block = Block.LATEST)),
+                RpcBalanceRequest(EthBalance(Solidity.Address(BigInteger.ONE), id = 1, block = Block.LATEST)),
                 "eth_getBalance",
-                listOf(BigInteger.ONE.asEthereumAddressString(), "latest"),
+                listOf(Solidity.Address(BigInteger.ONE).asEthereumAddressString(), "latest"),
                 rpcResult(Wei.ether("1").value.toHexString(), id = 1),
                 EthRequest.Response.Success(Wei.ether("1")),
                 1
             ),
             TestCase(
-                RpcBalanceRequest(EthBalance(BigInteger.ONE, id = 1, block = Block.EARLIEST)),
+                RpcBalanceRequest(EthBalance(Solidity.Address(BigInteger.ONE), id = 1, block = Block.EARLIEST)),
                 "eth_getBalance",
-                listOf(BigInteger.ONE.asEthereumAddressString(), "earliest"),
+                listOf(Solidity.Address(BigInteger.ONE).asEthereumAddressString(), "earliest"),
                 rpcResult(Wei.ether("1").value.toHexString(), id = 1),
                 EthRequest.Response.Success(Wei.ether("1")),
                 1
@@ -154,35 +154,35 @@ class RpcRequestTest {
             TestCase(
                 RpcBalanceRequest(
                     EthBalance(
-                        BigInteger.ONE,
+                        Solidity.Address(BigInteger.ONE),
                         id = 1,
                         block = BlockNumber(BigInteger.ONE)
                     )
                 ),
                 "eth_getBalance",
-                listOf(BigInteger.ONE.asEthereumAddressString(), "0x1"),
+                listOf(Solidity.Address(BigInteger.ONE).asEthereumAddressString(), "0x1"),
                 rpcResult(Wei.ether("1").value.toHexString(), id = 1),
                 EthRequest.Response.Success(Wei.ether("1")),
                 1
             ),
             TestCase(
-                RpcBalanceRequest(EthBalance(BigInteger.ONE)),
+                RpcBalanceRequest(EthBalance(Solidity.Address(BigInteger.ONE))),
                 "eth_getBalance",
-                listOf(BigInteger.ONE.asEthereumAddressString(), "pending"),
+                listOf(Solidity.Address(BigInteger.ONE).asEthereumAddressString(), "pending"),
                 rpcResult(error = "Some Error"),
                 EthRequest.Response.Failure<Wei>("Some Error")
             ),
             TestCase(
-                RpcBalanceRequest(EthBalance(BigInteger.ONE)),
+                RpcBalanceRequest(EthBalance(Solidity.Address(BigInteger.ONE))),
                 "eth_getBalance",
-                listOf(BigInteger.ONE.asEthereumAddressString(), "pending"),
+                listOf(Solidity.Address(BigInteger.ONE).asEthereumAddressString(), "pending"),
                 rpcResult("Invalid Number"),
                 EthRequest.Response.Failure<Wei>("Invalid balance!")
             ),
 
             // EstimateGas
             TestCase(
-                RpcEstimateGasRequest(EthEstimateGas(BigInteger.ONE, TEST_TX, id = 1)),
+                RpcEstimateGasRequest(EthEstimateGas(Solidity.Address(BigInteger.ONE), TEST_TX, id = 1)),
                 "eth_estimateGas",
                 listOf(TEST_CALL_PARAMS),
                 rpcResult(Wei.ether("0.002").value.toHexString(), id = 1),
@@ -190,14 +190,14 @@ class RpcRequestTest {
                 1
             ),
             TestCase(
-                RpcEstimateGasRequest(EthEstimateGas(BigInteger.ONE, TEST_TX)),
+                RpcEstimateGasRequest(EthEstimateGas(Solidity.Address(BigInteger.ONE), TEST_TX)),
                 "eth_estimateGas",
                 listOf(TEST_CALL_PARAMS),
                 rpcResult(error = "Some Error"),
                 EthRequest.Response.Failure<BigInteger>("Some Error")
             ),
             TestCase(
-                RpcEstimateGasRequest(EthEstimateGas(BigInteger.ONE, TEST_TX)),
+                RpcEstimateGasRequest(EthEstimateGas(Solidity.Address(BigInteger.ONE), TEST_TX)),
                 "eth_estimateGas",
                 listOf(TEST_CALL_PARAMS),
                 rpcResult("Invalid Number"),
@@ -230,9 +230,9 @@ class RpcRequestTest {
 
             // GetTransactionCount
             TestCase(
-                RpcTransactionCountRequest(EthGetTransactionCount(BigInteger.TEN, id = 12)),
+                RpcTransactionCountRequest(EthGetTransactionCount(Solidity.Address(BigInteger.TEN), id = 12)),
                 "eth_getTransactionCount",
-                listOf(BigInteger.TEN.asEthereumAddressString(), "pending"),
+                listOf(Solidity.Address(BigInteger.TEN).asEthereumAddressString(), "pending"),
                 rpcResult(BigInteger.valueOf(23).toHexString()),
                 EthRequest.Response.Success(BigInteger.valueOf(23)),
                 12
@@ -240,13 +240,13 @@ class RpcRequestTest {
             TestCase(
                 RpcTransactionCountRequest(
                     EthGetTransactionCount(
-                        BigInteger.TEN,
+                        Solidity.Address(BigInteger.TEN),
                         id = 12,
                         block = Block.PENDING
                     )
                 ),
                 "eth_getTransactionCount",
-                listOf(BigInteger.TEN.asEthereumAddressString(), "pending"),
+                listOf(Solidity.Address(BigInteger.TEN).asEthereumAddressString(), "pending"),
                 rpcResult(BigInteger.valueOf(23).toHexString()),
                 EthRequest.Response.Success(BigInteger.valueOf(23)),
                 12
@@ -254,13 +254,13 @@ class RpcRequestTest {
             TestCase(
                 RpcTransactionCountRequest(
                     EthGetTransactionCount(
-                        BigInteger.TEN,
+                        Solidity.Address(BigInteger.TEN),
                         id = 12,
                         block = Block.LATEST
                     )
                 ),
                 "eth_getTransactionCount",
-                listOf(BigInteger.TEN.asEthereumAddressString(), "latest"),
+                listOf(Solidity.Address(BigInteger.TEN).asEthereumAddressString(), "latest"),
                 rpcResult(BigInteger.valueOf(23).toHexString()),
                 EthRequest.Response.Success(BigInteger.valueOf(23)),
                 12
@@ -268,13 +268,13 @@ class RpcRequestTest {
             TestCase(
                 RpcTransactionCountRequest(
                     EthGetTransactionCount(
-                        BigInteger.TEN,
+                        Solidity.Address(BigInteger.TEN),
                         id = 12,
                         block = Block.EARLIEST
                     )
                 ),
                 "eth_getTransactionCount",
-                listOf(BigInteger.TEN.asEthereumAddressString(), "earliest"),
+                listOf(Solidity.Address(BigInteger.TEN).asEthereumAddressString(), "earliest"),
                 rpcResult(BigInteger.valueOf(23).toHexString()),
                 EthRequest.Response.Success(BigInteger.valueOf(23)),
                 12
@@ -282,28 +282,28 @@ class RpcRequestTest {
             TestCase(
                 RpcTransactionCountRequest(
                     EthGetTransactionCount(
-                        BigInteger.TEN, id = 12, block = BlockNumber(
+                        Solidity.Address(BigInteger.TEN), id = 12, block = BlockNumber(
                             BigInteger.ZERO
                         )
                     )
                 ),
                 "eth_getTransactionCount",
-                listOf(BigInteger.TEN.asEthereumAddressString(), "0x0"),
+                listOf(Solidity.Address(BigInteger.TEN).asEthereumAddressString(), "0x0"),
                 rpcResult(BigInteger.valueOf(23).toHexString()),
                 EthRequest.Response.Success(BigInteger.valueOf(23)),
                 12
             ),
             TestCase(
-                RpcTransactionCountRequest(EthGetTransactionCount(BigInteger.TEN)),
+                RpcTransactionCountRequest(EthGetTransactionCount(Solidity.Address(BigInteger.TEN))),
                 "eth_getTransactionCount",
-                listOf(BigInteger.TEN.asEthereumAddressString(), "pending"),
+                listOf(Solidity.Address(BigInteger.TEN).asEthereumAddressString(), "pending"),
                 rpcResult(error = "Some Error"),
                 EthRequest.Response.Failure<BigInteger>("Some Error")
             ),
             TestCase(
-                RpcTransactionCountRequest(EthGetTransactionCount(BigInteger.TEN)),
+                RpcTransactionCountRequest(EthGetTransactionCount(Solidity.Address(BigInteger.TEN))),
                 "eth_getTransactionCount",
-                listOf(BigInteger.TEN.asEthereumAddressString(), "pending"),
+                listOf(Solidity.Address(BigInteger.TEN).asEthereumAddressString(), "pending"),
                 rpcResult("Invalid Number"),
                 EthRequest.Response.Failure<BigInteger>("Invalid transaction count!")
             ),

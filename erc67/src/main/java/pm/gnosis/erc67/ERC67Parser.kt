@@ -3,11 +3,10 @@ package pm.gnosis.erc67
 import android.net.Uri
 import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
+import pm.gnosis.utils.asEthereumAddress
 import pm.gnosis.utils.asEthereumAddressString
 import pm.gnosis.utils.decimalAsBigInteger
-import pm.gnosis.utils.hexAsEthereumAddressOrNull
 import pm.gnosis.utils.nullOnThrow
-
 import java.math.BigInteger
 
 /*
@@ -26,7 +25,7 @@ class ERC67Parser {
         fun parse(string: String): Transaction? {
             if (!string.startsWith(SCHEMA)) return null
             val parts = string.split(SEPARATOR)
-            val address = parts[0].removePrefix(SCHEMA).hexAsEthereumAddressOrNull() ?: return null
+            val address = parts[0].removePrefix(SCHEMA).asEthereumAddress() ?: return null
 
             var value: Wei? = null
             var gas: BigInteger? = null

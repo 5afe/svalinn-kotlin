@@ -1,5 +1,5 @@
 package pm.gnosis.svalinn.accounts.base.models
 
-import java.math.BigInteger
+import pm.gnosis.model.Solidity
 
-data class Account(val address: BigInteger)
+data class Account(val address: Solidity.Address)

@@ -1,5 +1,5 @@
 package pm.gnosis.models
 
-import java.math.BigInteger
+import pm.gnosis.model.Solidity
 
-data class AddressBookEntry(val address: BigInteger, val name: String, val description: String)
+data class AddressBookEntry(val address: Solidity.Address, val name: String, val description: String)

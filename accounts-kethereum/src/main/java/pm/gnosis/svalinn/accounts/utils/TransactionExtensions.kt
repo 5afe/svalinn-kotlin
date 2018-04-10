@@ -15,7 +15,7 @@ fun Transaction.rlp(signature: ECDSASignature? = null): ByteArray {
     items.add(nonce!!.toRLP())
     items.add(gasPrice!!.toRLP())
     items.add(gas!!.toRLP())
-    items.add(address.toRLP())
+    items.add(address.value.toRLP())
     items.add((value?.value ?: BigInteger.ZERO).toRLP())
     items.add((data?.hexStringToByteArray() ?: ByteArray(0)).toRLP())
 

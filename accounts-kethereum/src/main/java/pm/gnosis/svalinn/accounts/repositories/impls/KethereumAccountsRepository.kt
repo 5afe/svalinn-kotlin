@@ -6,6 +6,8 @@ import io.reactivex.schedulers.Schedulers
 import okio.ByteString
 import pm.gnosis.crypto.KeyGenerator
 import pm.gnosis.crypto.KeyPair
+import pm.gnosis.model.Solidity
+import pm.gnosis.models.Transaction
 import pm.gnosis.svalinn.accounts.base.exceptions.InvalidTransactionParams
 import pm.gnosis.svalinn.accounts.base.models.Account
 import pm.gnosis.svalinn.accounts.base.models.Signature
@@ -19,20 +21,17 @@ import pm.gnosis.svalinn.common.utils.edit
 import pm.gnosis.svalinn.security.EncryptionManager
 import pm.gnosis.svalinn.security.db.EncryptedByteArray
 import pm.gnosis.svalinn.security.db.EncryptedString
-import pm.gnosis.models.Transaction
 import pm.gnosis.utils.addHexPrefix
 import pm.gnosis.utils.asBigInteger
-import pm.gnosis.utils.isValidEthereumAddress
 import pm.gnosis.utils.toHexString
-import java.math.BigInteger
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class KethereumAccountsRepository @Inject internal constructor(
-        private val accountsDatabase: AccountsDatabase,
-        private val encryptionManager: EncryptionManager,
-        private val preferencesManager: PreferencesManager
+    private val accountsDatabase: AccountsDatabase,
+    private val encryptionManager: EncryptionManager,
+    private val preferencesManager: PreferencesManager
 ) : AccountsRepository {
 
     private val encryptedStringConverter = EncryptedString.Converter()
@@ -54,10 +53,10 @@ class KethereumAccountsRepository @Inject internal constructor(
             .map { it.sign(data).let { Signature(it.r, it.s, it.v) } }
     }
 
-    override fun recover(data: ByteArray, signature: Signature): Single<BigInteger> =
+    override fun recover(data: ByteArray, signature: Signature): Single<Solidity.Address> =
         Single.fromCallable {
             KeyPair.signatureToKey(data, signature.v, signature.r, signature.s).address.asBigInteger()
-        }
+        }.map { Solidity.Address(it) }
 
     private fun keyPairFromActiveAccount(): Single<KeyPair> {
         return accountsDatabase.accountsDao().observeAccounts()
@@ -71,10 +70,8 @@ class KethereumAccountsRepository @Inject internal constructor(
         val key = hdNode.derive(KeyGenerator.BIP44_PATH_ETHEREUM).deriveChild(accountIndex).keyPair
         val privateKey = key.privKeyBytes
                 ?: throw IllegalStateException("Private key must not be null")
-        val address = key.address.asBigInteger().apply {
-            isValidEthereumAddress()
-        }
-        val account = AccountDb(EncryptedByteArray.create(encryptionManager, privateKey), address)
+        val address = key.address.asBigInteger()
+        val account = AccountDb(EncryptedByteArray.create(encryptionManager, privateKey), Solidity.Address(address))
         accountsDatabase.accountsDao().insertAccount(account)
     }.subscribeOn(Schedulers.io())
 

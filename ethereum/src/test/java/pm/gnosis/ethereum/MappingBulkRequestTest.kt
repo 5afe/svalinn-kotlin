@@ -1,7 +1,8 @@
 package pm.gnosis.ethereum
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
+import pm.gnosis.model.Solidity
 import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
 import java.math.BigInteger
@@ -9,9 +10,9 @@ import java.math.BigInteger
 class MappingBulkRequestTest {
     @Test
     fun testSuccess() {
-        val etherBalance = EthBalance(BigInteger.TEN)
+        val etherBalance = EthBalance(Solidity.Address(BigInteger.TEN))
         val tokenBalance = EthCall(
-            transaction = Transaction(BigInteger.ONE, data = "tokenBalanceData")
+            transaction = Transaction(Solidity.Address(BigInteger.ONE), data = "tokenBalanceData")
         )
         val request = MappingBulkRequest(
             MappedRequest(etherBalance, { it?.value }),
@@ -30,14 +31,15 @@ class MappingBulkRequestTest {
             )
         )
     }
+
     @Test
     fun testPartlyFailure() {
-        val etherBalance = EthBalance(BigInteger.TEN)
+        val etherBalance = EthBalance(Solidity.Address(BigInteger.TEN))
         val tokenBalance = EthCall(
-            transaction = Transaction(BigInteger.ONE, data = "tokenBalanceData")
+            transaction = Transaction(Solidity.Address(BigInteger.ONE), data = "tokenBalanceData")
         )
         val token2Balance = EthCall(
-            transaction = Transaction(BigInteger.valueOf(5), data = "token2BalanceData")
+            transaction = Transaction(Solidity.Address(BigInteger.valueOf(5)), data = "token2BalanceData")
         )
         val request = MappingBulkRequest(
             MappedRequest(etherBalance, { it?.value }),

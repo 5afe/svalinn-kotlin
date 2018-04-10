@@ -2,6 +2,7 @@ package pm.gnosis.models
 
 import android.os.Parcel
 import android.os.Parcelable
+import pm.gnosis.utils.asEthereumAddress
 import pm.gnosis.utils.asEthereumAddressString
 import pm.gnosis.utils.hexAsBigInteger
 import pm.gnosis.utils.nullOnThrow
@@ -9,7 +10,7 @@ import pm.gnosis.utils.nullOnThrow
 data class TransactionParcelable(val transaction: Transaction) : Parcelable {
     constructor(parcel: Parcel) : this(
         Transaction(
-            parcel.readString().hexAsBigInteger(),
+            parcel.readString().asEthereumAddress()!!,
             nullOnThrow { Wei(parcel.readString().hexAsBigInteger()) },
             nullOnThrow { parcel.readString().hexAsBigInteger() },
             nullOnThrow { parcel.readString().hexAsBigInteger() },

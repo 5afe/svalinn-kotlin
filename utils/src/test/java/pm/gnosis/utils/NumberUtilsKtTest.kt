@@ -3,38 +3,26 @@ package pm.gnosis.utils
 import org.junit.Assert.*
 import org.junit.Test
 import pm.gnosis.tests.utils.Asserts.assertThrow
-import pm.gnosis.utils.exceptions.InvalidAddressException
 import java.math.BigDecimal
 import java.math.BigInteger
 
 class NumberUtilsKtTest {
 
     @Test
-    fun hexAsEthereumAddressOrNull() {
-        assertNull("ffffffffffffffffffffffffffffffffffffffffff".hexAsEthereumAddressOrNull())
-        assertNull("0xffffffffffffffffffffffffffffffffffffffffff".hexAsEthereumAddressOrNull())
-        assertNull("thisisporbablynotahexnumber".hexAsEthereumAddressOrNull())
+    fun asEthereumAddress() {
+        assertNull("ffffffffffffffffffffffffffffffffffffffffff".asEthereumAddress())
+        assertNull("0xffffffffffffffffffffffffffffffffffffffffff".asEthereumAddress())
+        assertNull("thisisporbablynotahexnumber".asEthereumAddress())
         assertEquals(
             BigInteger("ffffffffffffffffffffffffffffffffffffffff", 16),
-            "ffffffffffffffffffffffffffffffffffffffff".hexAsEthereumAddressOrNull()
+            "ffffffffffffffffffffffffffffffffffffffff".asEthereumAddress()!!.value
         )
         assertEquals(
             BigInteger("ffffffffffffffffffffffffffffffffffffffff", 16),
-            "0xffffffffffffffffffffffffffffffffffffffff".hexAsEthereumAddressOrNull()
+            "0xffffffffffffffffffffffffffffffffffffffff".asEthereumAddress()!!.value
         )
-        assertEquals(BigInteger("abcd", 16), "abcd".hexAsEthereumAddressOrNull())
-        assertEquals(BigInteger("abcd", 16), "0xabcd".hexAsEthereumAddressOrNull())
-    }
-
-    @Test
-    fun hexAsEthereumAddress() {
-        assertThrow({ "ffffffffffffffffffffffffffffffffffffffffff".hexAsEthereumAddress() }, throwablePredicate = { it is InvalidAddressException })
-        assertThrow({ "0xffffffffffffffffffffffffffffffffffffffffff".hexAsEthereumAddress() }, throwablePredicate = { it is InvalidAddressException })
-        assertThrow({ "thisisporbablynotahexnumber".hexAsEthereumAddress() }, throwablePredicate = { it is InvalidAddressException })
-        assertEquals(BigInteger("ffffffffffffffffffffffffffffffffffffffff", 16), "ffffffffffffffffffffffffffffffffffffffff".hexAsEthereumAddress())
-        assertEquals(BigInteger("ffffffffffffffffffffffffffffffffffffffff", 16), "0xffffffffffffffffffffffffffffffffffffffff".hexAsEthereumAddress())
-        assertEquals(BigInteger("abcd", 16), "abcd".hexAsEthereumAddress())
-        assertEquals(BigInteger("abcd", 16), "0xabcd".hexAsEthereumAddress())
+        assertEquals(BigInteger("abcd", 16), "abcd".asEthereumAddress()!!.value)
+        assertEquals(BigInteger("abcd", 16), "0xabcd".asEthereumAddress()!!.value)
     }
 
     @Test
@@ -42,8 +30,8 @@ class NumberUtilsKtTest {
         assertFalse("ffffffffffffffffffffffffffffffffffffffffff".isValidEthereumAddress())
         assertFalse("0xffffffffffffffffffffffffffffffffffffffffff".isValidEthereumAddress())
         assertFalse("thisisporbablynotahexnumber".isValidEthereumAddress())
-        assertFalse("abcd".isValidEthereumAddress())
-        assertFalse("0xabcd".isValidEthereumAddress())
+        assertTrue("abcd".isValidEthereumAddress())
+        assertTrue("0xabcd".isValidEthereumAddress())
         assertTrue("ffffffffffffffffffffffffffffffffffffffff".isValidEthereumAddress())
         assertTrue("0xffffffffffffffffffffffffffffffffffffffff".isValidEthereumAddress())
     }
@@ -108,31 +96,6 @@ class NumberUtilsKtTest {
     fun asBigInteger() {
         val source = byteArrayOf(0x3a, 0x2b, 0x1c)
         assertEquals(BigInteger(source), source.asBigInteger())
-    }
-
-    @Test
-    fun asEthereumAddressStringOrNull() {
-        assertNull(
-            "0x0000000000000000000000000000000000000001",
-            BigInteger("ffffffffffffffffffffffffffffffffffffffffff", 16).asEthereumAddressStringOrNull()
-        )
-        assertEquals("0x0000000000000000000000000000000000000001", BigInteger.ONE.asEthereumAddressStringOrNull())
-        assertEquals(
-            "0xffffffffffffffffffffffffffffffffffffffff",
-            BigInteger("ffffffffffffffffffffffffffffffffffffffff", 16).asEthereumAddressStringOrNull()
-        )
-        assertEquals("0x000000000000000000000000000000000000abcd", BigInteger("abcd", 16).asEthereumAddressStringOrNull())
-    }
-
-    @Test
-    fun asEthereumAddressString() {
-        assertThrow({ BigInteger("ffffffffffffffffffffffffffffffffffffffffff", 16).asEthereumAddressString() })
-        assertEquals("0x0000000000000000000000000000000000000001", BigInteger.ONE.asEthereumAddressString())
-        assertEquals(
-            "0xffffffffffffffffffffffffffffffffffffffff",
-            BigInteger("ffffffffffffffffffffffffffffffffffffffff", 16).asEthereumAddressString()
-        )
-        assertEquals("0x000000000000000000000000000000000000abcd", BigInteger("abcd", 16).asEthereumAddressString())
     }
 
     @Test

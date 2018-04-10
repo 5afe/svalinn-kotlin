@@ -5,10 +5,10 @@ import pm.gnosis.ethereum.*
 import pm.gnosis.ethereum.models.TransactionParameters
 import pm.gnosis.ethereum.models.TransactionReceipt
 import pm.gnosis.ethereum.rpc.models.*
+import pm.gnosis.model.Solidity
 import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
 import java.math.BigDecimal
-import java.math.BigInteger
 
 class RpcEthereumRepository(
     private val ethereumRpcApi: EthereumRpcConnector
@@ -30,7 +30,7 @@ class RpcEthereumRepository(
                     .map { request }
             }
 
-    override fun getBalance(address: BigInteger): Observable<Wei> =
+    override fun getBalance(address: Solidity.Address): Observable<Wei> =
         request(EthBalance(address))
             .map { it.checkedResult() }
 
@@ -59,8 +59,8 @@ class RpcEthereumRepository(
         }
 
     override fun getTransactionParameters(
-        from: BigInteger,
-        to: BigInteger,
+        from: Solidity.Address,
+        to: Solidity.Address,
         value: Wei?,
         data: String?
     ): Observable<TransactionParameters> {

@@ -1,6 +1,7 @@
 package pm.gnosis.utils
 
 import okio.ByteString
+import pm.gnosis.model.Solidity
 import java.math.BigInteger
 import java.security.SecureRandom
 import java.util.regex.Pattern
@@ -77,6 +78,8 @@ fun String.asEthereumAddressString(): String {
 
     return numericValue.toString(16).padStart(40, '0').addHexPrefix()
 }
+
+fun Solidity.Address.asEthereumAddressString() = value.toString(16).padStart(40, '0').addHexPrefix()
 
 fun String.isSolidityMethod(methodId: String) = this.removeHexPrefix().startsWith(methodId.removeHexPrefix())
 fun String.removeSolidityMethodPrefix(methodId: String) = this.removeHexPrefix().removePrefix(methodId.removeHexPrefix())

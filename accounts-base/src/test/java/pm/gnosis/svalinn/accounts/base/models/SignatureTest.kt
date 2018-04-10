@@ -2,7 +2,6 @@ package pm.gnosis.svalinn.accounts.base.models
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import pm.gnosis.svalinn.accounts.base.models.Signature
 import java.math.BigInteger
 
 class SignatureTest {
@@ -19,5 +18,4 @@ class SignatureTest {
         )
         assertEquals(sig, Signature.from(encoded))
     }
-
 }

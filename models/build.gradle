@@ -8,6 +8,9 @@ targetCompatibility = JavaVersion.VERSION_1_8
 dependencies {
     implementation project(":utils")
 
+    // Bivrost
+    implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
+
     //Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$versions.kotlin"
 }

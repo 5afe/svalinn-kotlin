@@ -1,7 +1,7 @@
 package pm.gnosis.blockies
 
-import pm.gnosis.utils.asEthereumAddressStringOrNull
-import java.math.BigInteger
+import pm.gnosis.model.Solidity
+import pm.gnosis.utils.asEthereumAddressString
 
 internal class Blockies(
     val primaryColor: Int,
@@ -12,9 +12,8 @@ internal class Blockies(
     companion object {
         const val SIZE = 8
 
-        fun fromAddress(address: BigInteger): Blockies? {
-            val seed = address.asEthereumAddressStringOrNull()?.let { seedFromAddress(it) }
-                    ?: return null
+        fun fromAddress(address: Solidity.Address): Blockies? {
+            val seed = seedFromAddress(address.asEthereumAddressString())
 
             // colorFromSeed() and dataFromSeed() change the seed
             // thus order is important
