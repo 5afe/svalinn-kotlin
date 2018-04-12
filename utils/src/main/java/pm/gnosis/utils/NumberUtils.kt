@@ -1,20 +1,11 @@
 package pm.gnosis.utils
 
-import pm.gnosis.utils.exceptions.InvalidAddressException
+import pm.gnosis.model.Solidity
 import pm.gnosis.utils.exceptions.InvalidTransactionHashException
 import java.math.BigDecimal
 import java.math.BigInteger
 
-fun String.hexAsEthereumAddressOrNull() = nullOnThrow { this.hexAsEthereumAddress() }
-fun String.hexAsEthereumAddress(): BigInteger {
-    try {
-        val bigInt = hexAsBigInteger()
-        if (bigInt.isValidEthereumAddress()) return bigInt
-        else throw InvalidAddressException(this)
-    } catch (e: Exception) {
-        throw InvalidAddressException(this)
-    }
-}
+fun String.asEthereumAddress() = nullOnThrow { Solidity.Address(hexAsBigInteger()) }
 
 fun String.hexAsBigInteger() = BigInteger(this.removePrefix("0x"), 16)
 fun String.hexAsBigIntegerOrNull() = nullOnThrow { this.hexAsBigInteger() }
@@ -23,14 +14,8 @@ fun String.decimalAsBigIntegerOrNull() = nullOnThrow { this.decimalAsBigInteger(
 
 fun ByteArray.asBigInteger() = BigInteger(1, this)
 
-fun BigInteger.toHexString() =
-    this.toString(16).addHexPrefix()
+fun BigInteger.toHexString() = this.toString(16).addHexPrefix()
 
-fun BigInteger.asEthereumAddressStringOrNull() = nullOnThrow { this.asEthereumAddressString() }
-fun BigInteger.asEthereumAddressString(): String {
-    if (!isValidEthereumAddress()) throw InvalidAddressException(this)
-    return "0x${this.toString(16).padStart(40, '0')}"
-}
 
 fun BigInteger.isValidEthereumAddress() = this <= BigInteger.valueOf(2).pow(160).minus(BigInteger.ONE)
 
@@ -42,10 +27,10 @@ fun BigInteger.asTransactionHash(): String {
 fun BigInteger.isValidTransactionHash() = this <= BigInteger.valueOf(2).pow(256).minus(BigInteger.ONE)
 
 fun BigInteger.asDecimalString(): String = this.toString(10)
+
+//Issue: http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6480539
 fun BigDecimal.stringWithNoTrailingZeroes(): String =
-        //Issue: http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6480539
     if (this.unscaledValue() == BigInteger.ZERO) "0"
     else this.stripTrailingZeros().toPlainString()
 
-fun String.isValidEthereumAddress() = this.removePrefix("0x").length == 40 &&
-        nullOnThrow { this.hexAsBigInteger() } != null
+fun String.isValidEthereumAddress() = asEthereumAddress() != null

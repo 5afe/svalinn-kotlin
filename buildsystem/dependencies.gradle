@@ -4,13 +4,13 @@ ext {
             android_tools          : '3.1.0-rc02',
             fabric                 : '1.+',
             google_services        : '3.1.0',
-            kotlin                 : '1.2.21',
+            kotlin                 : '1.2.31',
             jacoco                 : '0.7.9',
 
             // Runtime dependencies
             android_support        : '27.0.2',
             architecture_components: '1.0.0',
-            bivrost                : 'v0.6.1',
+            bivrost                : 'v0.6.2',
             constraint_layout      : '1.0.2',
             crashlytics            : '2.8.0',
             dagger                 : '2.12',

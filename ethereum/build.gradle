@@ -19,5 +19,8 @@ dependencies {
     // Rx
     implementation "io.reactivex.rxjava2:rxjava:$versions.rxjava"
 
+    // Bivrost
+    implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
+
     testImplementation project(":utils-testing")
 }

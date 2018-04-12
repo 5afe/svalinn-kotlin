@@ -2,6 +2,7 @@ package pm.gnosis.svalinn.accounts.base.repositories
 
 import io.reactivex.Completable
 import io.reactivex.Single
+import pm.gnosis.model.Solidity
 import pm.gnosis.svalinn.accounts.base.models.Account
 import pm.gnosis.svalinn.accounts.base.models.Signature
 import pm.gnosis.models.Transaction
@@ -14,7 +15,7 @@ interface AccountsRepository {
 
     fun sign(data: ByteArray): Single<Signature>
 
-    fun recover(data: ByteArray, signature: Signature): Single<BigInteger>
+    fun recover(data: ByteArray, signature: Signature): Single<Solidity.Address>
 
     fun saveAccountFromMnemonicSeed(mnemonicSeed: ByteArray, accountIndex: Long = 0): Completable
 

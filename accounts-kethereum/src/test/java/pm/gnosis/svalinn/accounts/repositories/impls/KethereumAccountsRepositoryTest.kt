@@ -11,6 +11,7 @@ import org.mockito.BDDMockito.given
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.junit.MockitoJUnitRunner
+import pm.gnosis.model.Solidity
 import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
 import pm.gnosis.svalinn.accounts.base.models.Signature
@@ -23,8 +24,8 @@ import pm.gnosis.svalinn.security.EncryptionManager
 import pm.gnosis.svalinn.security.db.EncryptedByteArray
 import pm.gnosis.tests.utils.ImmediateSchedulersRule
 import pm.gnosis.tests.utils.MockUtils
+import pm.gnosis.utils.asEthereumAddress
 import pm.gnosis.utils.hexAsBigInteger
-import pm.gnosis.utils.hexAsEthereumAddress
 import pm.gnosis.utils.hexStringToByteArray
 import pm.gnosis.utils.toHexString
 import java.math.BigInteger
@@ -36,17 +37,17 @@ class KethereumAccountsRepositoryTest {
     val rule = ImmediateSchedulersRule()
 
     @Mock
-    lateinit var accountsDatabase: AccountsDatabase
+    private lateinit var accountsDatabase: AccountsDatabase
 
     @Mock
-    lateinit var encryptionManager: EncryptionManager
+    private lateinit var encryptionManager: EncryptionManager
 
     @Mock
-    lateinit var preferencesManager: PreferencesManager
+    private lateinit var preferencesManager: PreferencesManager
 
-    lateinit var accountsDao: AccountDao
+    private lateinit var accountsDao: AccountDao
 
-    lateinit var repository: KethereumAccountsRepository
+    private lateinit var repository: KethereumAccountsRepository
 
     @Before
     fun setup() {
@@ -75,10 +76,10 @@ class KethereumAccountsRepositoryTest {
         val privateKey = "0x4646464646464646464646464646464646464646464646464646464646464646"
         val encryptedKey = EncryptedByteArray.create(encryptionManager, privateKey.hexStringToByteArray())
         // TODO: maybe replace with the real address
-        val account = AccountDb(encryptedKey, BigInteger.TEN)
+        val account = AccountDb(encryptedKey, Solidity.Address(BigInteger.TEN))
         given(accountsDao.observeAccounts()).willReturn(Single.just(account))
         val testObserver = TestObserver<String>()
-        val address = "0x3535353535353535353535353535353535353535".hexAsEthereumAddress()
+        val address = "0x3535353535353535353535353535353535353535".asEthereumAddress()!!
         val nonce = BigInteger("9")
         val value = Wei(BigInteger("1000000000000000000"))
         val gas = BigInteger("21000")
@@ -94,7 +95,7 @@ class KethereumAccountsRepositoryTest {
 
     @Test
     fun rlpTransactionExtension() {
-        val address = "0x19fd8863ea1185d8ef7ab3f2a8f4d469dc35dd52".hexAsEthereumAddress()
+        val address = "0x19fd8863ea1185d8ef7ab3f2a8f4d469dc35dd52".asEthereumAddress()!!
         val nonce = BigInteger("13")
         val gas = BigInteger("2034776")
         val gasPrice = BigInteger("20000000000")
@@ -115,10 +116,10 @@ class KethereumAccountsRepositoryTest {
          */
         val privateKey = "0x8678adf78db8d1c8a40028795077b3463ca06a743ca37dfd28a5b4442c27b457"
         val encryptedKey = EncryptedByteArray.create(encryptionManager, privateKey.hexStringToByteArray())
-        val account = AccountDb(encryptedKey, BigInteger.TEN)
+        val account = AccountDb(encryptedKey, Solidity.Address(BigInteger.TEN))
         given(accountsDao.observeAccounts()).willReturn(Single.just(account))
         val testObserver = TestObserver<String>()
-        val address = "0x19fd8863ea1185d8ef7ab3f2a8f4d469dc35dd52".hexAsEthereumAddress()
+        val address = "0x19fd8863ea1185d8ef7ab3f2a8f4d469dc35dd52".asEthereumAddress()!!
         val nonce = BigInteger("13")
         val gas = BigInteger("2034776")
         val gasPrice = BigInteger("20000000000")
@@ -135,7 +136,7 @@ class KethereumAccountsRepositoryTest {
     fun signAndRecover() {
         val privateKey = "0x8678adf78db8d1c8a40028795077b3463ca06a743ca37dfd28a5b4442c27b457"
         val encryptedKey = EncryptedByteArray.create(encryptionManager, privateKey.hexStringToByteArray())
-        val account = AccountDb(encryptedKey, BigInteger.TEN)
+        val account = AccountDb(encryptedKey, Solidity.Address(BigInteger.TEN))
         given(accountsDao.observeAccounts()).willReturn(Single.just(account))
         val testObserver = TestObserver<Signature>()
 
@@ -143,14 +144,14 @@ class KethereumAccountsRepositoryTest {
         repository.sign(data).subscribe(testObserver)
 
         val expectedSignature = Signature(
-                "6c65af8fabdf55b026300ccb4cf1c19f27592a81c78aba86abe83409563d9c13".hexAsBigInteger(),
-                "256a9a9e87604e89f083983f7449f58a456ac7929265f7114d585538fe226e1f".hexAsBigInteger(), 27
+            "6c65af8fabdf55b026300ccb4cf1c19f27592a81c78aba86abe83409563d9c13".hexAsBigInteger(),
+            "256a9a9e87604e89f083983f7449f58a456ac7929265f7114d585538fe226e1f".hexAsBigInteger(), 27
         )
         testObserver.assertResult(expectedSignature)
 
-        val recoverObserver = TestObserver<BigInteger>()
+        val recoverObserver = TestObserver<Solidity.Address>()
         repository.recover(data, expectedSignature).subscribe(recoverObserver)
-        recoverObserver.assertResult("a5056c8efadb5d6a1a6eb0176615692b6e648313".hexAsBigInteger())
+        recoverObserver.assertResult("a5056c8efadb5d6a1a6eb0176615692b6e648313".asEthereumAddress())
     }
 
     companion object {
@@ -162,5 +163,4 @@ class KethereumAccountsRepositoryTest {
                 "0000000000000000000000000000000000000000000000000000000000000001" +
                 "000000000000000000000000a5056c8efadb5d6a1a6eb0176615692b6e648313"
     }
-
 }

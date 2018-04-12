@@ -3,6 +3,7 @@ package pm.gnosis.ethereum
 import io.reactivex.Observable
 import pm.gnosis.ethereum.models.TransactionParameters
 import pm.gnosis.ethereum.models.TransactionReceipt
+import pm.gnosis.model.Solidity
 import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
 import java.math.BigInteger
@@ -13,15 +14,15 @@ interface EthereumRepository {
 
     fun <R : EthRequest<*>> request(request: R): Observable<R>
 
-    fun getBalance(address: BigInteger): Observable<Wei>
+    fun getBalance(address: Solidity.Address): Observable<Wei>
 
     fun sendRawTransaction(signedTransactionData: String): Observable<String>
 
     fun getTransactionReceipt(receiptHash: String): Observable<TransactionReceipt>
 
     fun getTransactionParameters(
-        from: BigInteger,
-        to: BigInteger,
+        from: Solidity.Address,
+        to: Solidity.Address,
         value: Wei? = null,
         data: String? = null
     ): Observable<TransactionParameters>
@@ -76,24 +77,24 @@ sealed class EthRequest<T>(val id: Int) {
 }
 
 class EthCall(
-    val from: BigInteger? = null,
+    val from: Solidity.Address? = null,
     val transaction: Transaction? = null,
     id: Int = 0,
     val block: Block = Block.PENDING
 ) : EthRequest<String>(id)
 
-class EthBalance(val address: BigInteger, id: Int = 0, val block: Block = Block.PENDING) :
+class EthBalance(val address: Solidity.Address, id: Int = 0, val block: Block = Block.PENDING) :
     EthRequest<Wei>(id)
 
 class EthGasPrice(id: Int = 0) : EthRequest<BigInteger>(id)
 
 class EthEstimateGas(
-    val from: BigInteger? = null,
+    val from: Solidity.Address? = null,
     val transaction: Transaction? = null,
     id: Int = 0
 ) : EthRequest<BigInteger>(id)
 
-class EthGetTransactionCount(val from: BigInteger, id: Int = 0, val block: Block = Block.PENDING) :
+class EthGetTransactionCount(val from: Solidity.Address, id: Int = 0, val block: Block = Block.PENDING) :
     EthRequest<BigInteger>(id)
 
 class EthSendRawTransaction(val signedData: String, id: Int = 0) : EthRequest<String>(id)
@@ -114,7 +115,7 @@ sealed class Block {
 
 class BlockNumber(val number: BigInteger) : Block()
 
-class BlockEarliest internal constructor(): Block()
+class BlockEarliest internal constructor() : Block()
 
 class BlockLatest internal constructor() : Block()
 

@@ -24,6 +24,9 @@ dependencies {
     // Moshi
     implementation "com.squareup.moshi:moshi:$versions.moshi"
 
+    // Bivrost
+    implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
+
     testImplementation "org.mockito:mockito-core:$versions.mockito"
     testImplementation "org.mockito:mockito-inline:$versions.mockito"
     testImplementation project(":utils-testing")

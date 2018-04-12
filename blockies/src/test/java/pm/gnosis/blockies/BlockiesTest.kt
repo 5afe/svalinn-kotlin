@@ -1,20 +1,13 @@
 package pm.gnosis.blockies
 
-import junit.framework.Assert.*
-import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.*
 import org.junit.Test
-import pm.gnosis.utils.hexAsBigInteger
+import pm.gnosis.utils.asEthereumAddress
 
 class BlockiesTest {
     @Test
-    fun blockiesWithInvalidAddress() {
-        val invalidAddress = "0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF".hexAsBigInteger()
-        assertNull(Blockies.fromAddress(invalidAddress))
-    }
-
-    @Test
     fun blockies0() {
-        val address = "0x0".hexAsBigInteger()
+        val address = "0x0".asEthereumAddress()!!
 
         val blockie = Blockies.fromAddress(address)
 
@@ -37,7 +30,7 @@ class BlockiesTest {
 
     @Test
     fun blockies1() {
-        val address = "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF".hexAsBigInteger()
+        val address = "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF".asEthereumAddress()!!
 
         val blockie = Blockies.fromAddress(address)
 

@@ -1,9 +1,10 @@
 package pm.gnosis.models
 
+import pm.gnosis.model.Solidity
 import java.math.BigInteger
 
 data class Transaction(
-    val address: BigInteger,
+    val address: Solidity.Address,
     val value: Wei? = null,
     var gas: BigInteger? = null,
     var gasPrice: BigInteger? = null,

@@ -16,6 +16,7 @@ import pm.gnosis.ethereum.*
 import pm.gnosis.ethereum.models.TransactionParameters
 import pm.gnosis.ethereum.models.TransactionReceipt
 import pm.gnosis.ethereum.rpc.models.*
+import pm.gnosis.model.Solidity
 import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
 import pm.gnosis.tests.utils.ImmediateSchedulersRule
@@ -59,12 +60,12 @@ class RpcEthereumRepositoryTest {
                 )
             )
 
-        val tx = Transaction(BigInteger.TEN, value = Wei.ether("0.001"))
+        val tx = Transaction(Solidity.Address(BigInteger.TEN), value = Wei.ether("0.001"))
         val bulk = BulkRequest(
-            EthCall(BigInteger.ONE, tx, 0),
-            EthBalance(BigInteger.ONE, 1),
+            EthCall(Solidity.Address(BigInteger.ONE), tx, 0),
+            EthBalance(Solidity.Address(BigInteger.ONE), 1),
             EthGasPrice(2),
-            EthGetTransactionCount(BigInteger.ONE, 3),
+            EthGetTransactionCount(Solidity.Address(BigInteger.ONE), 3),
             EthSendRawTransaction("some_signed_data", 4)
         )
 
@@ -106,9 +107,9 @@ class RpcEthereumRepositoryTest {
                 )
             )
 
-        val tx = Transaction(BigInteger.TEN, value = Wei.ether("0.001"))
+        val tx = Transaction(Solidity.Address(BigInteger.TEN), value = Wei.ether("0.001"))
         val bulk = BulkRequest(
-            EthCall(BigInteger.ONE, tx, 0),
+            EthCall(Solidity.Address(BigInteger.ONE), tx, 0),
             EthSendRawTransaction("some_signed_data", 0)
         )
 
@@ -141,10 +142,10 @@ class RpcEthereumRepositoryTest {
                 )
             )
 
-        val tx = Transaction(BigInteger.TEN, value = Wei.ether("0.001"))
+        val tx = Transaction(Solidity.Address(BigInteger.TEN), value = Wei.ether("0.001"))
         val bulk = BulkRequest(
-            EthCall(BigInteger.ONE, tx, 0),
-            EthBalance(BigInteger.ONE, 1),
+            EthCall(Solidity.Address(BigInteger.ONE), tx, 0),
+            EthBalance(Solidity.Address(BigInteger.ONE), 1),
             EthSendRawTransaction("some_signed_data", 2)
         )
 
@@ -174,7 +175,7 @@ class RpcEthereumRepositoryTest {
                 )
             )
 
-        val request = EthBalance(BigInteger.ONE, 1)
+        val request = EthBalance(Solidity.Address(BigInteger.ONE), 1)
 
         val testObserver = TestObserver<EthRequest<*>>()
         repository.request(request).subscribe(testObserver)
@@ -199,7 +200,7 @@ class RpcEthereumRepositoryTest {
                 )
             )
 
-        val request = EthBalance(BigInteger.ONE, 1)
+        val request = EthBalance(Solidity.Address(BigInteger.ONE), 1)
 
         val testObserver = TestObserver<EthRequest<*>>()
         repository.request(request).subscribe(testObserver)
@@ -225,11 +226,11 @@ class RpcEthereumRepositoryTest {
             )
 
         val testObserver = TestObserver<Wei>()
-        repository.getBalance(BigInteger.ONE).subscribe(testObserver)
+        repository.getBalance(Solidity.Address(BigInteger.ONE)).subscribe(testObserver)
 
         testObserver.assertResult(Wei.ether("1"))
 
-        then(apiMock).should().post(EthBalance(BigInteger.ONE).toRpcRequest().request())
+        then(apiMock).should().post(EthBalance(Solidity.Address(BigInteger.ONE)).toRpcRequest().request())
         then(apiMock).shouldHaveNoMoreInteractions()
     }
 
@@ -243,11 +244,11 @@ class RpcEthereumRepositoryTest {
             )
 
         val testObserver = TestObserver<Wei>()
-        repository.getBalance(BigInteger.ONE).subscribe(testObserver)
+        repository.getBalance(Solidity.Address(BigInteger.ONE)).subscribe(testObserver)
 
         testObserver.assertError { it is RequestFailedException && it.message == "eth_getBalance should never error" }
 
-        then(apiMock).should().post(EthBalance(BigInteger.ONE).toRpcRequest().request())
+        then(apiMock).should().post(EthBalance(Solidity.Address(BigInteger.ONE)).toRpcRequest().request())
         then(apiMock).shouldHaveNoMoreInteractions()
     }
 
@@ -284,7 +285,8 @@ class RpcEthereumRepositoryTest {
 
         testObserver.assertError {
             it is RequestFailedException &&
-                    it.message == "revert; But I won't tell you why (Could not send raw transaction)" }
+                    it.message == "revert; But I won't tell you why (Could not send raw transaction)"
+        }
 
         then(apiMock).should()
             .post(EthSendRawTransaction("0xSomeSignedManager").toRpcRequest().request())
@@ -382,10 +384,10 @@ class RpcEthereumRepositoryTest {
                 )
             )
 
-        val transaction = Transaction(BigInteger.ONE, value = Wei.ether("1"), data = "0x42cde4e8")
+        val transaction = Transaction(Solidity.Address(BigInteger.ONE), value = Wei.ether("1"), data = "0x42cde4e8")
         val testObserver = TestObserver<TransactionParameters>()
         repository.getTransactionParameters(
-            BigInteger.TEN,
+            Solidity.Address(BigInteger.TEN),
             transaction.address,
             transaction.value,
             transaction.data
@@ -401,9 +403,9 @@ class RpcEthereumRepositoryTest {
 
         then(apiMock).should().post(
             listOf(
-                EthEstimateGas(BigInteger.TEN, transaction, 0).toRpcRequest().request(),
+                EthEstimateGas(Solidity.Address(BigInteger.TEN), transaction, 0).toRpcRequest().request(),
                 EthGasPrice(1).toRpcRequest().request(),
-                EthGetTransactionCount(BigInteger.TEN, 2).toRpcRequest().request()
+                EthGetTransactionCount(Solidity.Address(BigInteger.TEN), 2).toRpcRequest().request()
             )
         )
         then(apiMock).shouldHaveNoMoreInteractions()
@@ -413,10 +415,10 @@ class RpcEthereumRepositoryTest {
         given(apiMock.post(MockUtils.any<Collection<JsonRpcRequest>>()))
             .willReturn(Observable.just(rpcResults))
 
-        val transaction = Transaction(BigInteger.ONE, value = Wei.ether("1"), data = "0x42cde4e8")
+        val transaction = Transaction(Solidity.Address(BigInteger.ONE), value = Wei.ether("1"), data = "0x42cde4e8")
         val testObserver = TestObserver<TransactionParameters>()
         repository.getTransactionParameters(
-            BigInteger.TEN,
+            Solidity.Address(BigInteger.TEN),
             transaction.address,
             transaction.value,
             transaction.data
@@ -426,9 +428,9 @@ class RpcEthereumRepositoryTest {
 
         then(apiMock).should().post(
             listOf(
-                EthEstimateGas(BigInteger.TEN, transaction, 0).toRpcRequest().request(),
+                EthEstimateGas(Solidity.Address(BigInteger.TEN), transaction, 0).toRpcRequest().request(),
                 EthGasPrice(1).toRpcRequest().request(),
-                EthGetTransactionCount(BigInteger.TEN, 2).toRpcRequest().request()
+                EthGetTransactionCount(Solidity.Address(BigInteger.TEN), 2).toRpcRequest().request()
             )
         )
         then(apiMock).shouldHaveNoMoreInteractions()

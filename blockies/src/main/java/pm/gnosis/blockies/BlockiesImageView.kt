@@ -6,7 +6,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
 import android.widget.ImageView
-import java.math.BigInteger
+import pm.gnosis.model.Solidity
 
 open class BlockiesImageView(context: Context, attributeSet: AttributeSet) : ImageView(context, attributeSet) {
     private val canvasPaint = Paint().apply { style = Paint.Style.FILL }
@@ -17,7 +17,7 @@ open class BlockiesImageView(context: Context, attributeSet: AttributeSet) : Ima
 
     private var blockies: Blockies? = null
 
-    fun setAddress(address: BigInteger) {
+    fun setAddress(address: Solidity.Address) {
         blockies = Blockies.fromAddress(address)
         invalidate()
     }

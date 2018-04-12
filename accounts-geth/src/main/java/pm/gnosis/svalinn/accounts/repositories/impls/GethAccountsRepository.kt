@@ -9,36 +9,33 @@ import org.ethereum.geth.BigInt
 import org.ethereum.geth.Geth
 import org.ethereum.geth.KeyStore
 import pm.gnosis.crypto.KeyGenerator
+import pm.gnosis.model.Solidity
+import pm.gnosis.models.Transaction
 import pm.gnosis.svalinn.accounts.base.exceptions.InvalidTransactionParams
 import pm.gnosis.svalinn.accounts.base.models.Account
 import pm.gnosis.svalinn.accounts.base.models.Signature
 import pm.gnosis.svalinn.accounts.base.repositories.AccountsRepository
+import pm.gnosis.svalinn.common.PreferencesManager
 import pm.gnosis.svalinn.common.utils.edit
 import pm.gnosis.svalinn.security.EncryptionManager
 import pm.gnosis.svalinn.security.db.EncryptedString
-import pm.gnosis.models.Transaction
-import pm.gnosis.svalinn.common.PreferencesManager
-import pm.gnosis.utils.asEthereumAddressString
-import pm.gnosis.utils.hexAsBigInteger
-import pm.gnosis.utils.hexStringToByteArray
-import pm.gnosis.utils.toHexString
-import java.math.BigInteger
+import pm.gnosis.utils.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class GethAccountsRepository @Inject constructor(
-        private val encryptionManager: EncryptionManager,
-        private val gethAccountManager: GethAccountManager,
-        private val gethKeyStore: KeyStore,
-        private val preferencesManager: PreferencesManager
+    private val encryptionManager: EncryptionManager,
+    private val gethAccountManager: GethAccountManager,
+    private val gethKeyStore: KeyStore,
+    private val preferencesManager: PreferencesManager
 ) : AccountsRepository {
     private val encryptedStringConverter = EncryptedString.Converter()
 
     override fun loadActiveAccount(): Single<Account> {
         return Single.fromCallable {
             gethAccountManager.getActiveAccount()
-        }.map { Account(it.address.hex.hexAsBigInteger()) }
+        }.map { Account(it.address.hex.asEthereumAddress()!!) }
     }
 
     override fun signTransaction(transaction: Transaction): Single<String> {
@@ -79,7 +76,7 @@ class GethAccountsRepository @Inject constructor(
         }
     }
 
-    override fun recover(data: ByteArray, signature: Signature): Single<BigInteger> = Single.error(UnsupportedOperationException())
+    override fun recover(data: ByteArray, signature: Signature): Single<Solidity.Address> = Single.error(UnsupportedOperationException())
 
     override fun saveAccountFromMnemonicSeed(mnemonicSeed: ByteArray, accountIndex: Long): Completable = Completable.fromAction {
         val hdNode = KeyGenerator.masterNode(ByteString.of(*mnemonicSeed))
