@@ -10,7 +10,7 @@ ext {
             // Runtime dependencies
             android_support        : '27.0.2',
             architecture_components: '1.0.0',
-            bivrost                : '14a5b346d8fb0f152ae12876925337489f8ef50b',
+            bivrost                : 'v0.6.2',
             constraint_layout      : '1.0.2',
             crashlytics            : '2.8.0',
             dagger                 : '2.12',
