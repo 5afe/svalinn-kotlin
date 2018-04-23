@@ -7,9 +7,7 @@ import pm.gnosis.ethereum.rpc.models.JsonRpcResult
 import pm.gnosis.ethereum.rpc.models.JsonRpcTransactionReceiptResult
 
 
-class RetrofitEthereumRpcConnector(
-    private val api: RetrofitEthereumRpcApi
-): EthereumRpcConnector {
+class RetrofitEthereumRpcConnector(private val api: RetrofitEthereumRpcApi) : EthereumRpcConnector {
     override fun receipt(jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcTransactionReceiptResult> =
         api.receipt(jsonRpcRequest)
 

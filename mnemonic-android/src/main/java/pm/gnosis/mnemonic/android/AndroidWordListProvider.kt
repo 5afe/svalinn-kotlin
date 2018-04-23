@@ -1,14 +1,10 @@
 package pm.gnosis.mnemonic.android
 
 import android.content.Context
-import pm.gnosis.svalinn.common.di.ApplicationContext
 import pm.gnosis.mnemonic.wordlists.WordList
 import pm.gnosis.mnemonic.wordlists.WordListProvider
-import javax.inject.Inject
 
-class DefaultWordListProvider @Inject constructor(
-    @ApplicationContext private val context: Context
-) : WordListProvider {
+class AndroidWordListProvider(private val context: Context) : WordListProvider {
     companion object {
         val supportedWordList = mapOf(
             R.id.english to R.raw.english,

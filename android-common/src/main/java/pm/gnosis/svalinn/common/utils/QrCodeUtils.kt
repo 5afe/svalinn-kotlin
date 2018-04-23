@@ -10,16 +10,13 @@ import com.google.zxing.WriterException
 import com.google.zxing.qrcode.QRCodeWriter
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import javax.inject.Inject
-import javax.inject.Singleton
 
 interface QrCodeGenerator {
     fun generateQrCode(contents: String, width: Int = 512, height: Int = 512, @ColorInt backgroundColor: Int = Color.WHITE): Single<Bitmap>
     fun generateQrCodeSync(contents: String, width: Int, height: Int, @ColorInt backgroundColor: Int): Bitmap
 }
 
-@Singleton
-class ZxingQrCodeGenerator @Inject constructor() : QrCodeGenerator {
+class ZxingQrCodeGenerator : QrCodeGenerator {
     override fun generateQrCode(contents: String, width: Int, height: Int, @ColorInt backgroundColor: Int): Single<Bitmap> =
         Single.fromCallable {
             generateQrCodeSync(contents, width, height, backgroundColor)

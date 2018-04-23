@@ -24,11 +24,8 @@ import pm.gnosis.utils.nullOnThrow
 import pm.gnosis.utils.toHexString
 import java.security.SecureRandom
 import javax.crypto.spec.IvParameterSpec
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class AesEncryptionManager @Inject constructor(
+class AesEncryptionManager(
     application: Application,
     private val preferencesManager: PreferencesManager,
     private val fingerprintHelper: FingerprintHelper

@@ -2,12 +2,8 @@ package pm.gnosis.svalinn.common
 
 import android.content.Context
 import android.content.SharedPreferences
-import pm.gnosis.svalinn.common.di.ApplicationContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class PreferencesManager @Inject constructor(@ApplicationContext context: Context) {
+class PreferencesManager(context: Context) {
     companion object {
         const val GNOSIS_PREFS_NAME = "GnosisPrefs"
         const val FINISHED_TOKENS_SETUP = "prefs.boolean.finished_tokens_setup"

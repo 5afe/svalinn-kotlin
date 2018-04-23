@@ -10,7 +10,6 @@ import android.support.v4.hardware.fingerprint.FingerprintManagerCompat
 import android.support.v4.os.CancellationSignal
 import io.reactivex.*
 import io.reactivex.schedulers.Schedulers
-import pm.gnosis.svalinn.common.di.ApplicationContext
 import pm.gnosis.svalinn.security.*
 import pm.gnosis.utils.nullOnThrow
 import java.security.KeyStore
@@ -18,20 +17,15 @@ import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class DefaultFingerprintHelper @Inject constructor(
-    @ApplicationContext private val context: Context
-) : FingerprintHelper {
+class AndroidFingerprintHelper(private val context: Context) : FingerprintHelper {
     private val keyStore by lazy { KeyStore.getInstance(ANDROID_KEY_STORE) }
     private val keyGenerator by lazy { KeyGenerator.getInstance(AES, ANDROID_KEY_STORE) }
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun createKey(): SecretKey {
         val builder = KeyGenParameterSpec.Builder(
-                FINGERPRINT_KEY,
+            FINGERPRINT_KEY,
             KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
         )
             .setBlockModes(KeyProperties.BLOCK_MODE_CBC)

@@ -5,14 +5,8 @@ import org.ethereum.geth.KeyStore
 import pm.gnosis.svalinn.common.PreferencesManager
 import pm.gnosis.svalinn.common.utils.edit
 import pm.gnosis.utils.generateRandomString
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class GethAccountManager @Inject constructor(
-    private val preferencesManager: PreferencesManager,
-    private val keyStore: KeyStore
-) {
+class GethAccountManager(private val preferencesManager: PreferencesManager, private val keyStore: KeyStore) {
 
     fun getAccount(publicKey: String): Account? = getAccounts().find { it.address.hex == publicKey }
 
