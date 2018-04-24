@@ -36,10 +36,6 @@ dependencies {
     //Room
     implementation "android.arch.persistence.room:runtime:$versions.architecture_components"
 
-    //Dagger
-    implementation "com.google.dagger:dagger:$versions.dagger"
-    kapt "com.google.dagger:dagger-compiler:$versions.dagger"
-
     testImplementation "org.mockito:mockito-core:$versions.mockito"
     testImplementation "org.mockito:mockito-inline:$versions.mockito"
     testImplementation project(":utils-testing")

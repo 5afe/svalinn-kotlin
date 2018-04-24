@@ -10,9 +10,7 @@ import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
 import java.math.BigDecimal
 
-class RpcEthereumRepository(
-    private val ethereumRpcApi: EthereumRpcConnector
-) : EthereumRepository {
+class RpcEthereumRepository(private val ethereumRpcApi: EthereumRpcConnector) : EthereumRepository {
 
     override fun <R : BulkRequest> request(bulk: R): Observable<R> =
         Observable.fromCallable { bulk.requests.associate { it.id to it.toRpcRequest() } }

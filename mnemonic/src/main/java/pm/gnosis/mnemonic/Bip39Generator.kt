@@ -13,9 +13,8 @@ import java.security.spec.KeySpec
 import java.text.Normalizer
 import javax.crypto.SecretKey
 import javax.crypto.spec.PBEKeySpec
-import javax.inject.Inject
 
-class Bip39Generator @Inject constructor(private val wordListProvider: WordListProvider) : Bip39 {
+class Bip39Generator(private val wordListProvider: WordListProvider) : Bip39 {
     private class Hasher : PBEPBKDF2.PBKDF2withSHA512() {
         fun generateSecret(keySpec: KeySpec): SecretKey {
             return engineGenerateSecret(keySpec)

@@ -20,11 +20,8 @@ import pm.gnosis.svalinn.common.utils.edit
 import pm.gnosis.svalinn.security.EncryptionManager
 import pm.gnosis.svalinn.security.db.EncryptedString
 import pm.gnosis.utils.*
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class GethAccountsRepository @Inject constructor(
+class GethAccountsRepository(
     private val encryptionManager: EncryptionManager,
     private val gethAccountManager: GethAccountManager,
     private val gethKeyStore: KeyStore,

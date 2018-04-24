@@ -24,11 +24,8 @@ import pm.gnosis.svalinn.security.db.EncryptedString
 import pm.gnosis.utils.addHexPrefix
 import pm.gnosis.utils.asBigInteger
 import pm.gnosis.utils.toHexString
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class KethereumAccountsRepository @Inject internal constructor(
+class KethereumAccountsRepository(
     private val accountsDatabase: AccountsDatabase,
     private val encryptionManager: EncryptionManager,
     private val preferencesManager: PreferencesManager

@@ -32,13 +32,13 @@ dependencies {
     kapt "android.arch.persistence.room:compiler:$versions.architecture_components"
     implementation "android.arch.persistence.room:rxjava2:$versions.architecture_components"
 
-    //Dagger
-    implementation "com.google.dagger:dagger:$versions.dagger"
-    kapt "com.google.dagger:dagger-compiler:$versions.dagger"
+    implementation "com.squareup.moshi:moshi:$versions.moshi"
 
     //Retrofit
     implementation "com.squareup.retrofit2:retrofit:$versions.retrofit"
-    implementation "com.squareup.retrofit2:converter-moshi:$versions.retrofit"
+    implementation("com.squareup.retrofit2:converter-moshi:$versions.retrofit") {
+        exclude group: "com.squareup.moshi", module: "moshi"
+    }
     implementation "com.squareup.retrofit2:adapter-rxjava2:$versions.retrofit"
     implementation "com.jakewharton.timber:timber:$versions.timber"
 
