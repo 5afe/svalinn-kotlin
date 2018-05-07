@@ -25,7 +25,7 @@ dependencies {
     implementation project(':utils')
 
     //Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$versions.kotlin"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
 
     //Android Architecture Components
     implementation "android.arch.persistence.room:runtime:$versions.architecture_components"
