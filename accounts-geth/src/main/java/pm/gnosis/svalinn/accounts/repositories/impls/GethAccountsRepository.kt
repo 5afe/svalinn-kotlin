@@ -20,6 +20,7 @@ import pm.gnosis.svalinn.common.utils.edit
 import pm.gnosis.svalinn.security.EncryptionManager
 import pm.gnosis.svalinn.security.db.EncryptedString
 import pm.gnosis.utils.*
+import java.math.BigInteger
 
 class GethAccountsRepository(
     private val encryptionManager: EncryptionManager,
@@ -75,14 +76,22 @@ class GethAccountsRepository(
 
     override fun recover(data: ByteArray, signature: Signature): Single<Solidity.Address> = Single.error(UnsupportedOperationException())
 
-    override fun saveAccountFromMnemonicSeed(mnemonicSeed: ByteArray, accountIndex: Long): Completable = Completable.fromAction {
-        val hdNode = KeyGenerator.masterNode(ByteString.of(*mnemonicSeed))
-        val key = hdNode.derive(KeyGenerator.BIP44_PATH_ETHEREUM).deriveChild(accountIndex).keyPair
-        gethKeyStore.importECDSAKey(
-            key.privKeyBytes ?: throw IllegalStateException("Private key must not be null"),
-            gethAccountManager.getAccountPassphrase()
-        )
-    }
+    override fun accountFromMnemonicSeed(mnemonicSeed: ByteArray, accountIndex: Long): Single<Pair<Solidity.Address, ByteArray>> =
+        Single.fromCallable {
+            val hdNode = KeyGenerator.masterNode(ByteString.of(*mnemonicSeed))
+            val key = hdNode.derive(KeyGenerator.BIP44_PATH_ETHEREUM).deriveChild(accountIndex).keyPair
+            val privateKey = key.privKeyBytes ?: throw IllegalStateException("Private key must not be null")
+            Solidity.Address(BigInteger(key.address)) to privateKey
+        }
+
+    override fun saveAccountFromMnemonicSeed(mnemonicSeed: ByteArray, accountIndex: Long): Completable =
+        accountFromMnemonicSeed(mnemonicSeed, accountIndex)
+            .map { (_, privateKey) ->
+                gethKeyStore.importECDSAKey(
+                    privateKey,
+                    gethAccountManager.getAccountPassphrase()
+                )
+            }.toCompletable()
 
     override fun saveMnemonic(mnemonic: String): Completable = Completable.fromCallable {
         preferencesManager.prefs.edit {

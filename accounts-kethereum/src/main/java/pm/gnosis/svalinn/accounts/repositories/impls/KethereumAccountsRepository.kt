@@ -62,15 +62,21 @@ class KethereumAccountsRepository(
             .map { KeyPair.fromPrivate(it) }
     }
 
-    override fun saveAccountFromMnemonicSeed(mnemonicSeed: ByteArray, accountIndex: Long): Completable = Completable.fromAction {
-        val hdNode = KeyGenerator.masterNode(ByteString.of(*mnemonicSeed))
-        val key = hdNode.derive(KeyGenerator.BIP44_PATH_ETHEREUM).deriveChild(accountIndex).keyPair
-        val privateKey = key.privKeyBytes
-                ?: throw IllegalStateException("Private key must not be null")
-        val address = key.address.asBigInteger()
-        val account = AccountDb(EncryptedByteArray.create(encryptionManager, privateKey), Solidity.Address(address))
-        accountsDatabase.accountsDao().insertAccount(account)
-    }.subscribeOn(Schedulers.io())
+    override fun accountFromMnemonicSeed(mnemonicSeed: ByteArray, accountIndex: Long): Single<Pair<Solidity.Address, ByteArray>> =
+        Single.fromCallable {
+            val hdNode = KeyGenerator.masterNode(ByteString.of(*mnemonicSeed))
+            val key = hdNode.derive(KeyGenerator.BIP44_PATH_ETHEREUM).deriveChild(accountIndex).keyPair
+            val privateKey = key.privKeyBytes ?: throw IllegalStateException("Private key must not be null")
+            val address = key.address.asBigInteger()
+            Solidity.Address(address) to privateKey
+        }
+
+    override fun saveAccountFromMnemonicSeed(mnemonicSeed: ByteArray, accountIndex: Long): Completable =
+        accountFromMnemonicSeed(mnemonicSeed, accountIndex)
+            .map { (address, privateKey) ->
+                val account = AccountDb(EncryptedByteArray.create(encryptionManager, privateKey), address)
+                accountsDatabase.accountsDao().insertAccount(account)
+            }.toCompletable().subscribeOn(Schedulers.io())
 
     override fun saveMnemonic(mnemonic: String): Completable = Completable.fromCallable {
         preferencesManager.prefs.edit {
