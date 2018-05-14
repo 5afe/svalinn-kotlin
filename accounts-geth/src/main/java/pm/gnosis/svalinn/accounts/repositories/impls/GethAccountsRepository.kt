@@ -76,7 +76,7 @@ class GethAccountsRepository(
 
     override fun recover(data: ByteArray, signature: Signature): Single<Solidity.Address> = Single.error(UnsupportedOperationException())
 
-    override fun accountFromFromMnemonicSeed(mnemonicSeed: ByteArray, accountIndex: Long): Single<Pair<Solidity.Address, ByteArray>> =
+    override fun accountFromMnemonicSeed(mnemonicSeed: ByteArray, accountIndex: Long): Single<Pair<Solidity.Address, ByteArray>> =
         Single.fromCallable {
             val hdNode = KeyGenerator.masterNode(ByteString.of(*mnemonicSeed))
             val key = hdNode.derive(KeyGenerator.BIP44_PATH_ETHEREUM).deriveChild(accountIndex).keyPair
@@ -85,7 +85,7 @@ class GethAccountsRepository(
         }
 
     override fun saveAccountFromMnemonicSeed(mnemonicSeed: ByteArray, accountIndex: Long): Completable =
-        accountFromFromMnemonicSeed(mnemonicSeed, accountIndex)
+        accountFromMnemonicSeed(mnemonicSeed, accountIndex)
             .map { (_, privateKey) ->
                 gethKeyStore.importECDSAKey(
                     privateKey,

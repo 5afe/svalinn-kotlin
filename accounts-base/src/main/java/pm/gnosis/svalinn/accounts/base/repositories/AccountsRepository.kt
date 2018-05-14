@@ -16,7 +16,7 @@ interface AccountsRepository {
 
     fun recover(data: ByteArray, signature: Signature): Single<Solidity.Address>
 
-    fun accountFromFromMnemonicSeed(mnemonicSeed: ByteArray, accountIndex: Long = 0): Single<Pair<Solidity.Address, ByteArray>>
+    fun accountFromMnemonicSeed(mnemonicSeed: ByteArray, accountIndex: Long = 0): Single<Pair<Solidity.Address, ByteArray>>
 
     fun saveAccountFromMnemonicSeed(mnemonicSeed: ByteArray, accountIndex: Long = 0): Completable
 

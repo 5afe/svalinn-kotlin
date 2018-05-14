@@ -62,7 +62,7 @@ class KethereumAccountsRepository(
             .map { KeyPair.fromPrivate(it) }
     }
 
-    override fun accountFromFromMnemonicSeed(mnemonicSeed: ByteArray, accountIndex: Long): Single<Pair<Solidity.Address, ByteArray>> =
+    override fun accountFromMnemonicSeed(mnemonicSeed: ByteArray, accountIndex: Long): Single<Pair<Solidity.Address, ByteArray>> =
         Single.fromCallable {
             val hdNode = KeyGenerator.masterNode(ByteString.of(*mnemonicSeed))
             val key = hdNode.derive(KeyGenerator.BIP44_PATH_ETHEREUM).deriveChild(accountIndex).keyPair
@@ -72,7 +72,7 @@ class KethereumAccountsRepository(
         }
 
     override fun saveAccountFromMnemonicSeed(mnemonicSeed: ByteArray, accountIndex: Long): Completable =
-        accountFromFromMnemonicSeed(mnemonicSeed, accountIndex)
+        accountFromMnemonicSeed(mnemonicSeed, accountIndex)
             .map { (address, privateKey) ->
                 val account = AccountDb(EncryptedByteArray.create(encryptionManager, privateKey), address)
                 accountsDatabase.accountsDao().insertAccount(account)

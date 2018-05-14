@@ -2,7 +2,7 @@ ext {
     versions = [
             // Plug-Ins
             android_tools          : '3.1.2',
-            kotlin                 : '1.2.40',
+            kotlin                 : '1.2.41',
             jacoco                 : '0.7.9',
 
             // Runtime dependencies
