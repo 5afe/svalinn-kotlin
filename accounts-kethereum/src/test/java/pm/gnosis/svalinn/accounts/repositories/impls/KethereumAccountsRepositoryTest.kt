@@ -154,6 +154,23 @@ class KethereumAccountsRepositoryTest {
         recoverObserver.assertResult("a5056c8efadb5d6a1a6eb0176615692b6e648313".asEthereumAddress())
     }
 
+    @Test
+    fun recoverEIP155() {
+        // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md#example
+        val expectedData = "0xdaf5a779ae972f972197303d7b574746c7ef83eadac0f2791ad23db92e4c8e53".hexStringToByteArray()
+        val testObserver = TestObserver.create<Solidity.Address>()
+
+        repository.recover(
+            expectedData,
+            Signature.fromChainId(
+                "18515461264373351373200002665853028612451056578545711640558177340181847433846".toBigInteger(),
+                "46948507304638947509940763649030358759909902576025900602547168820602576006531".toBigInteger(),
+                37.toByte(), chainId = 1
+            )
+        ).subscribe(testObserver)
+        testObserver.assertResult("0x9d8a62f656a8d1615c1294fd71e9cfb3e4855a4f".asEthereumAddress())
+    }
+
     companion object {
 
         const val CREATE_SAFE_DATA = "0x" +
