@@ -19,9 +19,9 @@ data class Signature(val r: BigInteger, val s: BigInteger, val v: Byte) {
             if (encoded.length != 130) throw IllegalArgumentException()
             val r = BigInteger(encoded.substring(0, 64), 16)
             val s = BigInteger(encoded.substring(64, 128), 16)
-            val v = encoded.substring(128, 130).toByte(16).adjustV(chainId)
+            val v = encoded.substring(128, 130).toByte(16)
 
-            return Signature(r, s, v)
+            return Signature.fromChainId(r, s, v, chainId)
         }
 
         fun fromChainId(r: BigInteger, s: BigInteger, v: Byte, chainId: Int) = Signature(r, s, v.adjustV(chainId))

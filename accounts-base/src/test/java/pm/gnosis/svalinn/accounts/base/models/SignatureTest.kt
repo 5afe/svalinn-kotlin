@@ -22,9 +22,10 @@ class SignatureTest {
 
     @Test
     fun testInvalidV() {
+        val r = BigInteger("6c65af8fabdf55b026300ccb4cf1c19f27592a81c78aba86abe83409563d9c13", 16)
+        val s = BigInteger("256a9a9e87604e89f083983f7449f58a456ac7929265f7114d585538fe226e1f", 16)
+
         try {
-            val r = BigInteger("6c65af8fabdf55b026300ccb4cf1c19f27592a81c78aba86abe83409563d9c13", 16)
-            val s = BigInteger("256a9a9e87604e89f083983f7449f58a456ac7929265f7114d585538fe226e1f", 16)
             val v = 35.toByte()
             Signature(r, s, v)
             fail()
@@ -32,16 +33,12 @@ class SignatureTest {
         }
 
         try {
-            val r = BigInteger("6c65af8fabdf55b026300ccb4cf1c19f27592a81c78aba86abe83409563d9c13", 16)
-            val s = BigInteger("256a9a9e87604e89f083983f7449f58a456ac7929265f7114d585538fe226e1f", 16)
             val v = 26.toByte()
             Signature(r, s, v)
             fail()
         } catch (exception: IllegalStateException) {
         }
 
-        val r = BigInteger("6c65af8fabdf55b026300ccb4cf1c19f27592a81c78aba86abe83409563d9c13", 16)
-        val s = BigInteger("256a9a9e87604e89f083983f7449f58a456ac7929265f7114d585538fe226e1f", 16)
         val v = 27.toByte()
         Signature(r, s, v)
     }
