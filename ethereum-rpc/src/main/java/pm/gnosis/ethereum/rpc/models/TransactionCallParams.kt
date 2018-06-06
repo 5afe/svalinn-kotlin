@@ -1,7 +1,9 @@
 package pm.gnosis.ethereum.rpc.models
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class TransactionCallParams(
     @Json(name = "from") val from: String? = null,
     @Json(name = "to") val to: String? = null,

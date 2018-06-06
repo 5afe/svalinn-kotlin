@@ -28,11 +28,12 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
 
     //Android Architecture Components
-    implementation "android.arch.persistence.room:runtime:$versions.architecture_components"
-    kapt "android.arch.persistence.room:compiler:$versions.architecture_components"
-    implementation "android.arch.persistence.room:rxjava2:$versions.architecture_components"
+    implementation "android.arch.persistence.room:runtime:$versions.android_room"
+    kapt "android.arch.persistence.room:compiler:$versions.android_room"
+    implementation "android.arch.persistence.room:rxjava2:$versions.android_room"
 
     implementation "com.squareup.moshi:moshi:$versions.moshi"
+    kapt "com.squareup.moshi:moshi-kotlin-codegen:$versions.moshi"
 
     //Retrofit
     implementation "com.squareup.retrofit2:retrofit:$versions.retrofit"
