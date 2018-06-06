@@ -34,7 +34,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:$versions.rxjava"
 
     //Room
-    implementation "android.arch.persistence.room:runtime:$versions.architecture_components"
+    implementation "android.arch.persistence.room:runtime:$versions.android_room"
 
     testImplementation "org.mockito:mockito-core:$versions.mockito"
     testImplementation "org.mockito:mockito-inline:$versions.mockito"
