@@ -8,7 +8,7 @@ import pm.gnosis.ticker.data.remote.models.CurrencyNetwork
 class TickerAdapter {
     @FromJson
     fun fromJson(reader: JsonReader, delegate: JsonAdapter<Map<String, String>>): CurrencyNetwork {
-        val map = delegate.fromJson(reader).mapKeys {
+        val map = delegate.fromJson(reader)!!.mapKeys {
             if (it.key.startsWith("price_") && it.key != "price_usd" && it.key != "price_btc") {
                 "price"
             } else {
