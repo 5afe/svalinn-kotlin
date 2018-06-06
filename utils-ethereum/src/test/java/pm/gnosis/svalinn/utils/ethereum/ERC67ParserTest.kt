@@ -1,4 +1,4 @@
-package pm.gnosis.erc67
+package pm.gnosis.svalinn.utils.ethereum
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
