@@ -10,9 +10,7 @@ import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.then
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
-import pm.gnosis.ethereum.rpc.models.JsonRpcRequest
-import pm.gnosis.ethereum.rpc.models.JsonRpcResult
-import pm.gnosis.ethereum.rpc.models.JsonRpcTransactionReceiptResult
+import pm.gnosis.ethereum.rpc.models.*
 import pm.gnosis.tests.utils.MockUtils
 import java.math.BigInteger
 
@@ -40,6 +38,28 @@ class RetrofitEthereumRpcConnectorTest {
 
         assertEquals(expected, connector.receipt(request))
         then(api).should().receipt(request)
+        then(api).shouldHaveNoMoreInteractions()
+    }
+
+    @Test
+    fun block() {
+        val expected = Observable.error<JsonRpcBlockResult>(NotImplementedError())
+
+        given(api.block(MockUtils.any())).willReturn(expected)
+
+        assertEquals(expected, connector.block(request))
+        then(api).should().block(request)
+        then(api).shouldHaveNoMoreInteractions()
+    }
+
+    @Test
+    fun transaction() {
+        val expected = Observable.error<JsonRpcTransactionResult>(NotImplementedError())
+
+        given(api.transaction(MockUtils.any())).willReturn(expected)
+
+        assertEquals(expected, connector.transaction(request))
+        then(api).should().block(request)
         then(api).shouldHaveNoMoreInteractions()
     }
 
