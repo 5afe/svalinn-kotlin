@@ -59,7 +59,7 @@ class RetrofitEthereumRpcConnectorTest {
         given(api.transaction(MockUtils.any())).willReturn(expected)
 
         assertEquals(expected, connector.transaction(request))
-        then(api).should().block(request)
+        then(api).should().transaction(request)
         then(api).shouldHaveNoMoreInteractions()
     }
 
