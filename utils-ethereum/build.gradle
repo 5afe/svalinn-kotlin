@@ -6,17 +6,28 @@ apply from: '../buildsystem/coverageReport.gradle'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
+android {
+    testOptions {
+        unitTests {
+            returnDefaultValues = true
+        }
+    }
+}
+
 dependencies {
     // We specify junit before anything else to make sure that this version is prioritized over the
     // one bundled in the android.jar
     testImplementation "junit:junit:$versions.junit"
 
+    //Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
+
+    implementation project(":crypto")
     implementation project(":models")
     implementation project(":utils")
 
+    implementation "com.github.walleth.kethereum:rlp:$versions.kethereum"
+
     // Bivrost
     implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
-
-    // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
 }
