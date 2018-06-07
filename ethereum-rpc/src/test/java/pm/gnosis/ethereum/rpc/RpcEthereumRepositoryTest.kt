@@ -13,6 +13,8 @@ import org.mockito.BDDMockito.then
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import pm.gnosis.ethereum.*
+import pm.gnosis.ethereum.models.EthereumBlock
+import pm.gnosis.ethereum.models.TransactionData
 import pm.gnosis.ethereum.models.TransactionParameters
 import pm.gnosis.ethereum.models.TransactionReceipt
 import pm.gnosis.ethereum.rpc.models.*
@@ -21,6 +23,7 @@ import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
 import pm.gnosis.tests.utils.ImmediateSchedulersRule
 import pm.gnosis.tests.utils.MockUtils
+import pm.gnosis.utils.asEthereumAddress
 import pm.gnosis.utils.hexAsBigInteger
 import pm.gnosis.utils.toHexString
 import java.math.BigInteger
@@ -306,7 +309,14 @@ class RpcEthereumRepositoryTest {
                         result = JsonRpcTransactionReceiptResult.TransactionReceipt(
                             BigInteger.ONE,
                             transactionHash,
-                            null,
+                            BigInteger.valueOf(23),
+                            "block-hash",
+                            BigInteger.valueOf(31),
+                            "0x32".asEthereumAddress()!!,
+                            "0x55".asEthereumAddress()!!,
+                            BigInteger.valueOf(115),
+                            BigInteger.valueOf(11),
+                            "0x31415925".asEthereumAddress(),
                             listOf(
                                 JsonRpcTransactionReceiptResult.TransactionReceipt.Event(
                                     BigInteger.ZERO, data, listOf(topic0)
@@ -324,7 +334,14 @@ class RpcEthereumRepositoryTest {
             TransactionReceipt(
                 BigInteger.ONE,
                 transactionHash,
-                null,
+                BigInteger.valueOf(23),
+                "block-hash",
+                BigInteger.valueOf(31),
+                "0x32".asEthereumAddress()!!,
+                "0x55".asEthereumAddress()!!,
+                BigInteger.valueOf(115),
+                BigInteger.valueOf(11),
+                "0x31415925".asEthereumAddress(),
                 listOf(
                     TransactionReceipt.Event(
                         BigInteger.ZERO, data, listOf(topic0)
@@ -366,6 +383,185 @@ class RpcEthereumRepositoryTest {
                 JsonRpcRequest(
                     method = "eth_getTransactionReceipt",
                     params = listOf(transactionHash)
+                )
+            )
+        then(apiMock).shouldHaveNoMoreInteractions()
+    }
+
+    @Test
+    fun getTransactionByHash() {
+        val transactionHash = "0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1"
+        val data = "0x0000000000000000000000009205b8f1a21a3cee0f6a629fd83cee0f6a629fd8"
+        given(apiMock.transaction(MockUtils.any()))
+            .willReturn(
+                Observable.just(
+                    JsonRpcTransactionResult(
+                        1, "2.0",
+                        result = JsonRpcTransactionResult.JsonTransaction(
+                            transactionHash,
+                            BigInteger.valueOf(23),
+                            "block-hash",
+                            BigInteger.valueOf(31),
+                            BigInteger.valueOf(32),
+                            "0x32".asEthereumAddress()!!,
+                            "0x55".asEthereumAddress()!!,
+                            BigInteger.ONE,
+                            BigInteger.valueOf(11),
+                            BigInteger.valueOf(115),
+                            data
+                        )
+                    )
+                )
+            )
+
+        val testObserver = TestObserver<TransactionData>()
+        repository.getTransactionByHash(transactionHash).subscribe(testObserver)
+
+        testObserver.assertResult(
+            TransactionData(
+                transactionHash,
+                "0x32".asEthereumAddress()!!,
+                Transaction(
+                    "0x55".asEthereumAddress()!!,
+                    Wei(BigInteger.ONE),
+                    BigInteger.valueOf(115),
+                    BigInteger.valueOf(11),
+                    data,
+                    BigInteger.valueOf(23)
+                ),
+                BigInteger.valueOf(32),
+                "block-hash",
+                BigInteger.valueOf(31)
+            )
+        )
+
+        then(apiMock).should()
+            .transaction(
+                JsonRpcRequest(
+                    method = "eth_getTransactionByHash",
+                    params = listOf(transactionHash)
+                )
+            )
+        then(apiMock).shouldHaveNoMoreInteractions()
+    }
+
+    @Test
+    fun getTransactionByHashFailure() {
+        val transactionHash = "0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1"
+        given(apiMock.transaction(MockUtils.any()))
+            .willReturn(
+                Observable.just(
+                    JsonRpcTransactionResult(
+                        1, "2.0",
+                        result = null
+                    )
+                )
+            )
+
+        val testObserver = TestObserver<TransactionData>()
+        repository.getTransactionByHash(transactionHash).subscribe(testObserver)
+
+        testObserver.assertError { it is TransactionNotFound }
+
+        then(apiMock).should()
+            .transaction(
+                JsonRpcRequest(
+                    method = "eth_getTransactionByHash",
+                    params = listOf(transactionHash)
+                )
+            )
+        then(apiMock).shouldHaveNoMoreInteractions()
+    }
+
+    @Test
+    fun getBlockByHash() {
+        val blockHash = "0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1"
+        given(apiMock.block(MockUtils.any()))
+            .willReturn(
+                Observable.just(
+                    JsonRpcBlockResult(
+                        1, "2.0",
+                        result = JsonRpcBlockResult.JsonBlock(
+                            BigInteger.ONE,
+                            blockHash,
+                            "parent-hash",
+                            "weird-nonce",
+                            "uncles-hash",
+                            "logsBloom",
+                            "transactionsRoot",
+                            "stateRoot",
+                            "receiptRoot",
+                            "0x1234".asEthereumAddress()!!,
+                            BigInteger.valueOf(31),
+                            BigInteger.valueOf(1331),
+                            "extra-data",
+                            BigInteger.valueOf(1989),
+                            BigInteger.valueOf(115),
+                            BigInteger.valueOf(11),
+                            BigInteger.valueOf(987654321)
+                        )
+                    )
+                )
+            )
+
+        val testObserver = TestObserver<EthereumBlock>()
+        repository.getBlockByHash(blockHash).subscribe(testObserver)
+
+        testObserver.assertResult(
+            EthereumBlock(
+                BigInteger.ONE,
+                blockHash,
+                "parent-hash",
+                "weird-nonce",
+                "uncles-hash",
+                "logsBloom",
+                "transactionsRoot",
+                "stateRoot",
+                "receiptRoot",
+                "0x1234".asEthereumAddress()!!,
+                BigInteger.valueOf(31),
+                BigInteger.valueOf(1331),
+                "extra-data",
+                BigInteger.valueOf(1989),
+                BigInteger.valueOf(115),
+                BigInteger.valueOf(11),
+                BigInteger.valueOf(987654321)
+            )
+        )
+
+        then(apiMock).should()
+            .block(
+                JsonRpcRequest(
+                    method = "eth_getBlockByHash",
+                    params = listOf(blockHash, false)
+                )
+            )
+        then(apiMock).shouldHaveNoMoreInteractions()
+    }
+
+    @Test
+    fun getBlockByHashFailure() {
+        val blockHash = "0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1"
+        given(apiMock.block(MockUtils.any()))
+            .willReturn(
+                Observable.just(
+                    JsonRpcBlockResult(
+                        1, "2.0",
+                        result = null
+                    )
+                )
+            )
+
+        val testObserver = TestObserver<EthereumBlock>()
+        repository.getBlockByHash(blockHash).subscribe(testObserver)
+
+        testObserver.assertError { it is BlockNotFound }
+
+        then(apiMock).should()
+            .block(
+                JsonRpcRequest(
+                    method = "eth_getBlockByHash",
+                    params = listOf(blockHash, false)
                 )
             )
         then(apiMock).shouldHaveNoMoreInteractions()

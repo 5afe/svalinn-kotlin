@@ -1,9 +1,7 @@
 package pm.gnosis.ethereum.rpc
 
 import io.reactivex.Observable
-import pm.gnosis.ethereum.rpc.models.JsonRpcRequest
-import pm.gnosis.ethereum.rpc.models.JsonRpcResult
-import pm.gnosis.ethereum.rpc.models.JsonRpcTransactionReceiptResult
+import pm.gnosis.ethereum.rpc.models.*
 
 interface EthereumRpcConnector {
 
@@ -21,6 +19,10 @@ interface EthereumRpcConnector {
     }
 
     fun receipt(jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcTransactionReceiptResult>
+
+    fun block(jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcBlockResult>
+
+    fun transaction(jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcTransactionResult>
 
     fun post(jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcResult>
 

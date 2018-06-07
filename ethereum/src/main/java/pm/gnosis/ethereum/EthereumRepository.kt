@@ -1,6 +1,8 @@
 package pm.gnosis.ethereum
 
 import io.reactivex.Observable
+import pm.gnosis.ethereum.models.EthereumBlock
+import pm.gnosis.ethereum.models.TransactionData
 import pm.gnosis.ethereum.models.TransactionParameters
 import pm.gnosis.ethereum.models.TransactionReceipt
 import pm.gnosis.model.Solidity
@@ -18,7 +20,11 @@ interface EthereumRepository {
 
     fun sendRawTransaction(signedTransactionData: String): Observable<String>
 
-    fun getTransactionReceipt(receiptHash: String): Observable<TransactionReceipt>
+    fun getTransactionReceipt(transactionHash: String): Observable<TransactionReceipt>
+
+    fun getTransactionByHash(transactionHash: String): Observable<TransactionData>
+
+    fun getBlockByHash(blockHash: String): Observable<EthereumBlock>
 
     fun getTransactionParameters(
         from: Solidity.Address,
@@ -100,6 +106,10 @@ class EthGetTransactionCount(val from: Solidity.Address, id: Int = 0, val block:
 class EthSendRawTransaction(val signedData: String, id: Int = 0) : EthRequest<String>(id)
 
 class TransactionReceiptNotFound : NoSuchElementException()
+
+class TransactionNotFound : NoSuchElementException()
+
+class BlockNotFound : NoSuchElementException()
 
 class RequestFailedException(msg: String? = null) : RuntimeException(msg)
 

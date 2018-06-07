@@ -2,6 +2,8 @@ package pm.gnosis.ethereum.rpc
 
 import io.reactivex.Observable
 import pm.gnosis.ethereum.*
+import pm.gnosis.ethereum.models.EthereumBlock
+import pm.gnosis.ethereum.models.TransactionData
 import pm.gnosis.ethereum.models.TransactionParameters
 import pm.gnosis.ethereum.models.TransactionReceipt
 import pm.gnosis.ethereum.rpc.models.*
@@ -38,21 +40,86 @@ class RpcEthereumRepository(private val ethereumRpcApi: EthereumRpcConnector) : 
                 it.checkedResult("Could not send raw transaction")
             }
 
-    override fun getTransactionReceipt(receiptHash: String): Observable<TransactionReceipt> =
+    override fun getTransactionReceipt(transactionHash: String): Observable<TransactionReceipt> =
         ethereumRpcApi.receipt(
             JsonRpcRequest(
                 method = "eth_getTransactionReceipt",
-                params = listOf(receiptHash)
+                params = listOf(transactionHash)
             )
         ).map {
             it.result?.let {
                 TransactionReceipt(
                     it.status,
                     it.transactionHash,
+                    it.transactionIndex,
+                    it.blockHash,
+                    it.blockNumber,
+                    it.from,
+                    it.to,
+                    it.cumulativeGasUsed,
+                    it.gasUsed,
                     it.contractAddress,
                     it.logs.map { TransactionReceipt.Event(it.logIndex, it.data, it.topics) }
                 )
             } ?: throw TransactionReceiptNotFound()
+
+        }
+
+    override fun getBlockByHash(blockHash: String): Observable<EthereumBlock> =
+        ethereumRpcApi.block(
+            JsonRpcRequest(
+                method = "eth_getBlockByHash",
+                params = listOf(blockHash, false)
+            )
+        ).map {
+            it.result?.let {
+                EthereumBlock(
+                    it.number,
+                    it.hash,
+                    it.parentHash,
+                    it.nonce,
+                    it.sha3Uncles,
+                    it.logsBloom,
+                    it.transactionsRoot,
+                    it.stateRoot,
+                    it.receiptsRoot,
+                    it.miner,
+                    it.difficulty,
+                    it.totalDifficulty,
+                    it.extraData,
+                    it.size,
+                    it.gasLimit,
+                    it.gasUsed,
+                    it.timestamp
+                )
+            } ?: throw BlockNotFound()
+
+        }
+
+    override fun getTransactionByHash(transactionHash: String): Observable<TransactionData> =
+        ethereumRpcApi.transaction(
+            JsonRpcRequest(
+                method = "eth_getTransactionByHash",
+                params = listOf(transactionHash)
+            )
+        ).map {
+            it.result?.let {
+                TransactionData(
+                    hash = transactionHash,
+                    from = it.from,
+                    transaction = Transaction(
+                        it.to,
+                        value = Wei(it.value),
+                        data = it.data,
+                        gas = it.gas,
+                        gasPrice = it.gasPrice,
+                        nonce = it.nonce
+                    ),
+                    blockHash = it.blockHash,
+                    blockNumber = it.blockNumber,
+                    transactionIndex = it.transactionIndex
+                )
+            } ?: throw TransactionNotFound()
 
         }
 
