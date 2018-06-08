@@ -114,7 +114,6 @@ class AndroidFingerprintHelper(private val context: Context) : FingerprintHelper
 
         override fun onAuthenticationHelp(helpMsgId: Int, helpString: CharSequence?) {
             emitter?.onNext(AuthenticationHelp(helpMsgId, helpString))
-            emitter?.onComplete()
         }
     }
 
