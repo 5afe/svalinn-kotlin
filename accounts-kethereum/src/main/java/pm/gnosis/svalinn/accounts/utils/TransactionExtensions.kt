@@ -32,9 +32,7 @@ fun Transaction.rlp(signature: ECDSASignature? = null): ByteArray {
     return RLPList(items).encode()
 }
 
-fun Transaction.hash(): ByteArray {
-    return Sha3Utils.keccak(rlp())
-}
+fun Transaction.hash(ecdsaSignature: ECDSASignature? = null) = rlp(ecdsaSignature).let { Sha3Utils.keccak(it) }
 
 private fun Transaction.adjustV(v: Byte): Byte {
     if (chainId > 0) {
