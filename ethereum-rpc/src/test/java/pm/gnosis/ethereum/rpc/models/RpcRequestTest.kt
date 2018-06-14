@@ -117,6 +117,13 @@ class RpcRequestTest {
                 rpcResult(error = "Some Error"),
                 EthRequest.Response.Failure<String>("Some Error")
             ),
+            TestCase(
+                RpcCallRequest(EthCall(Solidity.Address(BigInteger.ONE), TEST_TX)),
+                "eth_call",
+                listOf(TEST_CALL_PARAMS, "pending"),
+                rpcResult(),
+                EthRequest.Response.Failure<String>("Missing result")
+            ),
 
             // GetBalance
             TestCase(
@@ -179,6 +186,13 @@ class RpcRequestTest {
                 rpcResult("Invalid Number"),
                 EthRequest.Response.Failure<Wei>("Invalid balance!")
             ),
+            TestCase(
+                RpcBalanceRequest(EthBalance(Solidity.Address(BigInteger.ONE))),
+                "eth_getBalance",
+                listOf(Solidity.Address(BigInteger.ONE).asEthereumAddressString(), "pending"),
+                rpcResult(),
+                EthRequest.Response.Failure<Wei>("Invalid balance!")
+            ),
 
             // EstimateGas
             TestCase(
@@ -203,6 +217,13 @@ class RpcRequestTest {
                 rpcResult("Invalid Number"),
                 EthRequest.Response.Failure<BigInteger>("Invalid estimate!")
             ),
+            TestCase(
+                RpcEstimateGasRequest(EthEstimateGas(Solidity.Address(BigInteger.ONE), TEST_TX)),
+                "eth_estimateGas",
+                listOf(TEST_CALL_PARAMS),
+                rpcResult(),
+                EthRequest.Response.Failure<BigInteger>("Invalid estimate!")
+            ),
 
             // GasPrice
             TestCase(
@@ -225,6 +246,13 @@ class RpcRequestTest {
                 "eth_gasPrice",
                 emptyList(),
                 rpcResult("Invalid Number"),
+                EthRequest.Response.Failure<BigInteger>("Invalid gas price!")
+            ),
+            TestCase(
+                RpcGasPriceRequest(EthGasPrice()),
+                "eth_gasPrice",
+                emptyList(),
+                rpcResult(),
                 EthRequest.Response.Failure<BigInteger>("Invalid gas price!")
             ),
 
@@ -307,6 +335,13 @@ class RpcRequestTest {
                 rpcResult("Invalid Number"),
                 EthRequest.Response.Failure<BigInteger>("Invalid transaction count!")
             ),
+            TestCase(
+                RpcTransactionCountRequest(EthGetTransactionCount(Solidity.Address(BigInteger.TEN))),
+                "eth_getTransactionCount",
+                listOf(Solidity.Address(BigInteger.TEN).asEthereumAddressString(), "pending"),
+                rpcResult(),
+                EthRequest.Response.Failure<BigInteger>("Invalid transaction count!")
+            ),
 
             // SendRawTransaction
             TestCase(
@@ -323,6 +358,13 @@ class RpcRequestTest {
                 listOf("0x42cde4e8SomeSignedData"),
                 rpcResult(error = "Some Error"),
                 EthRequest.Response.Failure<String>("Some Error")
+            ),
+            TestCase(
+                RpcSendRawTransaction(EthSendRawTransaction("0x42cde4e8SomeSignedData")),
+                "eth_sendRawTransaction",
+                listOf("0x42cde4e8SomeSignedData"),
+                rpcResult(),
+                EthRequest.Response.Failure<String>("Missing result")
             )
         )
     }
