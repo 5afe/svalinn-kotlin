@@ -40,7 +40,7 @@ class RpcRequestTest {
 
     companion object {
 
-        private fun rpcResult(result: String = "0x", id: Int = 0, error: String? = null) =
+        private fun rpcResult(result: String? = null, id: Int = 0, error: String? = null) =
             JsonRpcResult(id, "2.0", error?.let { JsonRpcError(23, it) }, result)
 
         private val TEST_TX = Transaction(
