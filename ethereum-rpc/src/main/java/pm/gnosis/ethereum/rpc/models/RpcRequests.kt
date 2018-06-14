@@ -33,7 +33,8 @@ class RpcCallRequest(raw: EthCall) : RpcRequest<EthCall>(raw) {
 
     override fun parse(response: JsonRpcResult) {
         raw.response = response.error?.let { EthRequest.Response.Failure<String>(it.message) }
-                ?: EthRequest.Response.Success(response.result)
+                ?: response.result?.let { EthRequest.Response.Success(response.result) }
+                ?: EthRequest.Response.Failure("Missing result")
     }
 }
 
@@ -47,7 +48,8 @@ class RpcBalanceRequest(raw: EthBalance) : RpcRequest<EthBalance>(raw) {
 
     override fun parse(response: JsonRpcResult) {
         raw.response = response.error?.let { EthRequest.Response.Failure<Wei>(it.message) }
-                ?: response.result.hexAsBigIntegerOrNull()?.let { EthRequest.Response.Success(Wei(it)) }
+                ?:
+                response.result?.hexAsBigIntegerOrNull()?.let { EthRequest.Response.Success(Wei(it)) }
                 ?: EthRequest.Response.Failure("Invalid balance!")
     }
 }
@@ -64,7 +66,7 @@ class RpcEstimateGasRequest(raw: EthEstimateGas) : RpcRequest<EthEstimateGas>(ra
 
     override fun parse(response: JsonRpcResult) {
         raw.response = response.error?.let { EthRequest.Response.Failure<BigInteger>(it.message) }
-                ?: response.result.hexAsBigIntegerOrNull()?.let { EthRequest.Response.Success(it) }
+                ?: response.result?.hexAsBigIntegerOrNull()?.let { EthRequest.Response.Success(it) }
                 ?: EthRequest.Response.Failure("Invalid estimate!")
     }
 }
@@ -78,7 +80,7 @@ class RpcGasPriceRequest(raw: EthGasPrice) : RpcRequest<EthGasPrice>(raw) {
 
     override fun parse(response: JsonRpcResult) {
         raw.response = response.error?.let { EthRequest.Response.Failure<BigInteger>(it.message) }
-                ?: response.result.hexAsBigIntegerOrNull()?.let { EthRequest.Response.Success(it) }
+                ?: response.result?.hexAsBigIntegerOrNull()?.let { EthRequest.Response.Success(it) }
                 ?: EthRequest.Response.Failure("Invalid gas price!")
     }
 }
@@ -94,7 +96,7 @@ class RpcTransactionCountRequest(raw: EthGetTransactionCount) :
 
     override fun parse(response: JsonRpcResult) {
         raw.response = response.error?.let { EthRequest.Response.Failure<BigInteger>(it.message) }
-                ?: response.result.hexAsBigIntegerOrNull()?.let { EthRequest.Response.Success(it) }
+                ?: response.result?.hexAsBigIntegerOrNull()?.let { EthRequest.Response.Success(it) }
                 ?: EthRequest.Response.Failure("Invalid transaction count!")
     }
 }
@@ -110,7 +112,8 @@ class RpcSendRawTransaction(raw: EthSendRawTransaction) : RpcRequest<EthSendRawT
     override fun parse(response: JsonRpcResult) {
         raw.response =
                 response.error?.let { EthRequest.Response.Failure<String>(it.message) }
-                ?: EthRequest.Response.Success(response.result)
+                ?: response.result?.let { EthRequest.Response.Success(response.result) }
+                ?: EthRequest.Response.Failure("Missing result")
     }
 }
 
