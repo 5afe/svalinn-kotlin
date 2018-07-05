@@ -3,7 +3,7 @@ package pm.gnosis.blockies
 import pm.gnosis.model.Solidity
 import pm.gnosis.utils.asEthereumAddressString
 
-internal class Blockies(
+class Blockies(
     val primaryColor: Int,
     val backgroundColor: Int,
     val spotColor: Int,
