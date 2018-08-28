@@ -8,6 +8,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import org.spongycastle.crypto.engines.AESEngine
+import org.spongycastle.crypto.generators.SCrypt
 import org.spongycastle.crypto.modes.CBCBlockCipher
 import org.spongycastle.crypto.paddings.PKCS7Padding
 import org.spongycastle.crypto.paddings.PaddedBufferedBlockCipher
@@ -25,11 +26,16 @@ import pm.gnosis.utils.toHexString
 import java.security.SecureRandom
 import javax.crypto.spec.IvParameterSpec
 
+/**
+ * @param passwordIterations Number of iterations the password is hashed to prevent brute force attacks.
+ *                           Will be disabled when set to 0 else has to be larger than 1, a power of 2 and less than <code>2^(128 * r / 8)</code>.
+ */
 class AesEncryptionManager(
     application: Application,
     private val preferencesManager: PreferencesManager,
     private val fingerprintHelper: FingerprintHelper,
-    private val keyStorage: KeyStorage
+    private val keyStorage: KeyStorage,
+    private val passwordIterations: Int = SCRYPT_ITERATIONS
 ) : EncryptionManager {
 
     private val secureRandom = SecureRandom()
@@ -69,6 +75,13 @@ class AesEncryptionManager(
         }
     }
 
+    private fun deriveKeyFromPassword(password: ByteArray): ByteArray =
+        // If password iterations is set to 0 we will not use SCrypt
+        if (passwordIterations == 0)
+            Sha3Utils.sha3(password)
+        else
+            SCrypt.generate(password, Sha3Utils.sha3(password), passwordIterations, SCRYPT_BLOCK_SIZE, SCRYPT_PARALLELIZATION, SCRYPT_KEY_LENGTH)
+
     override fun setupPassword(newPassword: ByteArray, oldPassword: ByteArray?): Single<Boolean> {
         return Single.fromCallable {
             synchronized(keyLock) {
@@ -77,7 +90,7 @@ class AesEncryptionManager(
                 if (checksum != null) {
                     previousKey = buildPasswordKeyIfValid(oldPassword, checksum) ?: return@fromCallable false
                 }
-                val passwordKey = Sha3Utils.sha3(newPassword)
+                val passwordKey = deriveKeyFromPassword(newPassword)
                 key = previousKey?.let {
                     decryptAppKey(it)
                 } ?: generateKey()
@@ -151,7 +164,7 @@ class AesEncryptionManager(
 
     private fun buildPasswordKeyIfValid(key: ByteArray?, checksum: String): ByteArray? {
         key ?: return null
-        val hashedKey = Sha3Utils.sha3(key)
+        val hashedKey = deriveKeyFromPassword(key)
         val decryptedChecksum = nullOnThrow { decrypt(hashedKey, CryptoData.fromString(checksum)).toHexString() }
         if (keyChecksum(hashedKey).toHexString() == decryptedChecksum) {
             return hashedKey
@@ -250,6 +263,10 @@ class AesEncryptionManager(
     }
 
     companion object {
+        private const val SCRYPT_ITERATIONS = 16384
+        private const val SCRYPT_BLOCK_SIZE = 8
+        private const val SCRYPT_PARALLELIZATION = 1
+        private const val SCRYPT_KEY_LENGTH = 32
         private const val LOCK_DELAY_MS = 5 * 60 * 1000L
         private const val PREF_KEY_PASSWORD_ENCRYPTED_APP_KEY = "encryption_manager.string.password_encrypted_app_key"
         private const val PREF_KEY_PASSWORD_CHECKSUM = "encryption_manager.string.password_checksum"
