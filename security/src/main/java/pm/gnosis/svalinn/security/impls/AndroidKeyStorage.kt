@@ -20,7 +20,7 @@ class AndroidKeyStorage(
     private val context: Context
 ): KeyStorage {
 
-    private val keyStore by lazy { KeyStore.getInstance(ANDROID_KEY_STORE) }
+    private val keyStore by lazy { KeyStore.getInstance(ANDROID_KEY_STORE).apply { load(null) } }
 
     init {
         // If we don't have a key we will generate one on setup.
