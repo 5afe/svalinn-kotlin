@@ -28,7 +28,8 @@ import javax.crypto.spec.IvParameterSpec
 class AesEncryptionManager(
     application: Application,
     private val preferencesManager: PreferencesManager,
-    private val fingerprintHelper: FingerprintHelper
+    private val fingerprintHelper: FingerprintHelper,
+    private val keyStorage: KeyStorage
 ) : EncryptionManager {
 
     private val secureRandom = SecureRandom()
@@ -93,7 +94,7 @@ class AesEncryptionManager(
     private fun generateKey(): ByteArray {
         val generatedPassword = ByteArray(32)
         secureRandom.nextBytes(generatedPassword)
-        return generatedPassword
+        return keyStorage.store(generatedPassword)
     }
 
     override fun unlocked(): Single<Boolean> {
@@ -129,14 +130,18 @@ class AesEncryptionManager(
 
     override fun decrypt(data: CryptoData): ByteArray {
         val key = synchronized(keyLock) {
-            this.key ?: throw DeviceIsLockedException()
+            this.key?.let {
+                keyStorage.retrieve(it) ?: it // Fallback if app was setup before storage existed
+            } ?: throw DeviceIsLockedException()
         }
         return decrypt(key, data)
     }
 
     override fun encrypt(data: ByteArray): CryptoData {
         val key = synchronized(keyLock) {
-            this.key ?: throw DeviceIsLockedException()
+            this.key?.let {
+                keyStorage.retrieve(it) ?: it // Fallback if app was setup before storage existed
+            } ?: throw DeviceIsLockedException()
         }
         return encrypt(key, data)
     }
