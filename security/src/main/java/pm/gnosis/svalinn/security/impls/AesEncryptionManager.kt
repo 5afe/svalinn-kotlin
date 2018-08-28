@@ -131,7 +131,7 @@ class AesEncryptionManager(
     override fun decrypt(data: CryptoData): ByteArray {
         val key = synchronized(keyLock) {
             this.key?.let {
-                keyStorage.retrieve(it) ?: it // Fallback if app was setup before storage existed
+                nullOnThrow { keyStorage.retrieve(it) } ?: it // Fallback if app was setup before storage existed
             } ?: throw DeviceIsLockedException()
         }
         return decrypt(key, data)
@@ -140,7 +140,7 @@ class AesEncryptionManager(
     override fun encrypt(data: ByteArray): CryptoData {
         val key = synchronized(keyLock) {
             this.key?.let {
-                keyStorage.retrieve(it) ?: it // Fallback if app was setup before storage existed
+                nullOnThrow { keyStorage.retrieve(it) } ?: it // Fallback if app was setup before storage existed
             } ?: throw DeviceIsLockedException()
         }
         return encrypt(key, data)
