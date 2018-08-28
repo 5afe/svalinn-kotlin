@@ -53,7 +53,7 @@ class AndroidKeyStorage(
     }
 
     private fun generateKey() {
-        KeyPairGenerator.getInstance(AES, ANDROID_KEY_STORE).apply {
+        KeyPairGenerator.getInstance(RSA, ANDROID_KEY_STORE).apply {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
                 initGeneratorWithKeyPairGeneratorSpec()
             else
@@ -82,7 +82,7 @@ class AndroidKeyStorage(
     }
 
     companion object {
-        private const val AES = "AES"
+        private const val RSA = "RSA"
         private const val ANDROID_KEY_STORE = "AndroidKeyStore"
         private const val KEY_ALIAS = "AndroidKeyStorageKey"
         private const val TRANSFORMATION_ASYMMETRIC = "RSA/ECB/PKCS1Padding"
