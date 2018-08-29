@@ -22,7 +22,7 @@ interface EncryptionManager {
 
     class CryptoData(val data: ByteArray, val iv: ByteArray) {
         override fun toString(): String {
-            return "${data.toHexString()}${SEPARATOR}${iv.toHexString()}"
+            return "${data.toHexString()}$SEPARATOR${iv.toHexString()}"
         }
 
         companion object {
@@ -36,6 +36,22 @@ interface EncryptionManager {
                 }
         }
     }
+}
+
+interface KeyStorage {
+    /**
+     * Stores a key and returns an id to retrieve the key again
+     * @param key to store
+     * @return id to retrieve key
+     */
+    fun store(key: ByteArray): ByteArray
+
+    /**
+     * Retrieves a key by id from the storage
+     * @param id of the key to retrieve
+     * @return key or null if no key for this id was stored
+     */
+    fun retrieve(id: ByteArray): ByteArray?
 }
 
 sealed class FingerprintUnlockResult

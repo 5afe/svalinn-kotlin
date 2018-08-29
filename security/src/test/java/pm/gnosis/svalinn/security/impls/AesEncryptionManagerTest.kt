@@ -17,6 +17,7 @@ import org.mockito.Mock
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.stubbing.Answer
+import pm.gnosis.crypto.utils.Sha3Utils
 import pm.gnosis.svalinn.common.PreferencesManager
 import pm.gnosis.svalinn.security.*
 import pm.gnosis.tests.utils.ImmediateSchedulersRule
@@ -41,6 +42,9 @@ class AesEncryptionManagerTest {
     @Mock
     private lateinit var fingerprintHelperMock: FingerprintHelper
 
+    @Mock
+    private lateinit var keyStorage: KeyStorage
+
     private val preferences = TestPreferences()
 
     private lateinit var preferencesManager: PreferencesManager
@@ -50,7 +54,7 @@ class AesEncryptionManagerTest {
     fun setup() {
         given(application.getSharedPreferences(anyString(), anyInt())).willReturn(preferences)
         preferencesManager = PreferencesManager(application)
-        manager = AesEncryptionManager(application, preferencesManager, fingerprintHelperMock)
+        manager = AesEncryptionManager(application, preferencesManager, fingerprintHelperMock, keyStorage)
     }
 
     @Test
@@ -68,11 +72,13 @@ class AesEncryptionManagerTest {
 
     @Test
     fun passwordFlow() {
+        given(keyStorage.store(MockUtils.any())).willAnswer { it.arguments.first() }
         val setupObserver = TestObserver<Boolean>()
         preferences.remove(PREF_KEY_PASSWORD_CHECKSUM)
 
         // Setup with "test"
         manager.setupPassword("test".toByteArray()).subscribe(setupObserver)
+        then(keyStorage).should().store(MockUtils.any())
         setupObserver.assertNoErrors().assertValue(true)
 
         // Check that it is unlocked
@@ -116,6 +122,7 @@ class AesEncryptionManagerTest {
 
     @Test
     fun fingerprintFlow() {
+        given(keyStorage.store(MockUtils.any())).willAnswer { it.arguments.first() }
         val cipherMock = mock(Cipher::class.java)
         val algorithmParametersMock = mock(AlgorithmParameters::class.java)
         val ivParameterSpecMock = mock(IvParameterSpec::class.java)
