@@ -1,6 +1,6 @@
 package pm.gnosis.crypto
 
-import okio.ByteString
+import okio.ByteString.Companion.decodeHex
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -13,7 +13,7 @@ class HDNodeTest {
     fun derive() {
         // Create node -> author wire harbor elbow library sphere nothing receive team
         val masterNode =
-            KeyGenerator.masterNode(ByteString.decodeHex("358ace7a8cff8d5d42e2b33b5a8584b785e317df5f7b2717b4c5da23faf1f1442a644117005b37874b1be21b7a76cf4cd942dd93aabf5e33f392944f83e8ce33"))
+            KeyGenerator.masterNode("358ace7a8cff8d5d42e2b33b5a8584b785e317df5f7b2717b4c5da23faf1f1442a644117005b37874b1be21b7a76cf4cd942dd93aabf5e33f392944f83e8ce33".decodeHex())
         assertEquals(
             "xprv9s21ZrQH143K4SVQXcP9UHe8tk5GhRpLJH97oc3v99LJbRt8xhdRUZgWpSN4nFuFWoMz7NW2HGUZVYyBP6n8Q9pR96MzwhPweAQ7nGhGZHF",
             masterNode.toBase58()
@@ -32,11 +32,11 @@ class HDNodeTest {
         TEST_DATA.forEachIndexed { index, value ->
             val privateKey = BigInteger(value.private, 16)
             val derivedChild = derivedBip32.deriveChild(index.toLong())
-            val deriveChildCopy = masterNode.derive("m/44'/60'/0'/0/" + index)
+            val deriveChildCopy = masterNode.derive("m/44'/60'/0'/0/$index")
             assertEquals(privateKey, derivedChild.keyPair.privKey)
             assertEquals(privateKey, deriveChildCopy.keyPair.privKey)
             assertEquals(derivedChild.toBase58(), deriveChildCopy.toBase58())
-            assertEquals(ByteString.decodeHex(value.public), derivedChild.publicKey())
+            assertEquals(value.public.decodeHex(), derivedChild.publicKey())
             assertArrayEquals(value.address.hexStringToByteArray(), derivedChild.keyPair.address)
         }
     }
@@ -45,7 +45,7 @@ class HDNodeTest {
     fun deriveSelf() {
         // Create node -> author wire harbor elbow library sphere nothing receive team
         val masterNode =
-            KeyGenerator.masterNode(ByteString.decodeHex("358ace7a8cff8d5d42e2b33b5a8584b785e317df5f7b2717b4c5da23faf1f1442a644117005b37874b1be21b7a76cf4cd942dd93aabf5e33f392944f83e8ce33"))
+            KeyGenerator.masterNode("358ace7a8cff8d5d42e2b33b5a8584b785e317df5f7b2717b4c5da23faf1f1442a644117005b37874b1be21b7a76cf4cd942dd93aabf5e33f392944f83e8ce33".decodeHex())
         assertEquals(masterNode, masterNode.derive("m"))
         assertEquals(masterNode, masterNode.derive("M"))
         assertEquals(masterNode, masterNode.derive("m'"))
@@ -56,7 +56,7 @@ class HDNodeTest {
     fun deriveInvalid() {
         // Create node -> author wire harbor elbow library sphere nothing receive team
         val masterNode =
-            KeyGenerator.masterNode(ByteString.decodeHex("358ace7a8cff8d5d42e2b33b5a8584b785e317df5f7b2717b4c5da23faf1f1442a644117005b37874b1be21b7a76cf4cd942dd93aabf5e33f392944f83e8ce33"))
+            KeyGenerator.masterNode("358ace7a8cff8d5d42e2b33b5a8584b785e317df5f7b2717b4c5da23faf1f1442a644117005b37874b1be21b7a76cf4cd942dd93aabf5e33f392944f83e8ce33".decodeHex())
         assertThrow({ masterNode.derive("x") }, "invalid first index")
         assertThrow({ masterNode.derive("z/44'") }, "invalid first index")
         assertThrow({ masterNode.derive("m/" + 0x80000000) }, "invalid child index")

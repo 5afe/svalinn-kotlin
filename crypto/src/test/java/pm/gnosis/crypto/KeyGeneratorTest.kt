@@ -1,6 +1,6 @@
 package pm.gnosis.crypto
 
-import okio.ByteString
+import okio.ByteString.Companion.decodeHex
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -9,7 +9,7 @@ class KeyGeneratorTest {
     @Test
     fun masterNode() {
         TEST_CASES.forEach { (encodedSeed, encodedNode) ->
-            val seed = ByteString.decodeHex(encodedSeed)
+            val seed = encodedSeed.decodeHex()
             val masterNode = KeyGenerator.masterNode(seed)
             Thread.sleep(100)
             val masterNodeCopy = KeyGenerator.masterNode(seed)

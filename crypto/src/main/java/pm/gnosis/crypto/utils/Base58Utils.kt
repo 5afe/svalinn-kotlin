@@ -1,13 +1,14 @@
 package pm.gnosis.crypto.utils
 
 import okio.ByteString
+import okio.ByteString.Companion.toByteString
 import java.math.BigInteger
 
 
 object Base58Utils {
 
     fun encode(source: ByteString): String {
-        val sourceSize = source.size()
+        val sourceSize = source.size
         if (sourceSize == 0) {
             return ""
         }
@@ -35,7 +36,7 @@ object Base58Utils {
         }
 
         var i = 0
-        while (i < sourceSize && source.getByte(i) == ZERO_BYTE) {
+        while (i < sourceSize && source[i] == ZERO_BYTE) {
             result.append(LEADER)
             i++
         }
@@ -46,13 +47,13 @@ object Base58Utils {
     private fun addChecksum(data: ByteString): ByteString {
         val checksum = data.sha256().sha256()
 
-        val resultSize = data.size() + 4
+        val resultSize = data.size + 4
         val result = ByteArray(resultSize)
 
-        System.arraycopy(data.toByteArray(), 0, result, 0, data.size())
-        System.arraycopy(checksum.toByteArray(), 0, result, data.size(), 4)
+        System.arraycopy(data.toByteArray(), 0, result, 0, data.size)
+        System.arraycopy(checksum.toByteArray(), 0, result, data.size, 4)
 
-        return ByteString.of(result, 0, resultSize)
+        return result.toByteString(0, resultSize)
     }
 
     fun encodeChecked(data: ByteString): String {

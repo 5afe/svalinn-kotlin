@@ -1,6 +1,7 @@
 package pm.gnosis.crypto.utils
 
-import okio.ByteString
+import okio.ByteString.Companion.decodeHex
+import okio.ByteString.Companion.encodeUtf8
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import pm.gnosis.utils.asEthereumAddress
@@ -9,9 +10,9 @@ class CryptoExtensionsKtTest {
 
     @Test
     fun rmd160() {
-        assertEquals(ByteString.decodeHex("b472a266d0bd89c13706a4132ccfb16f7c3b9fcb"), ByteString.encodeUtf8("").hash160())
-        val data = ByteString.encodeUtf8("Hello World")
-        assertEquals(ByteString.decodeHex("bdfb69557966d026975bebe914692bf08490d8ca"), data.hash160())
+        assertEquals("b472a266d0bd89c13706a4132ccfb16f7c3b9fcb".decodeHex(), "".encodeUtf8().hash160())
+        val data = "Hello World".encodeUtf8()
+        assertEquals("bdfb69557966d026975bebe914692bf08490d8ca".decodeHex(), data.hash160())
     }
 
     // From https://github.com/ethereum/EIPs/blob/master/EIPS/eip-55.md#test-cases

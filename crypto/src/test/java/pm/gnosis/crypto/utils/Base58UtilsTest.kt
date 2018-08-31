@@ -1,6 +1,7 @@
 package pm.gnosis.crypto.utils
 
 import okio.ByteString
+import okio.ByteString.Companion.encodeUtf8
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -8,13 +9,13 @@ class Base58UtilsTest {
 
     @Test
     fun encode() {
-        assertEquals("", Base58Utils.encode(ByteString.encodeUtf8("")))
-        assertEquals("JxF12TrwUP45BMd", Base58Utils.encode(ByteString.encodeUtf8("Hello World")))
+        assertEquals("", Base58Utils.encode("".encodeUtf8()))
+        assertEquals("JxF12TrwUP45BMd", Base58Utils.encode("Hello World".encodeUtf8()))
     }
 
     @Test
     fun encodeChecked() {
-        assertEquals("3QJmnh", Base58Utils.encodeChecked(ByteString.encodeUtf8("")))
+        assertEquals("3QJmnh", Base58Utils.encodeChecked("".encodeUtf8()))
         assertEquals(
             "16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM", Base58Utils.encodeChecked(
                 toByteString(
