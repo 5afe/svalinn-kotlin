@@ -1,6 +1,6 @@
 package pm.gnosis.utils
 
-import okio.ByteString
+import okio.ByteString.Companion.decodeHex
 import org.junit.Assert.*
 import org.junit.Test
 import pm.gnosis.tests.utils.Asserts.assertThrow
@@ -32,7 +32,7 @@ class ExtensionsKtTest {
 
     @Test
     fun testBigInt() {
-        val input = ByteString.decodeHex("de23dc54f047bcbd66a12ded71adcf3f34369c35")
+        val input = "de23dc54f047bcbd66a12ded71adcf3f34369c35".decodeHex()
         assertEquals(BigInteger("de23dc54f047bcbd66a12ded71adcf3f34369c35", 16), input.bigInt())
     }
 

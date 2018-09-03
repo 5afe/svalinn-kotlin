@@ -28,7 +28,7 @@ import javax.crypto.spec.IvParameterSpec
 
 /**
  * @param passwordIterations Number of iterations the password is hashed to prevent brute force attacks.
- *                           Will be disabled when set to 0 else has to be larger than 1, a power of 2 and less than <code>2^(128 * r / 8)</code>.
+ *                           Will be disabled when set to 0 else has to be larger than 1, a power of 2 and less than <code>2^128</code>.
  */
 class AesEncryptionManager(
     application: Application,

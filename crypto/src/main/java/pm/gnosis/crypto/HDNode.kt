@@ -2,6 +2,7 @@ package pm.gnosis.crypto
 
 import okio.Buffer
 import okio.ByteString
+import okio.ByteString.Companion.toByteString
 import pm.gnosis.crypto.utils.Base58Utils
 import pm.gnosis.crypto.utils.Curves
 import pm.gnosis.crypto.utils.hash160
@@ -49,7 +50,7 @@ class HDNode(val keyPair: KeyPair, val chainCode: ByteString, val depth: Int, va
         val dataBuffer = Buffer()
         if (isHardened) {
             dataBuffer.writeByte(0)
-            dataBuffer.write(keyPair.privKeyBytes)
+            dataBuffer.write(keyPair.privKeyBytes!!)
         } else {
             dataBuffer.write(publicKey()) // Use public key
         }
@@ -97,23 +98,16 @@ class HDNode(val keyPair: KeyPair, val chainCode: ByteString, val depth: Int, va
                 .write(chainCode)
                 // 33 bytes: private key data (0 + 32 key)
                 .writeByte(0)
-                .write(keyPair.privKeyBytes)
+                .write(keyPair.privKeyBytes!!)
                 .readByteString()
         )
     }
 
-    fun publicKey(): ByteString {
-        val encoded = keyPair.pubKey
-        return ByteString.of(encoded, 0, encoded.size)
-    }
+    fun publicKey(): ByteString = keyPair.pubKey.let { it.toByteString(0, it.size) }
 
-    fun identifier(): ByteString {
-        return publicKey().hash160()
-    }
+    fun identifier(): ByteString = publicKey().hash160()
 
-    fun fingerprint(): ByteString {
-        return identifier().substring(0, 4)
-    }
+    fun fingerprint(): ByteString = identifier().substring(0, 4)
 
     companion object {
         private const val VERSION = 0x0488ade4
