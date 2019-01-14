@@ -1,14 +1,14 @@
 ext {
     versions = [
             // Plug-Ins
-            android_tools  : '3.2.0',
-            kotlin         : '1.2.71',
+            android_tools  : '3.3.0',
+            kotlin         : '1.3.11',
             jacoco         : '0.7.9',
 
             // Runtime dependencies
-            android_support: '27.1.1',
-            android_room   : '1.1.0',
-            bivrost        : 'v0.6.2',
+            android_support: '28.0.0',
+            android_room   : '1.1.1',
+            bivrost        : 'v0.7.1',
             geth           : '1.7.1',
             kethereum      : '0.33',
             moshi          : '1.8.0',

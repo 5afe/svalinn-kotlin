@@ -3,9 +3,6 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply from: '../buildsystem/coverageReport.gradle'
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-
 android {
     testOptions {
         unitTests {
@@ -20,7 +17,7 @@ dependencies {
     testImplementation "junit:junit:$versions.junit"
 
     //Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$versions.kotlin"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
 
     implementation project(":crypto")
     implementation project(":models")
