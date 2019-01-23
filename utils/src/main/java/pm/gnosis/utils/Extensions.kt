@@ -54,6 +54,7 @@ fun String.hexStringToByteArrayOrNull() =
 
 fun String.hexStringToByteArray(): ByteArray {
     val s = this.removeHexPrefix()
+    if (s.isEmpty()) return byteArrayOf()
     if (this.length % 2 != 0 || !hexPattern.matcher(this).matches()) {
         throw IllegalArgumentException("Invalid hex string")
     }
