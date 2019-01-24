@@ -98,8 +98,9 @@ class AndroidFingerprintHelper(private val context: Context) : FingerprintHelper
         }
 
         override fun onAuthenticationSucceeded(result: FingerprintManagerCompat.AuthenticationResult?) {
-            result?.let {
-                emitter?.onNext(AuthenticationResultSuccess(it.cryptoObject.cipher))
+            result?.let { authenticationResult ->
+                val cipher = authenticationResult.cryptoObject.cipher ?: run { emitter?.onError(IllegalStateException("Ciper is null")); return@let }
+                emitter?.onNext(AuthenticationResultSuccess(cipher))
                 emitter?.onComplete()
             }
         }
