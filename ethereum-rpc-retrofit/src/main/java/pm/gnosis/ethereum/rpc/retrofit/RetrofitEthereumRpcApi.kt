@@ -7,18 +7,18 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface RetrofitEthereumRpcApi {
-    @POST("/")
+    @POST(".")
     fun receipt(@Body jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcTransactionReceiptResult>
 
-    @POST("/")
+    @POST(".")
     fun block(@Body jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcBlockResult>
 
-    @POST("/")
+    @POST(".")
     fun transaction(@Body jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcTransactionResult>
 
-    @POST("/")
+    @POST(".")
     fun post(@Body jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcResult>
 
-    @POST("/")
+    @POST(".")
     fun post(@Body jsonRpcRequest: Collection<JsonRpcRequest>): Observable<Collection<JsonRpcResult>>
 }
