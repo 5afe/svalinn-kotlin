@@ -12,7 +12,7 @@ dependencies {
     //Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
 
-    implementation("com.madgag.spongycastle:prov:$versions.spongycastle", {
+    implementation("org.bouncycastle:bcprov-jdk15on:$versions.bouncycastle", {
         exclude group: 'junit', module: 'junit'
     })
     implementation "com.squareup.okio:okio:$versions.okio"

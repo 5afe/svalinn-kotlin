@@ -1,7 +1,7 @@
 package pm.gnosis.crypto.utils
 
-import org.spongycastle.asn1.sec.SECNamedCurves
-import org.spongycastle.crypto.params.ECDomainParameters
+import org.bouncycastle.asn1.sec.SECNamedCurves
+import org.bouncycastle.crypto.params.ECDomainParameters
 import java.math.BigInteger
 
 

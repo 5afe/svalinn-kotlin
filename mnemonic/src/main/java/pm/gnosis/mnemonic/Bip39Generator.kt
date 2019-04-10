@@ -1,7 +1,7 @@
 package pm.gnosis.mnemonic
 
-import org.spongycastle.jcajce.provider.digest.SHA256
-import org.spongycastle.jcajce.provider.symmetric.PBEPBKDF2
+import org.bouncycastle.jcajce.provider.digest.SHA256
+import org.bouncycastle.jcajce.provider.symmetric.PBEPBKDF2
 import pm.gnosis.mnemonic.wordlists.WordListProvider
 import pm.gnosis.utils.getIndexes
 import pm.gnosis.utils.toBinaryString

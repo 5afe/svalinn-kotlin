@@ -2,7 +2,7 @@ package pm.gnosis.crypto
 
 import org.junit.Assert.*
 import org.junit.Test
-import org.spongycastle.util.encoders.Base64
+import org.bouncycastle.util.encoders.Base64
 import pm.gnosis.crypto.exceptions.MissingPrivateKeyException
 import pm.gnosis.tests.utils.Asserts.assertThrow
 import pm.gnosis.utils.hexAsBigInteger

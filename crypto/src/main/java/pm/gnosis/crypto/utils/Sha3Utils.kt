@@ -1,8 +1,8 @@
 package pm.gnosis.crypto.utils
 
-import org.spongycastle.crypto.digests.KeccakDigest
-import org.spongycastle.crypto.digests.SHA3Digest
-import org.spongycastle.util.encoders.Hex
+import org.bouncycastle.crypto.digests.KeccakDigest
+import org.bouncycastle.crypto.digests.SHA3Digest
+import org.bouncycastle.util.encoders.Hex
 
 
 object Sha3Utils {
