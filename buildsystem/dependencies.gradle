@@ -9,6 +9,7 @@ ext {
             android_support: '28.0.0',
             android_room   : '1.1.1',
             bivrost        : 'v0.7.1',
+            bouncycastle   : '1.61',
             geth           : '1.7.1',
             kethereum      : '0.33',
             moshi          : '1.8.0',
@@ -19,7 +20,6 @@ ext {
             rxbinding      : '2.1.1',
             rxjava         : '2.2.1',
             rxkotlin       : '2.3.0',
-            spongycastle   : '1.58.0.0',
             timber         : '4.7.1',
             zxing          : '3.3.1',
 

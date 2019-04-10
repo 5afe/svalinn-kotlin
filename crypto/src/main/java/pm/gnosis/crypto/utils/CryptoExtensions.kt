@@ -2,7 +2,7 @@ package pm.gnosis.crypto.utils
 
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
-import org.spongycastle.jcajce.provider.digest.RIPEMD160
+import org.bouncycastle.jcajce.provider.digest.RIPEMD160
 import pm.gnosis.model.Solidity
 import pm.gnosis.utils.asEthereumAddressString
 import pm.gnosis.utils.removeHexPrefix

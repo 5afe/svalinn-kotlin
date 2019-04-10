@@ -20,7 +20,7 @@ dependencies {
     implementation project(':android-common')
     implementation project(":utils")
 
-    implementation("com.madgag.spongycastle:prov:$versions.spongycastle", {
+    implementation("org.bouncycastle:bcprov-jdk15on:$versions.bouncycastle", {
         exclude group: 'junit', module: 'junit'
     })
 
