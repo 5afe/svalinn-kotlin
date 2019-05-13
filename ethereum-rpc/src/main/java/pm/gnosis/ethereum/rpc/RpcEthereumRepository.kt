@@ -103,21 +103,21 @@ class RpcEthereumRepository(private val ethereumRpcApi: EthereumRpcConnector) : 
                 params = listOf(transactionHash)
             )
         ).map {
-            it.result?.let {
+            it.result?.let { result ->
                 TransactionData(
                     hash = transactionHash,
-                    from = it.from,
+                    from = result.from,
                     transaction = Transaction(
-                        it.to,
-                        value = Wei(it.value),
-                        data = it.data,
-                        gas = it.gas,
-                        gasPrice = it.gasPrice,
-                        nonce = it.nonce
+                        result.to,
+                        value = Wei(result.value),
+                        data = result.data,
+                        gas = result.gas,
+                        gasPrice = result.gasPrice,
+                        nonce = result.nonce
                     ),
-                    blockHash = it.blockHash,
-                    blockNumber = it.blockNumber,
-                    transactionIndex = it.transactionIndex
+                    blockHash = result.blockHash,
+                    blockNumber = result.blockNumber,
+                    transactionIndex = result.transactionIndex
                 )
             } ?: throw TransactionNotFound()
 
@@ -153,5 +153,5 @@ private fun <T> EthRequest<T>.toRpcRequest() =
         is EthGasPrice -> RpcGasPriceRequest(this)
         is EthGetTransactionCount -> RpcTransactionCountRequest(this)
         is EthSendRawTransaction -> RpcSendRawTransaction(this)
-        else -> throw IllegalArgumentException()
+        is EthGetStorageAt -> RpcGetStorageAt(this)
     }

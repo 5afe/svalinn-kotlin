@@ -19,7 +19,7 @@ class EthRequestTest {
         assertEquals(result, request.checkedResult())
     }
 
-    @Test()
+    @Test
     fun failure() {
         val request = EthBalance(Solidity.Address(BigInteger.ONE), 10)
         val errorMsg = "Revert ... because we can"
@@ -37,7 +37,7 @@ class EthRequestTest {
         })
     }
 
-    @Test()
+    @Test
     fun notExecuted() {
         val request = EthBalance(Solidity.Address(BigInteger.ONE), 10)
         assertNull("Should not return result if not executed", request.result())
