@@ -103,6 +103,9 @@ class EthEstimateGas(
 class EthGetTransactionCount(val from: Solidity.Address, id: Int = 0, val block: Block = Block.PENDING) :
     EthRequest<BigInteger>(id)
 
+class EthGetStorageAt(val from: Solidity.Address, val location: BigInteger, id: Int = 0, val block: Block = Block.PENDING) :
+    EthRequest<String>(id)
+
 class EthSendRawTransaction(val signedData: String, id: Int = 0) : EthRequest<String>(id)
 
 class TransactionReceiptNotFound : NoSuchElementException()

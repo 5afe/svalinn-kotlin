@@ -343,6 +343,82 @@ class RpcRequestTest {
                 EthRequest.Response.Failure<BigInteger>("Invalid transaction count!")
             ),
 
+            // GetStorageAt
+            TestCase(
+                RpcGetStorageAt(EthGetStorageAt(Solidity.Address(BigInteger.TEN), BigInteger.valueOf(12345), id = 15)),
+                "eth_getStorageAt",
+                listOf(Solidity.Address(BigInteger.TEN).asEthereumAddressString(), BigInteger.valueOf(12345).toHexString(), "pending"),
+                rpcResult(BigInteger.valueOf(23).toHexString()),
+                EthRequest.Response.Success("0x17"),
+                15
+            ),
+            TestCase(
+                RpcGetStorageAt(
+                    EthGetStorageAt(
+                        Solidity.Address(BigInteger.TEN),
+                        BigInteger.valueOf(1234),
+                        id = 15,
+                        block = Block.PENDING
+                    )
+                ),
+                "eth_getStorageAt",
+                listOf(Solidity.Address(BigInteger.TEN).asEthereumAddressString(), BigInteger.valueOf(1234).toHexString(), "pending"),
+                rpcResult(BigInteger.valueOf(23).toHexString()),
+                EthRequest.Response.Success("0x17"),
+                15
+            ),
+            TestCase(
+                RpcGetStorageAt(
+                    EthGetStorageAt(
+                        Solidity.Address(BigInteger.TEN),
+                        BigInteger.valueOf(12346),
+                        id = 15,
+                        block = Block.LATEST
+                    )
+                ),
+                "eth_getStorageAt",
+                listOf(Solidity.Address(BigInteger.TEN).asEthereumAddressString(), BigInteger.valueOf(12346).toHexString(), "latest"),
+                rpcResult("some data"),
+                EthRequest.Response.Success("some data"),
+                15
+            ),
+            TestCase(
+                RpcGetStorageAt(
+                    EthGetStorageAt(
+                        Solidity.Address(BigInteger.TEN),
+                        BigInteger.valueOf(1236),
+                        id = 15,
+                        block = Block.EARLIEST
+                    )
+                ),
+                "eth_getStorageAt",
+                listOf(Solidity.Address(BigInteger.TEN).asEthereumAddressString(), BigInteger.valueOf(1236).toHexString(), "earliest"),
+                rpcResult(""),
+                EthRequest.Response.Success(""),
+                15
+            ),
+            TestCase(
+                RpcGetStorageAt(
+                    EthGetStorageAt(
+                        Solidity.Address(BigInteger.TEN), BigInteger.valueOf(123), id = 15, block = BlockNumber(
+                            BigInteger.ONE
+                        )
+                    )
+                ),
+                "eth_getStorageAt",
+                listOf(Solidity.Address(BigInteger.TEN).asEthereumAddressString(), BigInteger.valueOf(123).toHexString(), "0x1"),
+                rpcResult(BigInteger.valueOf(22).toHexString()),
+                EthRequest.Response.Success("0x16"),
+                15
+            ),
+            TestCase(
+                RpcGetStorageAt(EthGetStorageAt(Solidity.Address(BigInteger.TEN), BigInteger.valueOf(123))),
+                "eth_getStorageAt",
+                listOf(Solidity.Address(BigInteger.TEN).asEthereumAddressString(), BigInteger.valueOf(123).toHexString(), "pending"),
+                rpcResult(error = "Some Error"),
+                EthRequest.Response.Failure<BigInteger>("Some Error")
+            ),
+
             // SendRawTransaction
             TestCase(
                 RpcSendRawTransaction(EthSendRawTransaction("0x42cde4e8SomeSignedData", id = 13)),

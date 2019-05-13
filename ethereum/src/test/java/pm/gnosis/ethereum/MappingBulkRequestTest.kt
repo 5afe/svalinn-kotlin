@@ -15,10 +15,10 @@ class MappingBulkRequestTest {
             transaction = Transaction(Solidity.Address(BigInteger.ONE), data = "tokenBalanceData")
         )
         val request = MappingBulkRequest(
-            MappedRequest(etherBalance, { it?.value }),
-            MappedRequest(tokenBalance, {
-                it?.let { BigInteger(it.removePrefix("0x"), 16) }
-            })
+            MappedRequest(etherBalance) { it?.value },
+            MappedRequest(tokenBalance) { result ->
+                result?.let { BigInteger(it.removePrefix("0x"), 16) }
+            }
         )
 
         etherBalance.response = EthRequest.Response.Success(Wei(BigInteger.valueOf(11)))
@@ -42,13 +42,13 @@ class MappingBulkRequestTest {
             transaction = Transaction(Solidity.Address(BigInteger.valueOf(5)), data = "token2BalanceData")
         )
         val request = MappingBulkRequest(
-            MappedRequest(etherBalance, { it?.value }),
-            MappedRequest(tokenBalance, {
-                it?.let { BigInteger(it.removePrefix("0x"), 16) }
-            }),
-            MappedRequest(token2Balance, {
-                it?.let { BigInteger(it.removePrefix("0x"), 16) }
-            })
+            MappedRequest(etherBalance) { it?.value },
+            MappedRequest(tokenBalance) { result ->
+                result?.let { BigInteger(result.removePrefix("0x"), 16) }
+            },
+            MappedRequest(token2Balance) { result ->
+                result?.let { BigInteger(result.removePrefix("0x"), 16) }
+            }
         )
 
         etherBalance.response = EthRequest.Response.Success(Wei(BigInteger.valueOf(11)))

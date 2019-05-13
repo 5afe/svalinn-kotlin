@@ -6,6 +6,7 @@ import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.FUNCTION_CALL
 import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.FUNCTION_ESTIMATE_GAS
 import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.FUNCTION_GAS_PRICE
 import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.FUNCTION_GET_BALANCE
+import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.FUNCTION_GET_STORAGE_AT
 import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.FUNCTION_GET_TRANSACTION_COUNT
 import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.FUNCTION_SEND_RAW_TRANSACTION
 import pm.gnosis.models.Transaction
@@ -98,6 +99,22 @@ class RpcTransactionCountRequest(raw: EthGetTransactionCount) :
         raw.response = response.error?.let { EthRequest.Response.Failure<BigInteger>(it.message) }
                 ?: response.result?.hexAsBigIntegerOrNull()?.let { EthRequest.Response.Success(it) }
                 ?: EthRequest.Response.Failure("Invalid transaction count!")
+    }
+}
+
+class RpcGetStorageAt(raw: EthGetStorageAt) :
+    RpcRequest<EthGetStorageAt>(raw) {
+    override fun request() =
+        JsonRpcRequest(
+            method = FUNCTION_GET_STORAGE_AT,
+            params = arrayListOf(raw.from.asEthereumAddressString(), raw.location.toHexString(), raw.block.asString()),
+            id = raw.id
+        )
+
+    override fun parse(response: JsonRpcResult) {
+        raw.response = response.error?.let { EthRequest.Response.Failure<String>(it.message) }
+            ?: response.result?.let { EthRequest.Response.Success(response.result) }
+                    ?: EthRequest.Response.Failure("Missing result")
     }
 }
 
