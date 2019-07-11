@@ -1,7 +1,7 @@
 package pm.gnosis.tests.utils
 
-import android.support.v7.util.DiffUtil
-import android.support.v7.util.ListUpdateCallback
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListUpdateCallback
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 

@@ -8,15 +8,15 @@ import android.content.Context.VIBRATOR_SERVICE
 import android.net.Uri
 import android.os.Vibrator
 import android.provider.Browser
-import android.support.annotation.ColorRes
-import android.support.annotation.PluralsRes
-import android.support.annotation.RequiresPermission
-import android.support.annotation.StringRes
-import android.support.design.widget.Snackbar
-import android.support.v4.content.ContextCompat
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.annotation.ColorRes
+import androidx.annotation.PluralsRes
+import androidx.annotation.RequiresPermission
+import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
+import com.google.android.material.snackbar.Snackbar
 import timber.log.Timber
 
 
@@ -28,17 +28,17 @@ fun Context.toast(@StringRes text: Int, duration: Int = Toast.LENGTH_LONG) {
     Toast.makeText(this, text, duration).show()
 }
 
-fun snackbar(view: View, text: CharSequence, duration: Int = Snackbar.LENGTH_LONG, action: Pair<String, (View) -> Unit>? = null) {
-    val snackbar = Snackbar.make(view, text, duration)
-    action?.let { snackbar.setAction(it.first, it.second) }
-    snackbar.show()
-}
+fun snackbar(view: View, text: CharSequence, duration: Int = Snackbar.LENGTH_LONG, action: Pair<String, (View) -> Unit>? = null) =
+    Snackbar.make(view, text, duration).apply {
+        action?.let { setAction(it.first, it.second) }
+        show()
+    }
 
-fun snackbar(view: View, @StringRes textId: Int, duration: Int = Snackbar.LENGTH_LONG, action: Pair<Int, (View) -> Unit>? = null) {
-    val snackbar = Snackbar.make(view, textId, duration)
-    action?.let { snackbar.setAction(it.first, it.second) }
-    snackbar.show()
-}
+fun snackbar(view: View, @StringRes textId: Int, duration: Int = Snackbar.LENGTH_LONG, action: Pair<Int, (View) -> Unit>? = null) =
+    Snackbar.make(view, textId, duration).apply {
+        action?.let { setAction(it.first, it.second) }
+        show()
+    }
 
 fun Context.getSimplePlural(@PluralsRes stringId: Int, quantity: Long): String =
     resources.getQuantityString(stringId, quantity.toInt(), quantity)

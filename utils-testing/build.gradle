@@ -16,6 +16,5 @@ dependencies {
     implementation "org.mockito:mockito-core:$versions.mockito"
     implementation "org.mockito:mockito-inline:$versions.mockito"
 
-    implementation "com.android.support:appcompat-v7:$versions.android_support"
-    implementation "com.android.support:design:$versions.android_support"
+    implementation "androidx.recyclerview:recyclerview:$versions.androidx_recycler_view"
 }
