@@ -3,8 +3,8 @@ package pm.gnosis.svalinn.common.utils
 import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.support.annotation.ColorInt
-import android.support.v4.app.Fragment
+import androidx.annotation.ColorInt
+import androidx.fragment.app.Fragment
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.WriterException
 import com.google.zxing.qrcode.QRCodeWriter

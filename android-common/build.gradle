@@ -9,9 +9,9 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
 
     //Android
-    implementation "com.android.support:appcompat-v7:$versions.android_support"
-    implementation "com.android.support:cardview-v7:$versions.android_support"
-    implementation "com.android.support:design:$versions.android_support"
+    implementation "androidx.appcompat:appcompat:$versions.androidx_app_compat"
+    implementation "androidx.cardview:cardview:$versions.androidx_card_view"
+    implementation "com.google.android.material:material:$versions.material"
 
     //Rx
     implementation "io.reactivex.rxjava2:rxjava:$versions.rxjava"
