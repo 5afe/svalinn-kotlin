@@ -30,8 +30,9 @@ dependencies {
     //Rx
     implementation "io.reactivex.rxjava2:rxjava:$versions.rxjava"
 
-    //Room
-    implementation "android.arch.persistence.room:runtime:$versions.android_room"
+    //AndroidX
+    implementation "androidx.core:core:$versions.androidx_core"
+    implementation "androidx.room:room-runtime:$versions.androidx_room"
 
     testImplementation "org.mockito:mockito-core:$versions.mockito"
     testImplementation "org.mockito:mockito-inline:$versions.mockito"

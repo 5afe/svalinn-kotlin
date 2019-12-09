@@ -1,8 +1,8 @@
 package pm.gnosis.ticker.data.db
 
-import android.arch.persistence.room.Database
-import android.arch.persistence.room.RoomDatabase
-import android.arch.persistence.room.TypeConverters
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import pm.gnosis.ticker.data.db.models.CurrencyDb
 
 @Database(entities = [CurrencyDb::class], version = 1)
