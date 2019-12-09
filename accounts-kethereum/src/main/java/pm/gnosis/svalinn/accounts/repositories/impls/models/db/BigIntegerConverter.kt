@@ -1,6 +1,6 @@
 package pm.gnosis.svalinn.accounts.repositories.impls.models.db
 
-import android.arch.persistence.room.TypeConverter
+import androidx.room.TypeConverter
 import pm.gnosis.utils.hexAsBigIntegerOrNull
 import java.math.BigInteger
 

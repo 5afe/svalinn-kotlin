@@ -1,8 +1,8 @@
 package pm.gnosis.svalinn.accounts.data.db
 
-import android.arch.persistence.room.Database
-import android.arch.persistence.room.RoomDatabase
-import android.arch.persistence.room.TypeConverters
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import pm.gnosis.svalinn.accounts.repositories.impls.models.db.AccountDb
 import pm.gnosis.svalinn.security.db.EncryptedByteArray
 

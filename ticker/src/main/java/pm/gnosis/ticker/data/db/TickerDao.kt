@@ -1,6 +1,6 @@
 package pm.gnosis.ticker.data.db
 
-import android.arch.persistence.room.*
+import androidx.room.*
 import io.reactivex.Single
 import pm.gnosis.ticker.data.db.models.CurrencyDb
 

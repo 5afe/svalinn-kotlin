@@ -1,9 +1,9 @@
 package pm.gnosis.svalinn.accounts.repositories.impls.models.db
 
-import android.arch.persistence.room.ColumnInfo
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.PrimaryKey
-import android.arch.persistence.room.TypeConverters
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import pm.gnosis.model.Solidity
 import pm.gnosis.svalinn.security.db.EncryptedByteArray
 

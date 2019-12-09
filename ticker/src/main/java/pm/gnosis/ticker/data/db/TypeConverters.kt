@@ -1,6 +1,6 @@
 package pm.gnosis.ticker.data.db
 
-import android.arch.persistence.room.TypeConverter
+import androidx.room.TypeConverter
 import pm.gnosis.ticker.data.repositories.models.Currency
 import pm.gnosis.utils.nullOnThrow
 import java.math.BigDecimal

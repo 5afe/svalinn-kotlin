@@ -25,9 +25,9 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
 
     //Android Architecture Components
-    implementation "android.arch.persistence.room:runtime:$versions.android_room"
-    kapt "android.arch.persistence.room:compiler:$versions.android_room"
-    implementation "android.arch.persistence.room:rxjava2:$versions.android_room"
+    kapt "androidx.room:room-compiler:$versions.androidx_room"
+    implementation "androidx.room:room-runtime:$versions.androidx_room"
+    implementation "androidx.room:room-rxjava2:$versions.androidx_room"
 
     implementation "com.squareup.moshi:moshi:$versions.moshi"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:$versions.moshi"

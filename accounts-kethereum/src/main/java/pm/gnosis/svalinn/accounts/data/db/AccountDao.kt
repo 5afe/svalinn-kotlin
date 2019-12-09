@@ -1,6 +1,6 @@
 package pm.gnosis.svalinn.accounts.data.db
 
-import android.arch.persistence.room.*
+import androidx.room.*
 import io.reactivex.Single
 import pm.gnosis.svalinn.accounts.repositories.impls.models.db.AccountDb
 

@@ -1,6 +1,6 @@
 package pm.gnosis.svalinn.security.db
 
-import android.arch.persistence.room.TypeConverter
+import androidx.room.TypeConverter
 import pm.gnosis.svalinn.security.EncryptionManager
 import pm.gnosis.utils.utf8String
 
