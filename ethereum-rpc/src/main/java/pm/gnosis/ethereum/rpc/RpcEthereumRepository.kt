@@ -145,7 +145,7 @@ class RpcEthereumRepository(private val ethereumRpcApi: EthereumRpcConnector) : 
     }
 }
 
-private fun <T> EthRequest<T>.toRpcRequest() =
+internal fun <T> EthRequest<T>.toRpcRequest() =
     when (this) {
         is EthCall -> RpcCallRequest(this)
         is EthBalance -> RpcBalanceRequest(this)
