@@ -2,9 +2,11 @@ package pm.gnosis.ethereum.rpc
 
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import pm.gnosis.ethereum.*
@@ -71,6 +73,37 @@ class CoRpcEthereumRepositoryTest {
         )
 
         coVerify(exactly = 1) { apiMock.post(bulk.requests.map { it.toRpcRequest().request() }) }
+//        then(apiMock).shouldHaveNoMoreInteractions()
+    }
+
+    @Test
+    fun bulkSameId() = runBlocking {
+        coEvery { apiMock.post(any<Collection<JsonRpcRequest>>()) } returns
+                listOf(
+                    rpcResult(
+                        "0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1",
+                        0
+                    )
+                )
+
+        val tx = Transaction(Solidity.Address(BigInteger.TEN), value = Wei.ether("0.001"))
+        val bulk = BulkRequest(
+            EthCall(Solidity.Address(BigInteger.ONE), tx, 0),
+            EthSendRawTransaction("some_signed_data", 0)
+        )
+
+        val actual = repository.request(bulk)
+
+        assert(actual == bulk)
+
+        val requests = bulk.requests
+        assertNull("First request should be overwritten by second request", requests[0].response)
+        assertEquals(
+            EthRequest.Response.Success("0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1"),
+            requests[1].response
+        )
+
+        coVerify(exactly = 1) { apiMock.post(listOf(requests[1].toRpcRequest().request())) }
 //        then(apiMock).shouldHaveNoMoreInteractions()
     }
 
