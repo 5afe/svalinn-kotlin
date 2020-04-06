@@ -2,7 +2,6 @@ package pm.gnosis.ethereum.rpc
 
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -20,13 +19,13 @@ import java.math.BigInteger
 
 class CoRpcEthereumRepositoryTest {
 
-    private val apiMock = mockk<CoEthereumRpcConnector>()
+    private val apiMock = mockk<EthereumRpcConnector>()
 
-    private lateinit var repository: CoRpcEthereumRepository
+    private lateinit var repository: RpcEthereumRepository
 
     @Before
     fun setup() {
-        repository = CoRpcEthereumRepository(apiMock)
+        repository = RpcEthereumRepository(apiMock)
     }
 
     @Test

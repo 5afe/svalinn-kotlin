@@ -11,7 +11,7 @@ import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
 import java.math.BigDecimal
 
-class CoRpcEthereumRepository(
+class RpcEthereumRepository(
     private val ethereumRpcApi: EthereumRpcConnector
 ) : EthereumRepository {
 
