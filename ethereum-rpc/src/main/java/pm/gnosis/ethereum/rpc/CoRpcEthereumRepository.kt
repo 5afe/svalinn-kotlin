@@ -5,15 +5,15 @@ import pm.gnosis.ethereum.models.EthereumBlock
 import pm.gnosis.ethereum.models.TransactionData
 import pm.gnosis.ethereum.models.TransactionParameters
 import pm.gnosis.ethereum.models.TransactionReceipt
-import pm.gnosis.ethereum.rpc.models.JsonRpcRequest
+import pm.gnosis.ethereum.rpc.models.*
 import pm.gnosis.model.Solidity
 import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
 import java.math.BigDecimal
 
 class CoRpcEthereumRepository(
-    private val ethereumRpcApi: CoEthereumRpcConnector
-) : CoEthereumRepository {
+    private val ethereumRpcApi: EthereumRpcConnector
+) : EthereumRepository {
 
     override suspend fun <R : BulkRequest> request(bulk: R): R =
         bulk.requests.associate { it.id to it.toRpcRequest() }
@@ -131,3 +131,14 @@ class CoRpcEthereumRepository(
         }
     }
 }
+
+internal fun <T> EthRequest<T>.toRpcRequest() =
+    when (this) {
+        is EthCall -> RpcCallRequest(this)
+        is EthBalance -> RpcBalanceRequest(this)
+        is EthEstimateGas -> RpcEstimateGasRequest(this)
+        is EthGasPrice -> RpcGasPriceRequest(this)
+        is EthGetTransactionCount -> RpcTransactionCountRequest(this)
+        is EthSendRawTransaction -> RpcSendRawTransaction(this)
+        is EthGetStorageAt -> RpcGetStorageAt(this)
+    }

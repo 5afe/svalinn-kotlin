@@ -1,6 +1,5 @@
 package pm.gnosis.ethereum.rpc
 
-import io.reactivex.Observable
 import pm.gnosis.ethereum.rpc.models.*
 
 interface EthereumRpcConnector {
@@ -18,19 +17,6 @@ interface EthereumRpcConnector {
         const val FUNCTION_GET_STORAGE_AT = "eth_getStorageAt"
         const val FUNCTION_SEND_RAW_TRANSACTION = "eth_sendRawTransaction"
     }
-
-    fun receipt(jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcTransactionReceiptResult>
-
-    fun block(jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcBlockResult>
-
-    fun transaction(jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcTransactionResult>
-
-    fun post(jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcResult>
-
-    fun post(jsonRpcRequest: Collection<JsonRpcRequest>): Observable<Collection<JsonRpcResult>>
-}
-
-interface CoEthereumRpcConnector {
 
     suspend fun receipt(jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionReceiptResult
 

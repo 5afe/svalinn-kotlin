@@ -1,7 +1,6 @@
 package pm.gnosis.ethereum.rpc.retrofit
 
 import io.reactivex.Observable
-import pm.gnosis.ethereum.rpc.CoEthereumRpcConnector
 import pm.gnosis.ethereum.rpc.EthereumRpcConnector
 import pm.gnosis.ethereum.rpc.models.*
 
@@ -24,7 +23,7 @@ class RetrofitEthereumRpcConnector(private val api: RetrofitEthereumRpcApi) : Et
         api.post(jsonRpcRequest)
 }
 
-class CoRetrofitEthereumRpcConnector(private val api: CoRetrofitEthereumRpcApi) : CoEthereumRpcConnector {
+class CoRetrofitEthereumRpcConnector(private val api: CoRetrofitEthereumRpcApi) : EthereumRpcConnector {
 
     override suspend fun receipt(jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionReceiptResult =
         api.receipt(jsonRpcRequest)
