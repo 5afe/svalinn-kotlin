@@ -1,0 +1,24 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply from: '../buildsystem/coverageReport.gradle'
+
+dependencies {
+    // We specify junit before anything else to make sure that this version is prioritized over the
+    // one bundled in the android.jar
+    testImplementation "junit:junit:$versions.junit"
+
+    implementation project(":ethereum-rpc")
+
+    //Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
+
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$versions.retrofit"
+    implementation "com.squareup.retrofit2:converter-moshi:$versions.retrofit"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$versions.retrofit"
+
+    testImplementation "org.mockito:mockito-core:$versions.mockito"
+    testImplementation "org.mockito:mockito-inline:$versions.mockito"
+    testImplementation project(":utils-testing")
+}

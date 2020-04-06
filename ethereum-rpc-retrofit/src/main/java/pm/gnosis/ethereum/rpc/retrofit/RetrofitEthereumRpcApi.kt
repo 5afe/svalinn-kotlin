@@ -22,21 +22,3 @@ interface RetrofitEthereumRpcApi {
     @POST(".")
     fun post(@Body jsonRpcRequest: Collection<JsonRpcRequest>): Observable<Collection<JsonRpcResult>>
 }
-
-
-interface CoRetrofitEthereumRpcApi {
-    @POST(".")
-    suspend fun receipt(@Body jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionReceiptResult
-
-    @POST(".")
-    suspend fun block(@Body jsonRpcRequest: JsonRpcRequest): JsonRpcBlockResult
-
-    @POST(".")
-    suspend fun transaction(@Body jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionResult
-
-    @POST(".")
-    suspend fun post(@Body jsonRpcRequest: JsonRpcRequest): JsonRpcResult
-
-    @POST(".")
-    suspend fun post(@Body jsonRpcRequest: Collection<JsonRpcRequest>): Collection<JsonRpcResult>
-}
