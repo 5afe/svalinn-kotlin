@@ -13,13 +13,9 @@ dependencies {
     //Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
 
-    //Rx
-    implementation "io.reactivex.rxjava2:rxjava:$versions.rxjava"
-
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:$versions.retrofit"
     implementation "com.squareup.retrofit2:converter-moshi:$versions.retrofit"
-    implementation "com.squareup.retrofit2:adapter-rxjava2:$versions.retrofit"
 
     testImplementation "org.mockito:mockito-core:$versions.mockito"
     testImplementation "org.mockito:mockito-inline:$versions.mockito"

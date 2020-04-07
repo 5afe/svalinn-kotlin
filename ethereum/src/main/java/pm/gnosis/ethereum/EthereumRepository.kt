@@ -9,29 +9,29 @@ import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
 import java.math.BigInteger
 
-interface EthereumRepository {
-
-    suspend fun <R : BulkRequest> request(bulk: R): R
-
-    suspend fun <R : EthRequest<*>> request(request: R): R
-
-    suspend fun getBalance(address: Solidity.Address): Wei
-
-    suspend fun sendRawTransaction(signedTransactionData: String): String
-
-    suspend fun getTransactionReceipt(transactionHash: String): TransactionReceipt
-
-    suspend fun getTransactionByHash(transactionHash: String): TransactionData
-
-    suspend fun getBlockByHash(blockHash: String): EthereumBlock
-
-    suspend fun getTransactionParameters(
-        from: Solidity.Address,
-        to: Solidity.Address,
-        value: Wei? = null,
-        data: String? = null
-    ): TransactionParameters
-}
+//interface EthereumRepository {
+//
+//    fun <R : BulkRequest> request(bulk: R): R
+//
+//    fun <R : EthRequest<*>> request(request: R): R
+//
+//    fun getBalance(address: Solidity.Address): Wei
+//
+//    fun sendRawTransaction(signedTransactionData: String): String
+//
+//    fun getTransactionReceipt(transactionHash: String): TransactionReceipt
+//
+//    fun getTransactionByHash(transactionHash: String): TransactionData
+//
+//    fun getBlockByHash(blockHash: String): EthereumBlock
+//
+//    fun getTransactionParameters(
+//        from: Solidity.Address,
+//        to: Solidity.Address,
+//        value: Wei? = null,
+//        data: String? = null
+//    ): TransactionParameters
+//}
 
 open class BulkRequest(val requests: List<EthRequest<*>>) {
     constructor(vararg requests: EthRequest<*>) : this(requests.toList())
@@ -64,9 +64,9 @@ sealed class EthRequest<T>(val id: Int) {
     fun checkedResult(errorMsg: String? = null): T =
         response.let {
             when (it) {
-                is EthRequest.Response.Success ->
+                is Response.Success ->
                     it.data
-                is EthRequest.Response.Failure -> {
+                is Response.Failure -> {
                     val msg = it.error + (errorMsg?.let { " ($it)" } ?: "")
                     throw RequestFailedException(msg)
                 }
