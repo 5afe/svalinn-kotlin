@@ -1,6 +1,5 @@
 package pm.gnosis.ethereum.rpc.retrofit
 
-import io.reactivex.Observable
 import org.junit.Before
 import org.junit.Test
 
@@ -30,55 +29,55 @@ class RetrofitEthereumRpcConnectorTest {
         connector = RetrofitEthereumRpcConnector(api)
     }
 
-    @Test
+    @Test(expected = NotImplementedError::class)
     fun receipt() {
-        val expected = Observable.error<JsonRpcTransactionReceiptResult>(NotImplementedError())
+        val expected = NotImplementedError()
 
-        given(api.receipt(MockUtils.any())).willReturn(expected)
+        given(api.receipt(MockUtils.any())).willThrow(expected)
 
         assertEquals(expected, connector.receipt(request))
         then(api).should().receipt(request)
         then(api).shouldHaveNoMoreInteractions()
     }
 
-    @Test
+    @Test(expected = NotImplementedError::class)
     fun block() {
-        val expected = Observable.error<JsonRpcBlockResult>(NotImplementedError())
+        val expected = NotImplementedError()
 
-        given(api.block(MockUtils.any())).willReturn(expected)
+        given(api.block(MockUtils.any())).willThrow(expected)
 
         assertEquals(expected, connector.block(request))
         then(api).should().block(request)
         then(api).shouldHaveNoMoreInteractions()
     }
 
-    @Test
+    @Test(expected = NotImplementedError::class)
     fun transaction() {
-        val expected = Observable.error<JsonRpcTransactionResult>(NotImplementedError())
+        val expected = NotImplementedError()
 
-        given(api.transaction(MockUtils.any())).willReturn(expected)
+        given(api.transaction(MockUtils.any())).willThrow(expected)
 
         assertEquals(expected, connector.transaction(request))
         then(api).should().transaction(request)
         then(api).shouldHaveNoMoreInteractions()
     }
 
-    @Test
+    @Test(expected = NotImplementedError::class)
     fun post() {
-        val expected = Observable.error<JsonRpcResult>(NotImplementedError())
+        val expected = NotImplementedError()
 
-        given(api.post(MockUtils.any<JsonRpcRequest>())).willReturn(expected)
+        given(api.post(MockUtils.any<JsonRpcRequest>())).willThrow(expected)
 
         assertEquals(expected, connector.post(request))
         then(api).should().post(request)
         then(api).shouldHaveNoMoreInteractions()
     }
 
-    @Test
+    @Test(expected = NotImplementedError::class)
     fun bulk() {
-        val expected = Observable.error<Collection<JsonRpcResult>>(NotImplementedError())
+        val expected = NotImplementedError()
 
-        given(api.post(MockUtils.any<Collection<JsonRpcRequest>>())).willReturn(expected)
+        given(api.post(MockUtils.any<Collection<JsonRpcRequest>>())).willThrow(expected)
 
         assertEquals(expected, connector.post(listOf(request)))
         then(api).should().post(listOf(request))
