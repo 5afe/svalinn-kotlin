@@ -1,11 +1,13 @@
-package pm.gnosis.ethereum.rpc
+package pm.gnosis.ethereum.rpc.co
 
 import pm.gnosis.ethereum.*
 import pm.gnosis.ethereum.models.EthereumBlock
 import pm.gnosis.ethereum.models.TransactionData
 import pm.gnosis.ethereum.models.TransactionParameters
 import pm.gnosis.ethereum.models.TransactionReceipt
+import pm.gnosis.ethereum.rpc.EthereumRpcConnector
 import pm.gnosis.ethereum.rpc.models.*
+import pm.gnosis.ethereum.rpc.toRpcRequest
 import pm.gnosis.model.Solidity
 import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
@@ -15,7 +17,7 @@ class RpcEthereumRepository(
     private val ethereumRpcApi: EthereumRpcConnector
 ) : EthereumRepository {
 
-    override fun <R : BulkRequest> request(bulk: R): R =
+    override suspend fun <R : BulkRequest> request(bulk: R): R =
         bulk.requests.associate { it.id to it.toRpcRequest() }
             .let { rpcRequests ->
                 ethereumRpcApi.post(rpcRequests.values.map { it.request() })
@@ -23,7 +25,7 @@ class RpcEthereumRepository(
                     .let { bulk }
             }
 
-    override fun <R : EthRequest<*>> request(request: R): R =
+    override suspend fun <R : EthRequest<*>> request(request: R): R =
         request.toRpcRequest().let { rpcRequest ->
             ethereumRpcApi.post(rpcRequest.request())
                 .let {
@@ -32,14 +34,14 @@ class RpcEthereumRepository(
                 }
         }
 
-    override fun getBalance(address: Solidity.Address): Wei =
+    override suspend fun getBalance(address: Solidity.Address): Wei =
         request(EthBalance(address)).checkedResult()
 
-    override fun sendRawTransaction(signedTransactionData: String): String =
+    override suspend fun sendRawTransaction(signedTransactionData: String): String =
         request(EthSendRawTransaction(signedTransactionData))
             .checkedResult("Could not send raw transaction")
 
-    override fun getTransactionReceipt(transactionHash: String): TransactionReceipt =
+    override suspend fun getTransactionReceipt(transactionHash: String): TransactionReceipt =
         ethereumRpcApi.receipt(
             JsonRpcRequest(
                 method = "eth_getTransactionReceipt",
@@ -62,7 +64,7 @@ class RpcEthereumRepository(
         } ?: throw TransactionReceiptNotFound()
 
 
-    override fun getTransactionByHash(transactionHash: String): TransactionData =
+    override suspend fun getTransactionByHash(transactionHash: String): TransactionData =
         ethereumRpcApi.transaction(
             JsonRpcRequest(
                 method = "eth_getTransactionByHash",
@@ -86,7 +88,7 @@ class RpcEthereumRepository(
             )
         } ?: throw TransactionNotFound()
 
-    override fun getBlockByHash(blockHash: String): EthereumBlock =
+    override suspend fun getBlockByHash(blockHash: String): EthereumBlock =
         ethereumRpcApi.block(
             JsonRpcRequest(
                 method = "eth_getBlockByHash",
@@ -115,7 +117,7 @@ class RpcEthereumRepository(
         } ?: throw BlockNotFound()
 
 
-    override fun getTransactionParameters(from: Solidity.Address, to: Solidity.Address, value: Wei?, data: String?): TransactionParameters {
+    override suspend fun getTransactionParameters(from: Solidity.Address, to: Solidity.Address, value: Wei?, data: String?): TransactionParameters {
         val tx = Transaction(address = to, value = value, data = data)
         val estimateRequest = EthEstimateGas(from, tx, 0)
         val gasPriceRequest = EthGasPrice(1)
@@ -131,14 +133,3 @@ class RpcEthereumRepository(
         }
     }
 }
-
-internal fun <T> EthRequest<T>.toRpcRequest() =
-    when (this) {
-        is EthCall -> RpcCallRequest(this)
-        is EthBalance -> RpcBalanceRequest(this)
-        is EthEstimateGas -> RpcEstimateGasRequest(this)
-        is EthGasPrice -> RpcGasPriceRequest(this)
-        is EthGetTransactionCount -> RpcTransactionCountRequest(this)
-        is EthSendRawTransaction -> RpcSendRawTransaction(this)
-        is EthGetStorageAt -> RpcGetStorageAt(this)
-    }

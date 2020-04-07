@@ -8,13 +8,20 @@ dependencies {
     // one bundled in the android.jar
     testImplementation "junit:junit:$versions.junit"
 
+    implementation project(":ethereum")
     implementation project(":ethereum-rpc")
+    implementation project(":models")
+    implementation project(":utils")
 
-    // Retrofit
-    implementation "com.squareup.retrofit2:retrofit:$versions.retrofit"
-    implementation "com.squareup.retrofit2:converter-moshi:$versions.retrofit"
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
+
+    // Bivrost
+    implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
 
     testImplementation "org.mockito:mockito-core:$versions.mockito"
     testImplementation "org.mockito:mockito-inline:$versions.mockito"
+    testImplementation "io.mockk:mockk:1.9.3"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.1"
     testImplementation project(":utils-testing")
 }

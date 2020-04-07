@@ -1,14 +1,15 @@
-package pm.gnosis.ethereum.rpc
+package pm.gnosis.ethereum.rpc.co
 
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Before
 import org.junit.Test
+
+import org.junit.Assert.*
+import org.junit.Before
 import pm.gnosis.ethereum.*
+import pm.gnosis.ethereum.rpc.EthereumRpcConnector
 import pm.gnosis.ethereum.rpc.models.*
 import pm.gnosis.model.Solidity
 import pm.gnosis.models.Transaction
@@ -17,7 +18,7 @@ import pm.gnosis.utils.hexAsBigInteger
 import pm.gnosis.utils.toHexString
 import java.math.BigInteger
 
-class CoRpcEthereumRepositoryTest {
+class RpcEthereumRepositoryTest {
 
     private val apiMock = mockk<EthereumRpcConnector>()
 

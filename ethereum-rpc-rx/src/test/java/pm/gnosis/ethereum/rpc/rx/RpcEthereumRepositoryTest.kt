@@ -1,4 +1,4 @@
-package pm.gnosis.ethereum.rpc
+package pm.gnosis.ethereum.rpc.rx
 
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
@@ -17,6 +17,7 @@ import pm.gnosis.ethereum.models.EthereumBlock
 import pm.gnosis.ethereum.models.TransactionData
 import pm.gnosis.ethereum.models.TransactionParameters
 import pm.gnosis.ethereum.models.TransactionReceipt
+import pm.gnosis.ethereum.rpc.EthereumRpcConnector
 import pm.gnosis.ethereum.rpc.models.*
 import pm.gnosis.model.Solidity
 import pm.gnosis.models.Transaction
@@ -49,19 +50,18 @@ class RpcEthereumRepositoryTest {
     fun bulk() {
         given(apiMock.post(MockUtils.any<Collection<JsonRpcRequest>>()))
             .willReturn(
-                Observable.just(
-                    listOf(
-                        rpcResult("0x", 0),
-                        rpcResult(Wei.ether("1").value.toHexString(), 1),
-                        rpcResult(Wei.ether("0.000000001").value.toHexString(), 2),
-                        rpcResult("0x0a", 3),
-                        rpcResult(
-                            "0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1",
-                            4
-                        )
+                listOf(
+                    rpcResult("0x", 0),
+                    rpcResult(Wei.ether("1").value.toHexString(), 1),
+                    rpcResult(Wei.ether("0.000000001").value.toHexString(), 2),
+                    rpcResult("0x0a", 3),
+                    rpcResult(
+                        "0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1",
+                        4
                     )
                 )
             )
+
 
         val tx = Transaction(Solidity.Address(BigInteger.TEN), value = Wei.ether("0.001"))
         val bulk = BulkRequest(
@@ -100,12 +100,10 @@ class RpcEthereumRepositoryTest {
     fun bulkSameId() {
         given(apiMock.post(MockUtils.any<Collection<JsonRpcRequest>>()))
             .willReturn(
-                Observable.just(
-                    listOf(
-                        rpcResult(
-                            "0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1",
-                            0
-                        )
+                listOf(
+                    rpcResult(
+                        "0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1",
+                        0
                     )
                 )
             )
@@ -136,12 +134,10 @@ class RpcEthereumRepositoryTest {
     fun bulkWithFailure() {
         given(apiMock.post(MockUtils.any<Collection<JsonRpcRequest>>()))
             .willReturn(
-                Observable.just(
-                    listOf(
-                        rpcResult("0x", 0),
-                        rpcResult(Wei.ether("1").value.toHexString(), 1),
-                        rpcResult("0x", 2, error = "revert; But I won't tell you why")
-                    )
+                listOf(
+                    rpcResult("0x", 0),
+                    rpcResult(Wei.ether("1").value.toHexString(), 1),
+                    rpcResult("0x", 2, error = "revert; But I won't tell you why")
                 )
             )
 
@@ -172,11 +168,7 @@ class RpcEthereumRepositoryTest {
     @Test
     fun request() {
         given(apiMock.post(MockUtils.any<JsonRpcRequest>()))
-            .willReturn(
-                Observable.just(
-                    rpcResult(Wei.ether("1").value.toHexString(), 1)
-                )
-            )
+            .willReturn(rpcResult(Wei.ether("1").value.toHexString(), 1))
 
         val request = EthBalance(Solidity.Address(BigInteger.ONE), 1)
 
@@ -197,11 +189,7 @@ class RpcEthereumRepositoryTest {
     @Test
     fun requestFailure() {
         given(apiMock.post(MockUtils.any<JsonRpcRequest>()))
-            .willReturn(
-                Observable.just(
-                    rpcResult("0x", 1, "eth_getBalance should never error")
-                )
-            )
+            .willReturn(rpcResult("0x", 1, "eth_getBalance should never error"))
 
         val request = EthBalance(Solidity.Address(BigInteger.ONE), 1)
 
@@ -222,11 +210,7 @@ class RpcEthereumRepositoryTest {
     @Test
     fun getBalance() {
         given(apiMock.post(MockUtils.any<JsonRpcRequest>()))
-            .willReturn(
-                Observable.just(
-                    rpcResult(Wei.ether("1").value.toHexString())
-                )
-            )
+            .willReturn(rpcResult(Wei.ether("1").value.toHexString()))
 
         val testObserver = TestObserver<Wei>()
         repository.getBalance(Solidity.Address(BigInteger.ONE)).subscribe(testObserver)
@@ -240,11 +224,7 @@ class RpcEthereumRepositoryTest {
     @Test
     fun getBalanceFailure() {
         given(apiMock.post(MockUtils.any<JsonRpcRequest>()))
-            .willReturn(
-                Observable.just(
-                    rpcResult("0x", 0, "eth_getBalance should never error")
-                )
-            )
+            .willReturn(rpcResult("0x", 0, "eth_getBalance should never error"))
 
         val testObserver = TestObserver<Wei>()
         repository.getBalance(Solidity.Address(BigInteger.ONE)).subscribe(testObserver)
@@ -258,11 +238,7 @@ class RpcEthereumRepositoryTest {
     @Test
     fun sendRawTransaction() {
         given(apiMock.post(MockUtils.any<JsonRpcRequest>()))
-            .willReturn(
-                Observable.just(
-                    rpcResult("0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1")
-                )
-            )
+            .willReturn(rpcResult("0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1"))
 
         val testObserver = TestObserver<String>()
         repository.sendRawTransaction("0xSomeSignedManager").subscribe(testObserver)
@@ -277,11 +253,7 @@ class RpcEthereumRepositoryTest {
     @Test
     fun sendRawTransactionFailure() {
         given(apiMock.post(MockUtils.any<JsonRpcRequest>()))
-            .willReturn(
-                Observable.just(
-                    rpcResult("0x", 0, "revert; But I won't tell you why")
-                )
-            )
+            .willReturn(rpcResult("0x", 0, "revert; But I won't tell you why"))
 
         val testObserver = TestObserver<String>()
         repository.sendRawTransaction("0xSomeSignedManager").subscribe(testObserver)
@@ -303,24 +275,22 @@ class RpcEthereumRepositoryTest {
         val topic0 = "0x4db17dd5e4732fb6da34a148104a592783ca119a1e7bb8829eba6cbadef0b511"
         given(apiMock.receipt(MockUtils.any()))
             .willReturn(
-                Observable.just(
-                    JsonRpcTransactionReceiptResult(
-                        1, "2.0",
-                        result = JsonRpcTransactionReceiptResult.TransactionReceipt(
-                            BigInteger.ONE,
-                            transactionHash,
-                            BigInteger.valueOf(23),
-                            "block-hash",
-                            BigInteger.valueOf(31),
-                            "0x32".asEthereumAddress()!!,
-                            "0x55".asEthereumAddress()!!,
-                            BigInteger.valueOf(115),
-                            BigInteger.valueOf(11),
-                            "0x31415925".asEthereumAddress(),
-                            listOf(
-                                JsonRpcTransactionReceiptResult.TransactionReceipt.Event(
-                                    BigInteger.ZERO, data, listOf(topic0)
-                                )
+                JsonRpcTransactionReceiptResult(
+                    1, "2.0",
+                    result = JsonRpcTransactionReceiptResult.TransactionReceipt(
+                        BigInteger.ONE,
+                        transactionHash,
+                        BigInteger.valueOf(23),
+                        "block-hash",
+                        BigInteger.valueOf(31),
+                        "0x32".asEthereumAddress()!!,
+                        "0x55".asEthereumAddress()!!,
+                        BigInteger.valueOf(115),
+                        BigInteger.valueOf(11),
+                        "0x31415925".asEthereumAddress(),
+                        listOf(
+                            JsonRpcTransactionReceiptResult.TransactionReceipt.Event(
+                                BigInteger.ZERO, data, listOf(topic0)
                             )
                         )
                     )
@@ -365,11 +335,9 @@ class RpcEthereumRepositoryTest {
         val transactionHash = "0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1"
         given(apiMock.receipt(MockUtils.any()))
             .willReturn(
-                Observable.just(
-                    JsonRpcTransactionReceiptResult(
-                        1, "2.0",
-                        result = null
-                    )
+                JsonRpcTransactionReceiptResult(
+                    1, "2.0",
+                    result = null
                 )
             )
 
@@ -394,22 +362,20 @@ class RpcEthereumRepositoryTest {
         val data = "0x0000000000000000000000009205b8f1a21a3cee0f6a629fd83cee0f6a629fd8"
         given(apiMock.transaction(MockUtils.any()))
             .willReturn(
-                Observable.just(
-                    JsonRpcTransactionResult(
-                        1, "2.0",
-                        result = JsonRpcTransactionResult.JsonTransaction(
-                            transactionHash,
-                            BigInteger.valueOf(23),
-                            "block-hash",
-                            BigInteger.valueOf(31),
-                            BigInteger.valueOf(32),
-                            "0x32".asEthereumAddress()!!,
-                            "0x55".asEthereumAddress()!!,
-                            BigInteger.ONE,
-                            BigInteger.valueOf(11),
-                            BigInteger.valueOf(115),
-                            data
-                        )
+                JsonRpcTransactionResult(
+                    1, "2.0",
+                    result = JsonRpcTransactionResult.JsonTransaction(
+                        transactionHash,
+                        BigInteger.valueOf(23),
+                        "block-hash",
+                        BigInteger.valueOf(31),
+                        BigInteger.valueOf(32),
+                        "0x32".asEthereumAddress()!!,
+                        "0x55".asEthereumAddress()!!,
+                        BigInteger.ONE,
+                        BigInteger.valueOf(11),
+                        BigInteger.valueOf(115),
+                        data
                     )
                 )
             )
@@ -450,11 +416,9 @@ class RpcEthereumRepositoryTest {
         val transactionHash = "0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1"
         given(apiMock.transaction(MockUtils.any()))
             .willReturn(
-                Observable.just(
-                    JsonRpcTransactionResult(
-                        1, "2.0",
-                        result = null
-                    )
+                JsonRpcTransactionResult(
+                    1, "2.0",
+                    result = null
                 )
             )
 
@@ -478,28 +442,26 @@ class RpcEthereumRepositoryTest {
         val blockHash = "0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1"
         given(apiMock.block(MockUtils.any()))
             .willReturn(
-                Observable.just(
-                    JsonRpcBlockResult(
-                        1, "2.0",
-                        result = JsonRpcBlockResult.JsonBlock(
-                            BigInteger.ONE,
-                            blockHash,
-                            "parent-hash",
-                            "weird-nonce",
-                            "uncles-hash",
-                            "logsBloom",
-                            "transactionsRoot",
-                            "stateRoot",
-                            "receiptRoot",
-                            "0x1234".asEthereumAddress()!!,
-                            BigInteger.valueOf(31),
-                            BigInteger.valueOf(1331),
-                            "extra-data",
-                            BigInteger.valueOf(1989),
-                            BigInteger.valueOf(115),
-                            BigInteger.valueOf(11),
-                            BigInteger.valueOf(987654321)
-                        )
+                JsonRpcBlockResult(
+                    1, "2.0",
+                    result = JsonRpcBlockResult.JsonBlock(
+                        BigInteger.ONE,
+                        blockHash,
+                        "parent-hash",
+                        "weird-nonce",
+                        "uncles-hash",
+                        "logsBloom",
+                        "transactionsRoot",
+                        "stateRoot",
+                        "receiptRoot",
+                        "0x1234".asEthereumAddress()!!,
+                        BigInteger.valueOf(31),
+                        BigInteger.valueOf(1331),
+                        "extra-data",
+                        BigInteger.valueOf(1989),
+                        BigInteger.valueOf(115),
+                        BigInteger.valueOf(11),
+                        BigInteger.valueOf(987654321)
                     )
                 )
             )
@@ -544,11 +506,9 @@ class RpcEthereumRepositoryTest {
         val blockHash = "0x2709205b8f1a21a3cee0f6a629fd8dcfee589733741a877aba873cb379e97fa1"
         given(apiMock.block(MockUtils.any()))
             .willReturn(
-                Observable.just(
-                    JsonRpcBlockResult(
-                        1, "2.0",
-                        result = null
-                    )
+                JsonRpcBlockResult(
+                    1, "2.0",
+                    result = null
                 )
             )
 
@@ -571,12 +531,10 @@ class RpcEthereumRepositoryTest {
     fun getTransactionParameters() {
         given(apiMock.post(MockUtils.any<Collection<JsonRpcRequest>>()))
             .willReturn(
-                Observable.just(
-                    listOf(
-                        rpcResult(BigInteger.valueOf(55000).toHexString(), 0),
-                        rpcResult(Wei.ether("0.000000001").value.toHexString(), 1),
-                        rpcResult("0x0a", 2)
-                    )
+                listOf(
+                    rpcResult(BigInteger.valueOf(55000).toHexString(), 0),
+                    rpcResult(Wei.ether("0.000000001").value.toHexString(), 1),
+                    rpcResult("0x0a", 2)
                 )
             )
 
@@ -609,7 +567,7 @@ class RpcEthereumRepositoryTest {
 
     private fun testTransactionParametersFailure(rpcResults: List<JsonRpcResult>) {
         given(apiMock.post(MockUtils.any<Collection<JsonRpcRequest>>()))
-            .willReturn(Observable.just(rpcResults))
+            .willReturn(rpcResults)
 
         val transaction = Transaction(Solidity.Address(BigInteger.ONE), value = Wei.ether("1"), data = "0x42cde4e8")
         val testObserver = TestObserver<TransactionParameters>()

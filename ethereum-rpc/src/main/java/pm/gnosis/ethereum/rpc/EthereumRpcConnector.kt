@@ -1,5 +1,6 @@
 package pm.gnosis.ethereum.rpc
 
+import pm.gnosis.ethereum.*
 import pm.gnosis.ethereum.rpc.models.*
 
 interface EthereumRpcConnector {
@@ -29,3 +30,14 @@ interface EthereumRpcConnector {
      fun post(jsonRpcRequest: Collection<JsonRpcRequest>): Collection<JsonRpcResult>
 
 }
+
+fun <T> EthRequest<T>.toRpcRequest() =
+    when (this) {
+        is EthCall -> RpcCallRequest(this)
+        is EthBalance -> RpcBalanceRequest(this)
+        is EthEstimateGas -> RpcEstimateGasRequest(this)
+        is EthGasPrice -> RpcGasPriceRequest(this)
+        is EthGetTransactionCount -> RpcTransactionCountRequest(this)
+        is EthSendRawTransaction -> RpcSendRawTransaction(this)
+        is EthGetStorageAt -> RpcGetStorageAt(this)
+    }
