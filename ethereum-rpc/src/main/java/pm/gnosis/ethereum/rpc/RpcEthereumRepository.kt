@@ -1,13 +1,11 @@
-package pm.gnosis.ethereum.rpc.co
+package pm.gnosis.ethereum.rpc
 
 import pm.gnosis.ethereum.*
 import pm.gnosis.ethereum.models.EthereumBlock
 import pm.gnosis.ethereum.models.TransactionData
 import pm.gnosis.ethereum.models.TransactionParameters
 import pm.gnosis.ethereum.models.TransactionReceipt
-import pm.gnosis.ethereum.rpc.EthereumRpcConnector
 import pm.gnosis.ethereum.rpc.models.*
-import pm.gnosis.ethereum.rpc.toRpcRequest
 import pm.gnosis.model.Solidity
 import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei

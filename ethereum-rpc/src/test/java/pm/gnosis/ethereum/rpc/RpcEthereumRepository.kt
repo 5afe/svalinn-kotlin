@@ -1,4 +1,4 @@
-package pm.gnosis.ethereum.rpc.co
+package pm.gnosis.ethereum.rpc
 
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -13,7 +13,6 @@ import pm.gnosis.ethereum.models.EthereumBlock
 import pm.gnosis.ethereum.models.TransactionData
 import pm.gnosis.ethereum.models.TransactionParameters
 import pm.gnosis.ethereum.models.TransactionReceipt
-import pm.gnosis.ethereum.rpc.EthereumRpcConnector
 import pm.gnosis.ethereum.rpc.models.*
 import pm.gnosis.model.Solidity
 import pm.gnosis.models.Transaction
