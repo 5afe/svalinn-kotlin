@@ -116,7 +116,6 @@ class RpcEthereumRepository(
             )
         } ?: throw BlockNotFound()
 
-
     override suspend fun getTransactionParameters(from: Solidity.Address, to: Solidity.Address, value: Wei?, data: String?): TransactionParameters {
         val tx = Transaction(address = to, value = value, data = data)
         val estimateRequest = EthEstimateGas(from, tx, 0)

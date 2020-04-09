@@ -7,27 +7,24 @@ import retrofit2.Response
 
 class RetrofitEthereumRpcConnector(private val api: RetrofitEthereumRpcApi) : EthereumRpcConnector {
 
-    override fun receipt(jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionReceiptResult {
-        return api.receipt(jsonRpcRequest).getOrThrow()
+    override suspend fun receipt(jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionReceiptResult {
+        return api.receipt(jsonRpcRequest)
     }
 
-    override fun block(jsonRpcRequest: JsonRpcRequest): JsonRpcBlockResult {
-        return api.block(jsonRpcRequest).getOrThrow()
+    override suspend fun block(jsonRpcRequest: JsonRpcRequest): JsonRpcBlockResult {
+        return api.block(jsonRpcRequest)
     }
 
-    override fun transaction(jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionResult {
-        return api.transaction(jsonRpcRequest).getOrThrow()
+    override suspend fun transaction(jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionResult {
+        return api.transaction(jsonRpcRequest)
     }
 
-    override fun post(jsonRpcRequest: JsonRpcRequest): JsonRpcResult {
-        return api.post(jsonRpcRequest).getOrThrow()
+    override suspend fun post(jsonRpcRequest: JsonRpcRequest): JsonRpcResult {
+        return api.post(jsonRpcRequest)
     }
 
-    override fun post(jsonRpcRequest: Collection<JsonRpcRequest>): Collection<JsonRpcResult> {
-        return api.post(jsonRpcRequest).getOrThrow()
+    override suspend fun post(jsonRpcRequest: Collection<JsonRpcRequest>): Collection<JsonRpcResult> {
+        return api.post(jsonRpcRequest)
     }
 
 }
-
-
-fun <T> Response<T>.getOrThrow() = this.body() ?: throw HttpException(this)

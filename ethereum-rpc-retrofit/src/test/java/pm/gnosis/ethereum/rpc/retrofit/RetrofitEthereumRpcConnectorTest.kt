@@ -29,11 +29,11 @@ class RetrofitEthereumRpcConnectorTest {
         connector = RetrofitEthereumRpcConnector(api)
     }
 
-    @Test(expected = NotImplementedError::class)
+    @Test()
     fun receipt() {
         val expected = NotImplementedError()
 
-        given(api.receipt(MockUtils.any())).willThrow(expected)
+        given(api.receipt(MockUtils.any())).willCallRealMethod()
 
         assertEquals(expected, connector.receipt(request))
         then(api).should().receipt(request)

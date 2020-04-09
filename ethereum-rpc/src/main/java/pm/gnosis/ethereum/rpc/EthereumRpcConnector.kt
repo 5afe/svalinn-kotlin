@@ -19,15 +19,15 @@ interface EthereumRpcConnector {
         const val FUNCTION_SEND_RAW_TRANSACTION = "eth_sendRawTransaction"
     }
 
-     fun receipt(jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionReceiptResult
+    suspend fun receipt(jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionReceiptResult
 
-     fun block(jsonRpcRequest: JsonRpcRequest): JsonRpcBlockResult
+    suspend fun block(jsonRpcRequest: JsonRpcRequest): JsonRpcBlockResult
 
-     fun transaction(jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionResult
+    suspend fun transaction(jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionResult
 
-     fun post(jsonRpcRequest: JsonRpcRequest): JsonRpcResult
+    suspend fun post(jsonRpcRequest: JsonRpcRequest): JsonRpcResult
 
-     fun post(jsonRpcRequest: Collection<JsonRpcRequest>): Collection<JsonRpcResult>
+    suspend fun post(jsonRpcRequest: Collection<JsonRpcRequest>): Collection<JsonRpcResult>
 
 }
 

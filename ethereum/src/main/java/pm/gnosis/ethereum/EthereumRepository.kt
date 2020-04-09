@@ -1,9 +1,37 @@
 package pm.gnosis.ethereum
 
+import pm.gnosis.ethereum.models.EthereumBlock
+import pm.gnosis.ethereum.models.TransactionData
+import pm.gnosis.ethereum.models.TransactionParameters
+import pm.gnosis.ethereum.models.TransactionReceipt
 import pm.gnosis.model.Solidity
 import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
 import java.math.BigInteger
+
+interface EthereumRepository {
+
+    suspend fun <R : BulkRequest> request(bulk: R): R
+
+    suspend fun <R : EthRequest<*>> request(request: R): R
+
+    suspend fun getBalance(address: Solidity.Address): Wei
+
+    suspend fun sendRawTransaction(signedTransactionData: String): String
+
+    suspend fun getTransactionReceipt(transactionHash: String): TransactionReceipt
+
+    suspend fun getTransactionByHash(transactionHash: String): TransactionData
+
+    suspend fun getBlockByHash(blockHash: String): EthereumBlock
+
+    suspend fun getTransactionParameters(
+        from: Solidity.Address,
+        to: Solidity.Address,
+        value: Wei? = null,
+        data: String? = null
+    ): TransactionParameters
+}
 
 open class BulkRequest(val requests: List<EthRequest<*>>) {
     constructor(vararg requests: EthRequest<*>) : this(requests.toList())
