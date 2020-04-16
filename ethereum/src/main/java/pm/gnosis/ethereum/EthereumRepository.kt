@@ -55,7 +55,7 @@ class MappedRequest<I, out T>(
     }
 }
 
-sealed class EthRequest<T>(val id: Int) {
+sealed class EthRequest<T>(open val id: Int) {
     var response: Response<T>? = null
 
     fun result(): T? = (response as? Response.Success)?.data
@@ -81,31 +81,46 @@ sealed class EthRequest<T>(val id: Int) {
     }
 }
 
-class EthCall(
+data class EthCall(
     val from: Solidity.Address? = null,
     val transaction: Transaction? = null,
-    id: Int = 0,
-    val block: Block = Block.PENDING
+    val block: Block = Block.PENDING,
+    override val id: Int = 0
 ) : EthRequest<String>(id)
 
-class EthBalance(val address: Solidity.Address, id: Int = 0, val block: Block = Block.PENDING) :
-    EthRequest<Wei>(id)
+data class EthBalance(
+    val address: Solidity.Address,
+    val block: Block = Block.PENDING,
+    override val id: Int = 0
+) : EthRequest<Wei>(id)
 
-class EthGasPrice(id: Int = 0) : EthRequest<BigInteger>(id)
-
-class EthEstimateGas(
-    val from: Solidity.Address? = null,
-    val transaction: Transaction? = null,
-    id: Int = 0
+data class EthGasPrice(
+    override val id: Int = 0
 ) : EthRequest<BigInteger>(id)
 
-class EthGetTransactionCount(val from: Solidity.Address, id: Int = 0, val block: Block = Block.PENDING) :
-    EthRequest<BigInteger>(id)
+data class EthEstimateGas(
+    val from: Solidity.Address? = null,
+    val transaction: Transaction? = null,
+    override val id: Int = 0
+) : EthRequest<BigInteger>(id)
 
-class EthGetStorageAt(val from: Solidity.Address, val location: BigInteger, id: Int = 0, val block: Block = Block.PENDING) :
-    EthRequest<String>(id)
+data class EthGetTransactionCount(
+    val from: Solidity.Address,
+    val block: Block = Block.PENDING,
+    override val id: Int = 0
+) : EthRequest<BigInteger>(id)
 
-class EthSendRawTransaction(val signedData: String, id: Int = 0) : EthRequest<String>(id)
+data class EthGetStorageAt(
+    val from: Solidity.Address,
+    val location: BigInteger,
+    val block: Block = Block.PENDING,
+    override val id: Int = 0
+) : EthRequest<String>(id)
+
+data class EthSendRawTransaction(
+    val signedData: String,
+    override val id: Int = 0
+) : EthRequest<String>(id)
 
 class TransactionReceiptNotFound : NoSuchElementException()
 
@@ -119,16 +134,16 @@ class RequestNotExecutedException(msg: String? = null) : RuntimeException(msg)
 
 sealed class Block {
     companion object {
-        val PENDING = BlockPending()
-        val LATEST = BlockLatest()
-        val EARLIEST = BlockEarliest()
+        val PENDING = BlockPending
+        val LATEST = BlockLatest
+        val EARLIEST = BlockEarliest
     }
 }
 
 class BlockNumber(val number: BigInteger) : Block()
 
-class BlockEarliest internal constructor() : Block()
+object BlockEarliest : Block()
 
-class BlockLatest internal constructor() : Block()
+object BlockLatest : Block()
 
-class BlockPending internal constructor() : Block()
+object BlockPending : Block()
