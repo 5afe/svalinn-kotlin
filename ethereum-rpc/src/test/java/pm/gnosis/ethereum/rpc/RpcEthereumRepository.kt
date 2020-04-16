@@ -50,10 +50,10 @@ class RpcEthereumRepositoryTest {
 
         val tx = Transaction(Solidity.Address(BigInteger.TEN), value = Wei.ether("0.001"))
         val bulk = BulkRequest(
-            EthCall(Solidity.Address(BigInteger.ONE), tx, 0),
-            EthBalance(Solidity.Address(BigInteger.ONE), 1),
+            EthCall(Solidity.Address(BigInteger.ONE), tx, id = 0),
+            EthBalance(Solidity.Address(BigInteger.ONE), id = 1),
             EthGasPrice(2),
-            EthGetTransactionCount(Solidity.Address(BigInteger.ONE), 3),
+            EthGetTransactionCount(Solidity.Address(BigInteger.ONE), id = 3),
             EthSendRawTransaction("some_signed_data", 4)
         )
 
@@ -92,7 +92,7 @@ class RpcEthereumRepositoryTest {
 
         val tx = Transaction(Solidity.Address(BigInteger.TEN), value = Wei.ether("0.001"))
         val bulk = BulkRequest(
-            EthCall(Solidity.Address(BigInteger.ONE), tx, 0),
+            EthCall(Solidity.Address(BigInteger.ONE), tx, id = 0),
             EthSendRawTransaction("some_signed_data", 0)
         )
 
@@ -122,8 +122,8 @@ class RpcEthereumRepositoryTest {
 
         val tx = Transaction(Solidity.Address(BigInteger.TEN), value = Wei.ether("0.001"))
         val bulk = BulkRequest(
-            EthCall(Solidity.Address(BigInteger.ONE), tx, 0),
-            EthBalance(Solidity.Address(BigInteger.ONE), 1),
+            EthCall(Solidity.Address(BigInteger.ONE), tx, id = 0),
+            EthBalance(Solidity.Address(BigInteger.ONE), id = 1),
             EthSendRawTransaction("some_signed_data", 2)
         )
 
@@ -146,7 +146,7 @@ class RpcEthereumRepositoryTest {
         coEvery { apiMock.post(any<JsonRpcRequest>()) } returns
                 rpcResult(Wei.ether("1").value.toHexString(), 1)
 
-        val request = EthBalance(Solidity.Address(BigInteger.ONE), 1)
+        val request = EthBalance(Solidity.Address(BigInteger.ONE), id = 1)
 
         val actual = repository.request(request)
 
@@ -165,7 +165,7 @@ class RpcEthereumRepositoryTest {
         coEvery { apiMock.post(any<JsonRpcRequest>()) } returns
                 rpcResult("0x", 1, "eth_getBalance should never error")
 
-        val request = EthBalance(Solidity.Address(BigInteger.ONE), 1)
+        val request = EthBalance(Solidity.Address(BigInteger.ONE), id = 1)
 
         val actual = repository.request(request)
 
@@ -522,7 +522,7 @@ class RpcEthereumRepositoryTest {
                 listOf(
                     EthEstimateGas(Solidity.Address(BigInteger.TEN), transaction, 0).toRpcRequest().request(),
                     EthGasPrice(1).toRpcRequest().request(),
-                    EthGetTransactionCount(Solidity.Address(BigInteger.TEN), 2).toRpcRequest().request()
+                    EthGetTransactionCount(Solidity.Address(BigInteger.TEN), id = 2).toRpcRequest().request()
                 )
             )
         }
@@ -584,7 +584,7 @@ class RpcEthereumRepositoryTest {
                 listOf(
                     EthEstimateGas(Solidity.Address(BigInteger.TEN), transaction, 0).toRpcRequest().request(),
                     EthGasPrice(1).toRpcRequest().request(),
-                    EthGetTransactionCount(Solidity.Address(BigInteger.TEN), 2).toRpcRequest().request()
+                    EthGetTransactionCount(Solidity.Address(BigInteger.TEN), id = 2).toRpcRequest().request()
                 )
             )
         }

@@ -118,7 +118,7 @@ class RpcEthereumRepository(
         val tx = Transaction(address = to, value = value, data = data)
         val estimateRequest = EthEstimateGas(from, tx, 0)
         val gasPriceRequest = EthGasPrice(1)
-        val nonceRequest = EthGetTransactionCount(from, 2)
+        val nonceRequest = EthGetTransactionCount(from, id = 2)
         return request(BulkRequest(estimateRequest, gasPriceRequest, nonceRequest)).let {
             val estimate = estimateRequest.checkedResult("Could not retrieve estimate")
             val price = gasPriceRequest.checkedResult("Could not retrieve gas price")
