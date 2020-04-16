@@ -4,6 +4,7 @@ buildscript {
     apply from: 'buildsystem/constants.gradle'
     apply from: 'buildsystem/helpers.gradle'
     apply from: 'buildsystem/dependencies.gradle'
+
     repositories {
         google()
         jcenter()

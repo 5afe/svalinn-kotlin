@@ -12,7 +12,7 @@ class EthRequestTest {
 
     @Test
     fun success() {
-        val request = EthBalance(Solidity.Address(BigInteger.ONE), 10)
+        val request = EthBalance(Solidity.Address(BigInteger.ONE), id = 10)
         val result = Wei.ether("1")
         request.response = EthRequest.Response.Success(result)
         assertEquals(result, request.result())
@@ -21,7 +21,7 @@ class EthRequestTest {
 
     @Test
     fun failure() {
-        val request = EthBalance(Solidity.Address(BigInteger.ONE), 10)
+        val request = EthBalance(Solidity.Address(BigInteger.ONE), id = 0)
         val errorMsg = "Revert ... because we can"
         request.response = EthRequest.Response.Failure(errorMsg)
         assertNull("Should not return result on failure", request.result())
@@ -39,7 +39,7 @@ class EthRequestTest {
 
     @Test
     fun notExecuted() {
-        val request = EthBalance(Solidity.Address(BigInteger.ONE), 10)
+        val request = EthBalance(Solidity.Address(BigInteger.ONE), id = 10)
         assertNull("Should not return result if not executed", request.result())
         assertThrow({
             request.checkedResult()

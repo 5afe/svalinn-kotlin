@@ -1,6 +1,6 @@
 package pm.gnosis.ethereum.rpc
 
-import io.reactivex.Observable
+import pm.gnosis.ethereum.*
 import pm.gnosis.ethereum.rpc.models.*
 
 interface EthereumRpcConnector {
@@ -19,13 +19,25 @@ interface EthereumRpcConnector {
         const val FUNCTION_SEND_RAW_TRANSACTION = "eth_sendRawTransaction"
     }
 
-    fun receipt(jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcTransactionReceiptResult>
+    suspend fun receipt(jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionReceiptResult
 
-    fun block(jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcBlockResult>
+    suspend fun block(jsonRpcRequest: JsonRpcRequest): JsonRpcBlockResult
 
-    fun transaction(jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcTransactionResult>
+    suspend fun transaction(jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionResult
 
-    fun post(jsonRpcRequest: JsonRpcRequest): Observable<JsonRpcResult>
+    suspend fun post(jsonRpcRequest: JsonRpcRequest): JsonRpcResult
 
-    fun post(jsonRpcRequest: Collection<JsonRpcRequest>): Observable<Collection<JsonRpcResult>>
+    suspend fun post(jsonRpcRequest: Collection<JsonRpcRequest>): Collection<JsonRpcResult>
+
 }
+
+fun <T> EthRequest<T>.toRpcRequest() =
+    when (this) {
+        is EthCall -> RpcCallRequest(this)
+        is EthBalance -> RpcBalanceRequest(this)
+        is EthEstimateGas -> RpcEstimateGasRequest(this)
+        is EthGasPrice -> RpcGasPriceRequest(this)
+        is EthGetTransactionCount -> RpcTransactionCountRequest(this)
+        is EthSendRawTransaction -> RpcSendRawTransaction(this)
+        is EthGetStorageAt -> RpcGetStorageAt(this)
+    }

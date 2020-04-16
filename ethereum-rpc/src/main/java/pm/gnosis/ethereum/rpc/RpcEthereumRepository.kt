@@ -1,6 +1,5 @@
 package pm.gnosis.ethereum.rpc
 
-import io.reactivex.Observable
 import pm.gnosis.ethereum.*
 import pm.gnosis.ethereum.models.EthereumBlock
 import pm.gnosis.ethereum.models.TransactionData
@@ -12,128 +11,115 @@ import pm.gnosis.models.Transaction
 import pm.gnosis.models.Wei
 import java.math.BigDecimal
 
-class RpcEthereumRepository(private val ethereumRpcApi: EthereumRpcConnector) : EthereumRepository {
+class RpcEthereumRepository(
+    private val ethereumRpcApi: EthereumRpcConnector
+) : EthereumRepository {
 
-    override fun <R : BulkRequest> request(bulk: R): Observable<R> =
-        Observable.fromCallable { bulk.requests.associate { it.id to it.toRpcRequest() } }
-            .flatMap { rpcRequests ->
+    override suspend fun <R : BulkRequest> request(bulk: R): R =
+        bulk.requests.associate { it.id to it.toRpcRequest() }
+            .let { rpcRequests ->
                 ethereumRpcApi.post(rpcRequests.values.map { it.request() })
-                    .map { it.forEach { rpcRequests[it.id]?.parse(it) } }
-                    .map { bulk }
+                    .map { rpcRequests[it.id]?.parse(it) }
+                    .let { bulk }
             }
 
-    override fun <R : EthRequest<*>> request(request: R): Observable<R> =
-        Observable.fromCallable { request.toRpcRequest() }
-            .flatMap { rpcRequest ->
-                ethereumRpcApi.post(rpcRequest.request())
-                    .map { rpcRequest.parse(it) }
-                    .map { request }
-            }
+    override suspend fun <R : EthRequest<*>> request(request: R): R =
+        request.toRpcRequest().let { rpcRequest ->
+            ethereumRpcApi.post(rpcRequest.request())
+                .let {
+                    rpcRequest.parse(it)
+                    request
+                }
+        }
 
-    override fun getBalance(address: Solidity.Address): Observable<Wei> =
-        request(EthBalance(address))
-            .map { it.checkedResult() }
+    override suspend fun getBalance(address: Solidity.Address): Wei =
+        request(EthBalance(address)).checkedResult()
 
-    override fun sendRawTransaction(signedTransactionData: String): Observable<String> =
+    override suspend fun sendRawTransaction(signedTransactionData: String): String =
         request(EthSendRawTransaction(signedTransactionData))
-            .map {
-                it.checkedResult("Could not send raw transaction")
-            }
+            .checkedResult("Could not send raw transaction")
 
-    override fun getTransactionReceipt(transactionHash: String): Observable<TransactionReceipt> =
+    override suspend fun getTransactionReceipt(transactionHash: String): TransactionReceipt =
         ethereumRpcApi.receipt(
             JsonRpcRequest(
                 method = "eth_getTransactionReceipt",
                 params = listOf(transactionHash)
             )
-        ).map {
-            it.result?.let {
-                TransactionReceipt(
-                    it.status,
-                    it.transactionHash,
-                    it.transactionIndex,
-                    it.blockHash,
-                    it.blockNumber,
-                    it.from,
-                    it.to,
-                    it.cumulativeGasUsed,
-                    it.gasUsed,
-                    it.contractAddress,
-                    it.logs.map { TransactionReceipt.Event(it.logIndex, it.data, it.topics) }
-                )
-            } ?: throw TransactionReceiptNotFound()
-
-        }
-
-    override fun getBlockByHash(blockHash: String): Observable<EthereumBlock> =
-        ethereumRpcApi.block(
-            JsonRpcRequest(
-                method = "eth_getBlockByHash",
-                params = listOf(blockHash, false)
+        ).result?.let {
+            TransactionReceipt(
+                it.status,
+                it.transactionHash,
+                it.transactionIndex,
+                it.blockHash,
+                it.blockNumber,
+                it.from,
+                it.to,
+                it.cumulativeGasUsed,
+                it.gasUsed,
+                it.contractAddress,
+                it.logs.map { TransactionReceipt.Event(it.logIndex, it.data, it.topics) }
             )
-        ).map {
-            it.result?.let {
-                EthereumBlock(
-                    it.number,
-                    it.hash,
-                    it.parentHash,
-                    it.nonce,
-                    it.sha3Uncles,
-                    it.logsBloom,
-                    it.transactionsRoot,
-                    it.stateRoot,
-                    it.receiptsRoot,
-                    it.miner,
-                    it.difficulty,
-                    it.totalDifficulty,
-                    it.extraData,
-                    it.size,
-                    it.gasLimit,
-                    it.gasUsed,
-                    it.timestamp
-                )
-            } ?: throw BlockNotFound()
+        } ?: throw TransactionReceiptNotFound()
 
-        }
 
-    override fun getTransactionByHash(transactionHash: String): Observable<TransactionData> =
+    override suspend fun getTransactionByHash(transactionHash: String): TransactionData =
         ethereumRpcApi.transaction(
             JsonRpcRequest(
                 method = "eth_getTransactionByHash",
                 params = listOf(transactionHash)
             )
-        ).map {
-            it.result?.let { result ->
-                TransactionData(
-                    hash = transactionHash,
-                    from = result.from,
-                    transaction = Transaction(
-                        result.to,
-                        value = Wei(result.value),
-                        data = result.data,
-                        gas = result.gas,
-                        gasPrice = result.gasPrice,
-                        nonce = result.nonce
-                    ),
-                    blockHash = result.blockHash,
-                    blockNumber = result.blockNumber,
-                    transactionIndex = result.transactionIndex
-                )
-            } ?: throw TransactionNotFound()
+        ).result?.let { result ->
+            TransactionData(
+                hash = transactionHash,
+                from = result.from,
+                transaction = Transaction(
+                    result.to,
+                    value = Wei(result.value),
+                    data = result.data,
+                    gas = result.gas,
+                    gasPrice = result.gasPrice,
+                    nonce = result.nonce
+                ),
+                blockHash = result.blockHash,
+                blockNumber = result.blockNumber,
+                transactionIndex = result.transactionIndex
+            )
+        } ?: throw TransactionNotFound()
 
-        }
+    override suspend fun getBlockByHash(blockHash: String): EthereumBlock =
+        ethereumRpcApi.block(
+            JsonRpcRequest(
+                method = "eth_getBlockByHash",
+                params = listOf(blockHash, false)
+            )
+        ).result?.let {
+            EthereumBlock(
+                it.number,
+                it.hash,
+                it.parentHash,
+                it.nonce,
+                it.sha3Uncles,
+                it.logsBloom,
+                it.transactionsRoot,
+                it.stateRoot,
+                it.receiptsRoot,
+                it.miner,
+                it.difficulty,
+                it.totalDifficulty,
+                it.extraData,
+                it.size,
+                it.gasLimit,
+                it.gasUsed,
+                it.timestamp
+            )
+        } ?: throw BlockNotFound()
 
-    override fun getTransactionParameters(
-        from: Solidity.Address,
-        to: Solidity.Address,
-        value: Wei?,
-        data: String?
-    ): Observable<TransactionParameters> {
+    override suspend fun getTransactionParameters(from: Solidity.Address, to: Solidity.Address, value: Wei?, data: String?): TransactionParameters {
         val tx = Transaction(address = to, value = value, data = data)
         val estimateRequest = EthEstimateGas(from, tx, 0)
         val gasPriceRequest = EthGasPrice(1)
-        val nonceRequest = EthGetTransactionCount(from, 2)
-        return request(BulkRequest(estimateRequest, gasPriceRequest, nonceRequest)).map {
+        val nonceRequest = EthGetTransactionCount(from, id = 2)
+        return request(BulkRequest(estimateRequest, gasPriceRequest, nonceRequest)).let {
             val estimate = estimateRequest.checkedResult("Could not retrieve estimate")
             val price = gasPriceRequest.checkedResult("Could not retrieve gas price")
             val nonce = nonceRequest.checkedResult("Could not retrieve nonce")
@@ -144,14 +130,3 @@ class RpcEthereumRepository(private val ethereumRpcApi: EthereumRpcConnector) : 
         }
     }
 }
-
-private fun <T> EthRequest<T>.toRpcRequest() =
-    when (this) {
-        is EthCall -> RpcCallRequest(this)
-        is EthBalance -> RpcBalanceRequest(this)
-        is EthEstimateGas -> RpcEstimateGasRequest(this)
-        is EthGasPrice -> RpcGasPriceRequest(this)
-        is EthGetTransactionCount -> RpcTransactionCountRequest(this)
-        is EthSendRawTransaction -> RpcSendRawTransaction(this)
-        is EthGetStorageAt -> RpcGetStorageAt(this)
-    }

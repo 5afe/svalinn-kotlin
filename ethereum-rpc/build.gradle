@@ -15,9 +15,6 @@ dependencies {
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
 
-    // Rx
-    implementation "io.reactivex.rxjava2:rxjava:$versions.rxjava"
-
     // Moshi
     implementation "com.squareup.moshi:moshi:$versions.moshi"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:$versions.moshi"
@@ -25,7 +22,6 @@ dependencies {
     // Bivrost
     implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
 
-    testImplementation "org.mockito:mockito-core:$versions.mockito"
-    testImplementation "org.mockito:mockito-inline:$versions.mockito"
-    testImplementation project(":utils-testing")
+    testImplementation "io.mockk:mockk:1.9.3"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.5"
 }

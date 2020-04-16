@@ -1,87 +1,100 @@
 package pm.gnosis.ethereum.rpc.retrofit
 
-import io.reactivex.Observable
+import io.mockk.coVerify
+import io.mockk.spyk
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
-
-import org.junit.Assert.*
-import org.junit.runner.RunWith
-import org.mockito.BDDMockito.given
-import org.mockito.BDDMockito.then
-import org.mockito.Mock
-import org.mockito.junit.MockitoJUnitRunner
 import pm.gnosis.ethereum.rpc.models.*
-import pm.gnosis.tests.utils.MockUtils
 import java.math.BigInteger
 
-@RunWith(MockitoJUnitRunner::class)
 class RetrofitEthereumRpcConnectorTest {
 
     private lateinit var connector: RetrofitEthereumRpcConnector
 
-    @Mock
-    private lateinit var api: RetrofitEthereumRpcApi
+    private val api = object : RetrofitEthereumRpcApi {
+        override suspend fun receipt(jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionReceiptResult {
+            TODO("Not yet implemented")
+        }
 
+        override suspend fun block(jsonRpcRequest: JsonRpcRequest): JsonRpcBlockResult {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun transaction(jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionResult {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun post(jsonRpcRequest: JsonRpcRequest): JsonRpcResult {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun post(jsonRpcRequest: Collection<JsonRpcRequest>): Collection<JsonRpcResult> {
+            TODO("Not yet implemented")
+        }
+    }
+
+    private val apiSpy = spyk(api)
 
     private val request = JsonRpcRequest("2.0", "eth_getBalance", listOf(BigInteger.ONE, "latest"), 1)
 
     @Before
     fun setUp() {
-        connector = RetrofitEthereumRpcConnector(api)
+        connector = RetrofitEthereumRpcConnector(apiSpy)
     }
 
     @Test
-    fun receipt() {
-        val expected = Observable.error<JsonRpcTransactionReceiptResult>(NotImplementedError())
+    fun receipt() = runBlocking {
+        val result = runCatching { connector.receipt(request) }
 
-        given(api.receipt(MockUtils.any())).willReturn(expected)
-
-        assertEquals(expected, connector.receipt(request))
-        then(api).should().receipt(request)
-        then(api).shouldHaveNoMoreInteractions()
+        with(result) {
+            assert(isFailure)
+            assert(exceptionOrNull() is NotImplementedError)
+        }
+        coVerify(exactly = 1) { apiSpy.receipt(request) }
     }
 
     @Test
-    fun block() {
-        val expected = Observable.error<JsonRpcBlockResult>(NotImplementedError())
+    fun block() = runBlocking {
+        val result = runCatching { connector.block(request) }
 
-        given(api.block(MockUtils.any())).willReturn(expected)
-
-        assertEquals(expected, connector.block(request))
-        then(api).should().block(request)
-        then(api).shouldHaveNoMoreInteractions()
+        with(result) {
+            assert(isFailure)
+            assert(exceptionOrNull() is NotImplementedError)
+        }
+        coVerify(exactly = 1) { apiSpy.block(request) }
     }
 
     @Test
-    fun transaction() {
-        val expected = Observable.error<JsonRpcTransactionResult>(NotImplementedError())
+    fun transaction() = runBlocking {
+        val result = runCatching { connector.transaction(request) }
 
-        given(api.transaction(MockUtils.any())).willReturn(expected)
-
-        assertEquals(expected, connector.transaction(request))
-        then(api).should().transaction(request)
-        then(api).shouldHaveNoMoreInteractions()
+        with(result) {
+            assert(isFailure)
+            assert(exceptionOrNull() is NotImplementedError)
+        }
+        coVerify(exactly = 1) { apiSpy.transaction(request) }
     }
 
     @Test
-    fun post() {
-        val expected = Observable.error<JsonRpcResult>(NotImplementedError())
+    fun post() = runBlocking {
+        val result = runCatching { connector.post(request) }
 
-        given(api.post(MockUtils.any<JsonRpcRequest>())).willReturn(expected)
-
-        assertEquals(expected, connector.post(request))
-        then(api).should().post(request)
-        then(api).shouldHaveNoMoreInteractions()
+        with(result) {
+            assert(isFailure)
+            assert(exceptionOrNull() is NotImplementedError)
+        }
+        coVerify(exactly = 1) { apiSpy.post(request) }
     }
 
     @Test
-    fun bulk() {
-        val expected = Observable.error<Collection<JsonRpcResult>>(NotImplementedError())
+    fun bulk() = runBlocking {
+        val result = runCatching { connector.post(listOf(request)) }
 
-        given(api.post(MockUtils.any<Collection<JsonRpcRequest>>())).willReturn(expected)
-
-        assertEquals(expected, connector.post(listOf(request)))
-        then(api).should().post(listOf(request))
-        then(api).shouldHaveNoMoreInteractions()
+        with(result) {
+            assert(isFailure)
+            assert(exceptionOrNull() is NotImplementedError)
+        }
+        coVerify(exactly = 1) { apiSpy.post(listOf(request)) }
     }
 }
