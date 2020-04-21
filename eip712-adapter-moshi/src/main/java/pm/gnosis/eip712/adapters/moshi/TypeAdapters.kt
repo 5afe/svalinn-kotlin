@@ -7,7 +7,10 @@ import com.squareup.moshi.ToJson
 import pm.gnosis.crypto.utils.asEthereumAddressChecksumString
 import pm.gnosis.model.Solidity
 import pm.gnosis.models.Wei
-import pm.gnosis.utils.*
+import pm.gnosis.utils.asEthereumAddress
+import pm.gnosis.utils.hexAsBigInteger
+import pm.gnosis.utils.parseToBigInteger
+import pm.gnosis.utils.toHexString
 import java.math.BigInteger
 
 object MoshiBuilderFactory {
@@ -24,7 +27,7 @@ object MoshiBuilderFactory {
 class WeiAdapter {
     @ToJson
     fun toJson(wei: Wei): String =
-        StringBuilder("0x").append(wei.value.toString(16)).toString()
+        wei.value.toHexString()
 
     @FromJson
     fun fromJson(wei: String): Wei {
