@@ -10,7 +10,7 @@ import pm.gnosis.models.Wei
 import pm.gnosis.utils.*
 import java.math.BigInteger
 
-object MoshiBuilderFactor {
+object MoshiBuilderFactory {
     fun makeMoshiBuilder(): Moshi.Builder {
         return Moshi.Builder()
             .add(WeiAdapter())
