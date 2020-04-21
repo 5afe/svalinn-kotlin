@@ -7,6 +7,9 @@ import java.math.BigInteger
 
 fun String.asEthereumAddress() = nullOnThrow { Solidity.Address(hexAsBigInteger()) }
 
+fun String.parseToBigInteger(): BigInteger =
+    if (startsWith("0x")) hexAsBigInteger() else decimalAsBigInteger()
+
 fun String.hexAsBigInteger() = BigInteger(this.removePrefix("0x"), 16)
 fun String.hexAsBigIntegerOrNull() = nullOnThrow { this.hexAsBigInteger() }
 fun String.decimalAsBigInteger() = BigInteger(this, 10)

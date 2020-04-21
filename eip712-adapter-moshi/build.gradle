@@ -12,9 +12,12 @@ dependencies {
     testImplementation "junit:junit:$versions.junit"
 
     implementation project(":eip712")
+    implementation project(":models")
     implementation project(":utils")
+    implementation project(":crypto")
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
 
     // Force Okio 2.X
     implementation "com.squareup.okio:okio:$versions.okio"
