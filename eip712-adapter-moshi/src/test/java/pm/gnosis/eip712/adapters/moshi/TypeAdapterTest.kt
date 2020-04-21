@@ -9,13 +9,13 @@ class TypeAdapterTest {
 
     @Test
     fun testWeiAdapterFromJson() {
-        val weiValue = WeiAdapter().fromJson("0x10")
-        assertEquals(BigInteger("16"), weiValue.value)
+        val weiValue = WeiAdapter().fromJson("0xde0b6b3a7640000")
+        assertEquals(BigInteger("1000000000000000000"), weiValue.value)
     }
 
     @Test
     fun testWeiAdapterToJson() {
-        val weiString = WeiAdapter().toJson(Wei(BigInteger("16")))
-        assertEquals("0x10", weiString)
+        val weiString = WeiAdapter().toJson(Wei(BigInteger("1000000000000000000")))
+        assertEquals("0xde0b6b3a7640000", weiString)
     }
 }
