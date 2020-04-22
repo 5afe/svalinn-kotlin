@@ -6,7 +6,7 @@ import pm.gnosis.model.Solidity
 import pm.gnosis.models.Wei
 import java.math.BigInteger
 
-class TypeAdapterTest {
+class TypeAdaptersTest {
 
     @Test
     fun testWeiAdapterFromJson() {
