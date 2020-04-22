@@ -46,8 +46,8 @@ class TypeAdapterTest {
 
     @Test
     fun testDefaultNumberAdapterFromJson() {
-        val weiValue = WeiAdapter().fromJson("0xde0b6b3a7640000")
-        assertEquals(BigInteger("1000000000000000000"), weiValue.value)
+        val value = DefaultNumberAdapter().fromJson("0xde0b6b3a7640000")
+        assertEquals(BigInteger("1000000000000000000"), value)
     }
 
     @Test
