@@ -1,4 +1,4 @@
-package pm.gnosis.eip712.adapters.moshi
+package pm.gnosis.common.adapters.moshi
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

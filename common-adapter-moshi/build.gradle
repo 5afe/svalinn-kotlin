@@ -1,42 +1,27 @@
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-    id 'kotlin-android-extensions'
-}
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply from: '../buildsystem/coverageReport.gradle'
 
-android {
-    compileSdkVersion 29
-
-    defaultConfig {
-        minSdkVersion 22
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
-}
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
+    // We specify junit before anything else to make sure that this version is prioritized over the
+    // one bundled in the android.jar
+    testImplementation "junit:junit:$versions.junit"
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation project(":models")
+    implementation project(":utils")
+    implementation project(":crypto")
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
+
+    // Force Okio 2.X
+    implementation "com.squareup.okio:okio:$versions.okio"
+
+    // Moshi
+    implementation "com.squareup.moshi:moshi:$versions.moshi"
+    kapt "com.squareup.moshi:moshi-kotlin-codegen:$versions.moshi"
 }
