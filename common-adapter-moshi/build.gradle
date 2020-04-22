@@ -15,11 +15,8 @@ dependencies {
     implementation project(":utils")
     implementation project(":crypto")
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
     implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
-
-    // Force Okio 2.X
-    implementation "com.squareup.okio:okio:$versions.okio"
 
     // Moshi
     implementation "com.squareup.moshi:moshi:$versions.moshi"
