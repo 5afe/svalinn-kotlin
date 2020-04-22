@@ -58,7 +58,7 @@ class DefaultNumberAdapter {
     fun toJson(hexNumber: BigInteger): String = hexNumber.toHexString()
 
     @FromJson
-    fun fromJson(hexNumber: String): BigInteger = hexNumber.hexAsBigInteger()
+    fun fromJson(hexNumber: String): BigInteger = hexNumber.parseToBigInteger()
 }
 
 class SolidityAddressAdapter {
