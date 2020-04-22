@@ -1,3 +1,4 @@
+include ':common-adapter-moshi'
 include ':accounts-base'
 include ':accounts-geth'
 include ':accounts-kethereum'
