@@ -11,13 +11,12 @@ dependencies {
     // one bundled in the android.jar
     testImplementation "junit:junit:$versions.junit"
 
-    implementation project(":eip712")
+    implementation project(":models")
     implementation project(":utils")
+    implementation project(":crypto")
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
-
-    // Force Okio 2.X
-    implementation "com.squareup.okio:okio:$versions.okio"
+    implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
 
     // Moshi
     implementation "com.squareup.moshi:moshi:$versions.moshi"

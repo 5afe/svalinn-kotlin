@@ -140,4 +140,14 @@ class NumberUtilsKtTest {
         assertEquals("0", BigDecimal.valueOf(0.0).setScale(6).stringWithNoTrailingZeroes())
         assertEquals("1.4", BigDecimal.valueOf(1.4).setScale(6).stringWithNoTrailingZeroes())
     }
+
+    @Test
+    fun parseHexStringToBigInteger() {
+        assertEquals(BigInteger("1000000000000000000"), "0xde0b6b3a7640000".parseToBigInteger())
+    }
+
+    @Test
+    fun parseDecimalStringToBigInteger() {
+        assertEquals(BigInteger("1000000000000000000"), "1000000000000000000".parseToBigInteger())
+    }
 }
