@@ -3,7 +3,7 @@ package pm.gnosis.utils
 import okio.ByteString.Companion.decodeHex
 import org.junit.Assert.*
 import org.junit.Test
-import pm.gnosis.tests.utils.Asserts.assertThrow
+import pm.gnosis.utils.Asserts.assertThrow
 import java.math.BigInteger
 
 class ExtensionsKtTest {

@@ -1,6 +1,5 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply from: '../buildsystem/coverageReport.gradle'
+apply plugin: 'java-library'
+apply plugin: 'kotlin'
 
 dependencies {
     // We specify junit before anything else to make sure that this version is prioritized over the
@@ -19,6 +18,4 @@ dependencies {
 
     // Bivrost
     implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
-
-    testImplementation project(":utils-testing")
 }
