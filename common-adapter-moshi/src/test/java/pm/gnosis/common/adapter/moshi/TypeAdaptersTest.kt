@@ -4,6 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import pm.gnosis.model.Solidity
 import pm.gnosis.models.Wei
+import java.math.BigDecimal
 import java.math.BigInteger
 
 class TypeAdaptersTest {
@@ -42,6 +43,18 @@ class TypeAdaptersTest {
     fun testDecimalNumberAdapterToJson() {
         val decimalString = DecimalNumberAdapter().toJson(BigInteger("1000000000000000000"))
         assertEquals("1000000000000000000", decimalString)
+    }
+
+    @Test
+    fun testBigDecimalNumberAdapterFromJson() {
+        val value = BigDecimalNumberAdapter().fromJson("1000000000000000000")
+        assertEquals(BigDecimal("1000000000000000000"), value)
+    }
+
+    @Test
+    fun testBigDecimalNumberAdapterToJson() {
+        val bigDecimalString = BigDecimalNumberAdapter().toJson(BigDecimal("1000000000000000000"))
+        assertEquals("1000000000000000000", bigDecimalString)
     }
 
     @Test

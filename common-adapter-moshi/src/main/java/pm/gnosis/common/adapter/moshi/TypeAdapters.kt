@@ -2,7 +2,6 @@ package pm.gnosis.common.adapters.moshi
 
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonQualifier
-import com.squareup.moshi.Moshi
 import com.squareup.moshi.ToJson
 import pm.gnosis.crypto.utils.asEthereumAddressChecksumString
 import pm.gnosis.model.Solidity
@@ -11,18 +10,8 @@ import pm.gnosis.utils.asEthereumAddress
 import pm.gnosis.utils.hexAsBigInteger
 import pm.gnosis.utils.parseToBigInteger
 import pm.gnosis.utils.toHexString
+import java.math.BigDecimal
 import java.math.BigInteger
-
-object MoshiBuilderFactory {
-    fun makeMoshiBuilder(): Moshi.Builder {
-        return Moshi.Builder()
-            .add(WeiAdapter())
-            .add(HexNumberAdapter())
-            .add(DecimalNumberAdapter())
-            .add(DefaultNumberAdapter())
-            .add(SolidityAddressAdapter())
-    }
-}
 
 class WeiAdapter {
     @ToJson
@@ -53,6 +42,15 @@ class DecimalNumberAdapter {
     fun fromJson(decimalNumber: String): BigInteger = decimalNumber.toBigInteger()
 }
 
+class BigDecimalNumberAdapter {
+    @ToJson
+    fun toJson(@BigDecimalNumber bigDecimal: BigDecimal): String = bigDecimal.toString()
+
+    @FromJson
+    @BigDecimalNumber
+    fun fromJson(decimalNumber: String): BigDecimal = decimalNumber.toBigDecimal()
+}
+
 class DefaultNumberAdapter {
     @ToJson
     fun toJson(hexNumber: BigInteger): String = hexNumber.toHexString()
@@ -76,3 +74,7 @@ annotation class HexNumber
 @Retention(AnnotationRetention.RUNTIME)
 @JsonQualifier
 annotation class DecimalNumber
+
+@Retention(AnnotationRetention.RUNTIME)
+@JsonQualifier
+annotation class BigDecimalNumber
