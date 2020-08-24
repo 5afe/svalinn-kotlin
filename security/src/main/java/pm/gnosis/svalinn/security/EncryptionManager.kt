@@ -1,23 +1,20 @@
 package pm.gnosis.svalinn.security
 
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
 import pm.gnosis.utils.hexStringToByteArrayOrNull
 import pm.gnosis.utils.toHexString
 
 interface EncryptionManager {
     fun decrypt(data: CryptoData): ByteArray
     fun encrypt(data: ByteArray): CryptoData
-    fun unlocked(): Single<Boolean>
-    fun unlockWithPassword(password: ByteArray): Single<Boolean>
+    fun unlocked(): Boolean
+    fun unlockWithPassword(password: ByteArray): Boolean
     fun lock()
-    fun setupPassword(newPassword: ByteArray, oldPassword: ByteArray? = null): Single<Boolean>
-    fun initialized(): Single<Boolean>
-    fun observeFingerprintForSetup(): Observable<Boolean>
-    fun observeFingerprintForUnlock(): Observable<FingerprintUnlockResult>
-    fun clearFingerprintData(): Completable
-    fun isFingerPrintSet(): Single<Boolean>
+    fun setupPassword(newPassword: ByteArray, oldPassword: ByteArray? = null): Boolean
+    fun initialized(): Boolean
+    suspend fun setupFingerprint(): Boolean
+    suspend fun unlockWithFingerprint(): FingerprintUnlockResult
+    fun clearFingerprintData()
+    fun isFingerPrintSet(): Boolean
     fun canSetupFingerprint(): Boolean
 
     class CryptoData(val data: ByteArray, val iv: ByteArray) {

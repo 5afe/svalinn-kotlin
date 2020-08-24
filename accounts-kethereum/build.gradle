@@ -41,4 +41,5 @@ dependencies {
     testImplementation "org.mockito:mockito-core:$versions.mockito"
     testImplementation "org.mockito:mockito-inline:$versions.mockito"
     testImplementation project(":utils-testing")
+    testImplementation project(":utils-testing-rx")
 }

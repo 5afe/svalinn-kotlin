@@ -1,15 +1,12 @@
 package pm.gnosis.svalinn.security
 
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
 import javax.crypto.Cipher
 
 interface FingerprintHelper {
-    fun removeKey(): Completable
+    fun removeKey()
     fun systemHasFingerprintsEnrolled(): Boolean
-    fun isKeySet(): Single<Boolean>
-    fun authenticate(iv: ByteArray? = null): Observable<AuthenticationResult>
+    fun isKeySet(): Boolean
+    suspend fun authenticate(iv: ByteArray? = null): AuthenticationResult
 }
 
 sealed class AuthenticationResult

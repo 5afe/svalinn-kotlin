@@ -1,5 +1,6 @@
 package pm.gnosis.svalinn.security.impls
 
+import android.annotation.SuppressLint
 import android.app.KeyguardManager
 import android.content.Context
 import android.os.Build
@@ -8,8 +9,6 @@ import android.security.keystore.KeyProperties
 import androidx.annotation.RequiresApi
 import androidx.core.hardware.fingerprint.FingerprintManagerCompat
 import androidx.core.os.CancellationSignal
-import io.reactivex.*
-import io.reactivex.schedulers.Schedulers
 import pm.gnosis.svalinn.security.*
 import pm.gnosis.utils.nullOnThrow
 import java.security.KeyStore
@@ -17,6 +16,9 @@ import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class AndroidFingerprintHelper(private val context: Context) : FingerprintHelper {
     private val keyStore by lazy { KeyStore.getInstance(ANDROID_KEY_STORE) }
@@ -35,14 +37,15 @@ class AndroidFingerprintHelper(private val context: Context) : FingerprintHelper
         return keyGenerator.generateKey()
     }
 
-    override fun removeKey(): Completable = Completable.fromCallable {
+    override fun removeKey() {
         keyStore.load(null)
         keyStore.deleteEntry(FINGERPRINT_KEY)
-    }.subscribeOn(Schedulers.io())
+    }
 
+    @SuppressLint("MissingPermission")
     override fun systemHasFingerprintsEnrolled() =
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                nullOnThrow { context.getSystemService(KeyguardManager::class.java).isKeyguardSecure == true } ?: false &&
+                nullOnThrow { context.getSystemService(KeyguardManager::class.java).isKeyguardSecure } ?: false &&
                 nullOnThrow { FingerprintManagerCompat.from(context).hasEnrolledFingerprints() } ?: false
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -51,10 +54,10 @@ class AndroidFingerprintHelper(private val context: Context) : FingerprintHelper
         return keyStore.getKey(FINGERPRINT_KEY, null) as? SecretKey ?: createKey()
     }
 
-    override fun isKeySet(): Single<Boolean> = Single.fromCallable {
+    override fun isKeySet(): Boolean {
         keyStore.load(null)
-        keyStore.getKey(FINGERPRINT_KEY, null) != null
-    }.subscribeOn(Schedulers.io())
+        return keyStore.getKey(FINGERPRINT_KEY, null) != null
+    }
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun createCipher(iv: ByteArray?) =
@@ -68,53 +71,35 @@ class AndroidFingerprintHelper(private val context: Context) : FingerprintHelper
                 else init(Cipher.DECRYPT_MODE, getOrCreateKey(), IvParameterSpec(iv))
             }
 
-    override fun authenticate(iv: ByteArray?): Observable<AuthenticationResult> =
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) Observable.error(FingerprintNotAvailable("Android version not supported (${Build.VERSION.SDK_INT})"))
-        else Observable.create(AuthenticateObservable(context, iv, ::createCipher))
-
-    private class AuthenticateObservable(
-        context: Context, private val iv: ByteArray? = null,
-        private val cipherProvider: (ByteArray?) -> Cipher
-    ) : FingerprintManagerCompat.AuthenticationCallback(), ObservableOnSubscribe<AuthenticationResult> {
-
-        private val fingerprintManager = FingerprintManagerCompat.from(context)
-        private var emitter: ObservableEmitter<AuthenticationResult>? = null
-
-        override fun subscribe(emitter: ObservableEmitter<AuthenticationResult>) {
-            try {
-                val cryptoObject = FingerprintManagerCompat.CryptoObject(cipherProvider(iv))
-                this.emitter = emitter
-                val signal = CancellationSignal()
-                fingerprintManager.authenticate(cryptoObject, 0, signal, this, null)
-                emitter.setCancellable {
-                    if (!signal.isCanceled) {
-                        signal.cancel()
-                        this.emitter = null
+    @SuppressLint("MissingPermission")
+    @RequiresApi(Build.VERSION_CODES.M)
+    override suspend fun authenticate(iv: ByteArray?): AuthenticationResult {
+        val cryptoObject = FingerprintManagerCompat.CryptoObject(createCipher(iv))
+        val fingerprintManager = FingerprintManagerCompat.from(context)
+        val signal = CancellationSignal()
+        return suspendCoroutine { cont ->
+            val callback = object:  FingerprintManagerCompat.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: FingerprintManagerCompat.AuthenticationResult?) {
+                    result?.cryptoObject?.cipher?.let {
+                        cont.resume(AuthenticationResultSuccess(it))
+                    } ?: run {
+                        cont.resumeWithException(IllegalStateException("Ciper is null"))
                     }
                 }
-            } catch (e: Exception) {
-                emitter.onError(e)
+
+                override fun onAuthenticationFailed() {
+                    cont.resume(AuthenticationFailed())
+                }
+
+                override fun onAuthenticationError(errMsgId: Int, errString: CharSequence?) {
+                    cont.resumeWithException(AuthenticationError(errMsgId, errString))
+                }
+
+                override fun onAuthenticationHelp(helpMsgId: Int, helpString: CharSequence?) {
+                    cont.resume(AuthenticationHelp(helpMsgId, helpString))
+                }
             }
-        }
-
-        override fun onAuthenticationSucceeded(result: FingerprintManagerCompat.AuthenticationResult?) {
-            result?.let { authenticationResult ->
-                val cipher = authenticationResult.cryptoObject.cipher ?: run { emitter?.onError(IllegalStateException("Ciper is null")); return@let }
-                emitter?.onNext(AuthenticationResultSuccess(cipher))
-                emitter?.onComplete()
-            }
-        }
-
-        override fun onAuthenticationFailed() {
-            emitter?.onNext(AuthenticationFailed())
-        }
-
-        override fun onAuthenticationError(errMsgId: Int, errString: CharSequence?) {
-            emitter?.onError(AuthenticationError(errMsgId, errString))
-        }
-
-        override fun onAuthenticationHelp(helpMsgId: Int, helpString: CharSequence?) {
-            emitter?.onNext(AuthenticationHelp(helpMsgId, helpString))
+            fingerprintManager.authenticate(cryptoObject, 0, signal, callback, null)
         }
     }
 

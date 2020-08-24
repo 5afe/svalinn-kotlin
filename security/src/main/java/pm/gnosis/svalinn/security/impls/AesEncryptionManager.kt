@@ -3,10 +3,6 @@ package pm.gnosis.svalinn.security.impls
 import android.app.Application
 import android.os.Handler
 import android.os.Looper
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 import org.bouncycastle.crypto.engines.AESEngine
 import org.bouncycastle.crypto.generators.SCrypt
 import org.bouncycastle.crypto.modes.CBCBlockCipher
@@ -69,10 +65,8 @@ class AesEncryptionManager(
         return randomBytes
     }
 
-    override fun initialized(): Single<Boolean> {
-        return Single.fromCallable {
-            preferencesManager.prefs.getString(PREF_KEY_PASSWORD_ENCRYPTED_APP_KEY, null) != null
-        }
+    override fun initialized(): Boolean {
+        return preferencesManager.prefs.getString(PREF_KEY_PASSWORD_ENCRYPTED_APP_KEY, null) != null
     }
 
     private fun deriveKeyFromPassword(password: ByteArray): ByteArray =
@@ -82,26 +76,24 @@ class AesEncryptionManager(
         else
             SCrypt.generate(password, Sha3Utils.sha3(password), passwordIterations, SCRYPT_BLOCK_SIZE, SCRYPT_PARALLELIZATION, SCRYPT_KEY_LENGTH)
 
-    override fun setupPassword(newPassword: ByteArray, oldPassword: ByteArray?): Single<Boolean> {
-        return Single.fromCallable {
-            synchronized(keyLock) {
-                val checksum = preferencesManager.prefs.getString(PREF_KEY_PASSWORD_CHECKSUM, null)
-                var previousKey: ByteArray? = null
-                if (checksum != null) {
-                    previousKey = buildPasswordKeyIfValid(oldPassword, checksum) ?: return@fromCallable false
-                }
-                val passwordKey = deriveKeyFromPassword(newPassword)
-                key = previousKey?.let {
-                    decryptAppKey(it)
-                } ?: generateKey()
-                key?.let {
-                    preferencesManager.prefs.edit { putString(PREF_KEY_PASSWORD_ENCRYPTED_APP_KEY, encrypt(passwordKey, it).toString()) }
-                    preferencesManager.prefs.edit { putString(PREF_KEY_PASSWORD_CHECKSUM, generateCryptedChecksum(passwordKey)) }
-                }
-
-                key != null
+    override fun setupPassword(newPassword: ByteArray, oldPassword: ByteArray?): Boolean {
+        return synchronized(keyLock) {
+            val checksum = preferencesManager.prefs.getString(PREF_KEY_PASSWORD_CHECKSUM, null)
+            var previousKey: ByteArray? = null
+            if (checksum != null) {
+                previousKey = buildPasswordKeyIfValid(oldPassword, checksum) ?: return false
             }
-        }.subscribeOn(Schedulers.io())
+            val passwordKey = deriveKeyFromPassword(newPassword)
+            key = previousKey?.let {
+                decryptAppKey(it)
+            } ?: generateKey()
+            key?.let {
+                preferencesManager.prefs.edit { putString(PREF_KEY_PASSWORD_ENCRYPTED_APP_KEY, encrypt(passwordKey, it).toString()) }
+                preferencesManager.prefs.edit { putString(PREF_KEY_PASSWORD_CHECKSUM, generateCryptedChecksum(passwordKey)) }
+            }
+
+            key != null
+        }
     }
 
     private fun generateKey(): ByteArray {
@@ -110,24 +102,20 @@ class AesEncryptionManager(
         return keyStorage.store(generatedPassword)
     }
 
-    override fun unlocked(): Single<Boolean> {
-        return Single.fromCallable {
-            synchronized(keyLock) {
-                key != null
-            }
+    override fun unlocked(): Boolean {
+        return synchronized(keyLock) {
+            key != null
         }
     }
 
-    override fun unlockWithPassword(password: ByteArray): Single<Boolean> {
-        return Single.fromCallable {
-            synchronized(keyLock) {
-                // If we have no password set (no checksum stored, we cannot unlockWithPassword
-                val checksum = preferencesManager.prefs.getString(PREF_KEY_PASSWORD_CHECKSUM, null) ?: return@fromCallable false
-                val passwordKey = buildPasswordKeyIfValid(password, checksum) ?: return@fromCallable false
-                key = decryptAppKey(passwordKey) ?: return@fromCallable false
-                key != null
-            }
-        }.subscribeOn(Schedulers.io())
+    override fun unlockWithPassword(password: ByteArray): Boolean {
+        return synchronized(keyLock) {
+            // If we have no password set (no checksum stored, we cannot unlockWithPassword
+            val checksum = preferencesManager.prefs.getString(PREF_KEY_PASSWORD_CHECKSUM, null) ?: return false
+            val passwordKey = buildPasswordKeyIfValid(password, checksum) ?: return false
+            key = decryptAppKey(passwordKey) ?: return false
+            key != null
+        }
     }
 
     private fun decryptAppKey(key: ByteArray): ByteArray? {
@@ -187,10 +175,9 @@ class AesEncryptionManager(
     override fun canSetupFingerprint() =
         nullOnThrow { fingerprintHelper.systemHasFingerprintsEnrolled() } ?: false
 
-    override fun observeFingerprintForSetup(): Observable<Boolean> =
+    override suspend fun setupFingerprint(): Boolean =
         fingerprintHelper.authenticate()
-            .subscribeOn(Schedulers.io())
-            .map { result ->
+            .let { result ->
                 when (result) {
                     is AuthenticationResultSuccess -> {
                         key?.let { key ->
@@ -208,38 +195,33 @@ class AesEncryptionManager(
                 }
             }
 
-    override fun observeFingerprintForUnlock(): Observable<FingerprintUnlockResult> =
-        Observable
-            .fromCallable {
-                val cryptedData = preferencesManager.prefs.getString(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY, null) ?: throw FingerprintUnlockError()
-                CryptoData.fromString(cryptedData)
-            }
-            .flatMap { cryptedData -> fingerprintHelper.authenticate(cryptedData.iv).map { cryptedData to it } }
-            .subscribeOn(Schedulers.io())
-            .map { (cryptedData, authResult) ->
-                when (authResult) {
-                    is AuthenticationResultSuccess -> {
-                        synchronized(keyLock) {
-                            key = authResult.cipher.doFinal(cryptedData.data)
-                        }
-                        if (key != null) FingerprintUnlockSuccessful() else throw FingerprintUnlockError()
-                    }
-                    is AuthenticationFailed -> FingerprintUnlockFailed()
-                    is AuthenticationHelp -> FingerprintUnlockHelp(authResult.helpString)
+    override suspend fun unlockWithFingerprint(): FingerprintUnlockResult {
+        val cryptedData = CryptoData.fromString(
+            preferencesManager.prefs.getString(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY, null) ?: throw FingerprintUnlockError()
+        )
+        val authResult = fingerprintHelper.authenticate(cryptedData.iv)
+        return when (authResult) {
+            is AuthenticationResultSuccess -> {
+                synchronized(keyLock) {
+                    key = authResult.cipher.doFinal(cryptedData.data)
                 }
+                if (key != null) FingerprintUnlockSuccessful() else throw FingerprintUnlockError()
             }
+            is AuthenticationFailed -> FingerprintUnlockFailed()
+            is AuthenticationHelp -> FingerprintUnlockHelp(authResult.helpString)
+        }
+    }
 
-    override fun isFingerPrintSet(): Single<Boolean> =
-        fingerprintHelper.isKeySet()
-            .map { it && preferencesManager.prefs.getString(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY, null) != null }
-            .onErrorReturn { false }
+    override fun isFingerPrintSet(): Boolean =
+        nullOnThrow { fingerprintHelper.isKeySet() } == true &&
+                preferencesManager.prefs.getString(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY, null) != null
 
-    override fun clearFingerprintData(): Completable =
-        Completable.fromCallable {
-            preferencesManager.prefs.edit {
-                remove(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY)
-            }
-        }.andThen(fingerprintHelper.removeKey())
+    override fun clearFingerprintData() {
+        preferencesManager.prefs.edit {
+            remove(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY)
+        }
+        fingerprintHelper.removeKey()
+    }
 
     private fun useCipher(encrypt: Boolean, key: ByteArray, wrapper: CryptoData): CryptoData {
         val padding = PKCS7Padding()

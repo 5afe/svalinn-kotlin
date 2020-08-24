@@ -190,7 +190,7 @@ class KeyPair(
      * Returns true if this pubkey is canonical, i.e. the correct length taking into account compression.
      */
     val isPubKeyCanonical: Boolean
-        get() = isPubKeyCanonical(pubKeyPoint.encoded)
+        get() = isPubKeyCanonical(pubKeyPoint.getEncoded(true))
 
     /**
      * Returns a 32 byte array containing the private key, or null if the key is encrypted or public only

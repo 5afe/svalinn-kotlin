@@ -7,6 +7,11 @@ dependencies {
     //Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
 
+    //Rx
+    implementation "io.reactivex.rxjava2:rxjava:$versions.rxjava"
+    implementation "io.reactivex.rxjava2:rxkotlin:$versions.rxkotlin"
+    implementation "io.reactivex.rxjava2:rxandroid:$versions.rxandroid"
+
     // Mockito
     implementation "org.mockito:mockito-core:$versions.mockito"
     implementation "org.mockito:mockito-inline:$versions.mockito"
