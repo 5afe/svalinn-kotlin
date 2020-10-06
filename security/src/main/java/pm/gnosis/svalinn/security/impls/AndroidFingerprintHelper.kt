@@ -76,7 +76,6 @@ class AndroidFingerprintHelper(private val context: Context) : FingerprintHelper
     override suspend fun authenticate(iv: ByteArray?): AuthenticationResult {
         val cryptoObject = FingerprintManagerCompat.CryptoObject(createCipher(iv))
         val fingerprintManager = FingerprintManagerCompat.from(context)
-        val signal = CancellationSignal()
         return suspendCoroutine { cont ->
             val callback = object:  FingerprintManagerCompat.AuthenticationCallback() {
                 override fun onAuthenticationSucceeded(result: FingerprintManagerCompat.AuthenticationResult?) {
@@ -99,7 +98,7 @@ class AndroidFingerprintHelper(private val context: Context) : FingerprintHelper
                     cont.resume(AuthenticationHelp(helpMsgId, helpString))
                 }
             }
-            fingerprintManager.authenticate(cryptoObject, 0, signal, callback, null)
+            fingerprintManager.authenticate(cryptoObject, 0, CancellationSignal(), callback, null)
         }
     }
 

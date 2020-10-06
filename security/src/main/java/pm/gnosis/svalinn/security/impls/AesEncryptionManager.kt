@@ -205,14 +205,13 @@ class AesEncryptionManager(
             }
 
     override suspend fun unlockWithFingerprint(): FingerprintUnlockResult {
-        val cryptedData = CryptoData.fromString(
+        val encryptedData = CryptoData.fromString(
             preferencesManager.prefs.getString(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY, null) ?: throw FingerprintUnlockError()
         )
-        val authResult = fingerprintHelper.authenticate(cryptedData.iv)
-        return when (authResult) {
+        return when (val authResult = fingerprintHelper.authenticate(encryptedData.iv)) {
             is AuthenticationResultSuccess -> {
                 synchronized(keyLock) {
-                    key = authResult.cipher.doFinal(cryptedData.data)
+                    key = authResult.cipher.doFinal(encryptedData.data)
                 }
                 if (key != null) FingerprintUnlockSuccessful else throw FingerprintUnlockError()
             }
