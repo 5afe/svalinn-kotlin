@@ -83,7 +83,7 @@ class AndroidFingerprintHelper(private val context: Context) : FingerprintHelper
                     result?.cryptoObject?.cipher?.let {
                         cont.resume(AuthenticationResultSuccess(it))
                     } ?: run {
-                        cont.resumeWithException(IllegalStateException("Ciper is null"))
+                        cont.resumeWithException(IllegalStateException("Cipher is null"))
                     }
                 }
 

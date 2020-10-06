@@ -3,6 +3,7 @@ package pm.gnosis.svalinn.security.impls
 import android.app.Application
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -106,7 +107,7 @@ class AesEncryptionManagerTest {
     }
 
     @Test
-    fun fingerprintFlow() = runBlocking {
+    fun fingerprintFlow() = runBlockingTest {
         given(keyStorage.store(MockUtils.any())).willAnswer { it.arguments.first() }
         val cipherMock = mock(Cipher::class.java)
         val algorithmParametersMock = mock(AlgorithmParameters::class.java)
