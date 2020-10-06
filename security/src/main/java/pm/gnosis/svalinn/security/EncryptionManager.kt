@@ -22,6 +22,24 @@ interface EncryptionManager {
             return "${data.toHexString()}$SEPARATOR${iv.toHexString()}"
         }
 
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as CryptoData
+
+            if (!data.contentEquals(other.data)) return false
+            if (!iv.contentEquals(other.iv)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = data.contentHashCode()
+            result = 31 * result + iv.contentHashCode()
+            return result
+        }
+
         companion object {
             const val SEPARATOR = "####"
             fun fromString(encoded: String) =
