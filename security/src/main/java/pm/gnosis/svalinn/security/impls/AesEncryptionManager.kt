@@ -14,8 +14,18 @@ import pm.gnosis.crypto.utils.Sha3Utils
 import pm.gnosis.svalinn.common.PreferencesManager
 import pm.gnosis.svalinn.common.base.TrackingActivityLifecycleCallbacks
 import pm.gnosis.svalinn.common.utils.edit
-import pm.gnosis.svalinn.security.*
+import pm.gnosis.svalinn.security.AuthenticationFailed
+import pm.gnosis.svalinn.security.AuthenticationHelp
+import pm.gnosis.svalinn.security.AuthenticationResultSuccess
+import pm.gnosis.svalinn.security.EncryptionManager
 import pm.gnosis.svalinn.security.EncryptionManager.CryptoData
+import pm.gnosis.svalinn.security.FingerprintHelper
+import pm.gnosis.svalinn.security.FingerprintUnlockError
+import pm.gnosis.svalinn.security.FingerprintUnlockFailed
+import pm.gnosis.svalinn.security.FingerprintUnlockHelp
+import pm.gnosis.svalinn.security.FingerprintUnlockResult
+import pm.gnosis.svalinn.security.FingerprintUnlockSuccessful
+import pm.gnosis.svalinn.security.KeyStorage
 import pm.gnosis.svalinn.security.exceptions.DeviceIsLockedException
 import pm.gnosis.utils.nullOnThrow
 import pm.gnosis.utils.toHexString
@@ -55,7 +65,6 @@ class AesEncryptionManager(
                 handler.postDelayed(runnable, LOCK_DELAY_MS)
                 lockRunnable = runnable
             }
-
         })
     }
 
@@ -205,9 +214,9 @@ class AesEncryptionManager(
                 synchronized(keyLock) {
                     key = authResult.cipher.doFinal(cryptedData.data)
                 }
-                if (key != null) FingerprintUnlockSuccessful() else throw FingerprintUnlockError()
+                if (key != null) FingerprintUnlockSuccessful else throw FingerprintUnlockError()
             }
-            is AuthenticationFailed -> FingerprintUnlockFailed()
+            is AuthenticationFailed -> FingerprintUnlockFailed
             is AuthenticationHelp -> FingerprintUnlockHelp(authResult.helpString)
         }
     }

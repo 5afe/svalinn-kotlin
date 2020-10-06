@@ -70,7 +70,7 @@ interface KeyStorage {
 }
 
 sealed class FingerprintUnlockResult
-class FingerprintUnlockSuccessful : FingerprintUnlockResult()
-class FingerprintUnlockFailed : FingerprintUnlockResult()
+object FingerprintUnlockSuccessful : FingerprintUnlockResult()
+object FingerprintUnlockFailed : FingerprintUnlockResult()
 class FingerprintUnlockError : IllegalArgumentException()
 class FingerprintUnlockHelp(val message: CharSequence?) : FingerprintUnlockResult()
