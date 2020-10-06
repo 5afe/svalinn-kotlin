@@ -11,11 +11,6 @@ interface EncryptionManager {
     fun lock()
     fun setupPassword(newPassword: ByteArray, oldPassword: ByteArray? = null): Boolean
     fun initialized(): Boolean
-    suspend fun setupFingerprint(): Boolean
-    suspend fun unlockWithFingerprint(): FingerprintUnlockResult
-    fun clearFingerprintData()
-    fun isFingerPrintSet(): Boolean
-    fun canSetupFingerprint(): Boolean
 
     class CryptoData(val data: ByteArray, val iv: ByteArray) {
         override fun toString(): String {
@@ -68,9 +63,3 @@ interface KeyStorage {
      */
     fun retrieve(id: ByteArray): ByteArray?
 }
-
-sealed class FingerprintUnlockResult
-object FingerprintUnlockSuccessful : FingerprintUnlockResult()
-object FingerprintUnlockFailed : FingerprintUnlockResult()
-class FingerprintUnlockError : IllegalArgumentException()
-class FingerprintUnlockHelp(val message: CharSequence?) : FingerprintUnlockResult()

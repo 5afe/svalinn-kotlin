@@ -14,23 +14,13 @@ import pm.gnosis.crypto.utils.Sha3Utils
 import pm.gnosis.svalinn.common.PreferencesManager
 import pm.gnosis.svalinn.common.base.TrackingActivityLifecycleCallbacks
 import pm.gnosis.svalinn.common.utils.edit
-import pm.gnosis.svalinn.security.AuthenticationFailed
-import pm.gnosis.svalinn.security.AuthenticationHelp
-import pm.gnosis.svalinn.security.AuthenticationResultSuccess
 import pm.gnosis.svalinn.security.EncryptionManager
 import pm.gnosis.svalinn.security.EncryptionManager.CryptoData
-import pm.gnosis.svalinn.security.FingerprintHelper
-import pm.gnosis.svalinn.security.FingerprintUnlockError
-import pm.gnosis.svalinn.security.FingerprintUnlockFailed
-import pm.gnosis.svalinn.security.FingerprintUnlockHelp
-import pm.gnosis.svalinn.security.FingerprintUnlockResult
-import pm.gnosis.svalinn.security.FingerprintUnlockSuccessful
 import pm.gnosis.svalinn.security.KeyStorage
 import pm.gnosis.svalinn.security.exceptions.DeviceIsLockedException
 import pm.gnosis.utils.nullOnThrow
 import pm.gnosis.utils.toHexString
 import java.security.SecureRandom
-import javax.crypto.spec.IvParameterSpec
 
 /**
  * @param passwordIterations Number of iterations the password is hashed to prevent brute force attacks.
@@ -39,7 +29,6 @@ import javax.crypto.spec.IvParameterSpec
 class AesEncryptionManager(
     application: Application,
     private val preferencesManager: PreferencesManager,
-    private val fingerprintHelper: FingerprintHelper,
     private val keyStorage: KeyStorage,
     private val passwordIterations: Int = SCRYPT_ITERATIONS
 ) : EncryptionManager {
@@ -181,56 +170,6 @@ class AesEncryptionManager(
         return useCipher(false, key, data).data
     }
 
-    override fun canSetupFingerprint() =
-        nullOnThrow { fingerprintHelper.systemHasFingerprintsEnrolled() } ?: false
-
-    override suspend fun setupFingerprint(): Boolean =
-        fingerprintHelper.authenticate()
-            .let { result ->
-                when (result) {
-                    is AuthenticationResultSuccess -> {
-                        key?.let { key ->
-                            preferencesManager.prefs.edit {
-                                val cryptoData = CryptoData(
-                                    result.cipher.doFinal(key),
-                                    result.cipher.parameters.getParameterSpec(IvParameterSpec::class.java).iv
-                                )
-                                putString(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY, cryptoData.toString())
-                            }
-                            true
-                        } ?: false
-                    }
-                    else -> false
-                }
-            }
-
-    override suspend fun unlockWithFingerprint(): FingerprintUnlockResult {
-        val encryptedData = CryptoData.fromString(
-            preferencesManager.prefs.getString(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY, null) ?: throw FingerprintUnlockError()
-        )
-        return when (val authResult = fingerprintHelper.authenticate(encryptedData.iv)) {
-            is AuthenticationResultSuccess -> {
-                synchronized(keyLock) {
-                    key = authResult.cipher.doFinal(encryptedData.data)
-                }
-                if (key != null) FingerprintUnlockSuccessful else throw FingerprintUnlockError()
-            }
-            is AuthenticationFailed -> FingerprintUnlockFailed
-            is AuthenticationHelp -> FingerprintUnlockHelp(authResult.helpString)
-        }
-    }
-
-    override fun isFingerPrintSet(): Boolean =
-        nullOnThrow { fingerprintHelper.isKeySet() } == true &&
-                preferencesManager.prefs.getString(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY, null) != null
-
-    override fun clearFingerprintData() {
-        preferencesManager.prefs.edit {
-            remove(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY)
-        }
-        fingerprintHelper.removeKey()
-    }
-
     private fun useCipher(encrypt: Boolean, key: ByteArray, wrapper: CryptoData): CryptoData {
         val padding = PKCS7Padding()
         val cipher = PaddedBufferedBlockCipher(CBCBlockCipher(AESEngine()), padding)
@@ -260,6 +199,5 @@ class AesEncryptionManager(
         private const val LOCK_DELAY_MS = 5 * 60 * 1000L
         private const val PREF_KEY_PASSWORD_ENCRYPTED_APP_KEY = "encryption_manager.string.password_encrypted_app_key"
         private const val PREF_KEY_PASSWORD_CHECKSUM = "encryption_manager.string.password_checksum"
-        private const val PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY = "encryption_manager.string.fingerprint_encrypted_app_key"
     }
 }
