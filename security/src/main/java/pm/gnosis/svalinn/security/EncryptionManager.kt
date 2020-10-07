@@ -10,6 +10,7 @@ interface EncryptionManager {
     fun unlockWithPassword(password: ByteArray): Boolean
     fun lock()
     fun setupPassword(newPassword: ByteArray, oldPassword: ByteArray? = null): Boolean
+    fun removePassword()
     fun initialized(): Boolean
 
     class CryptoData(val data: ByteArray, val iv: ByteArray) {

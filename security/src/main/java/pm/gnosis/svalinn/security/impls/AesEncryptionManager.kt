@@ -94,6 +94,12 @@ class AesEncryptionManager(
         }
     }
 
+    // If we don't know the previous password and want to start over
+    override fun removePassword() {
+        preferencesManager.prefs.edit { remove(PREF_KEY_PASSWORD_ENCRYPTED_APP_KEY) }
+        preferencesManager.prefs.edit { remove(PREF_KEY_PASSWORD_CHECKSUM) }
+    }
+
     private fun generateKey(): ByteArray {
         val generatedPassword = ByteArray(32)
         secureRandom.nextBytes(generatedPassword)

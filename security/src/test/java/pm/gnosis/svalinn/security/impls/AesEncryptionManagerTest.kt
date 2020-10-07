@@ -60,6 +60,18 @@ class AesEncryptionManagerTest {
     }
 
     @Test
+    fun removePassword() {
+        preferences.putString(PREF_KEY_PASSWORD_ENCRYPTED_APP_KEY, "TEST")
+        preferences.putString(PREF_KEY_PASSWORD_CHECKSUM, "TEST")
+
+        manager.removePassword()
+
+        assertFalse(manager.initialized())
+        assertEquals(null, preferences.getString(PREF_KEY_PASSWORD_ENCRYPTED_APP_KEY, null))
+        assertEquals(null, preferences.getString(PREF_KEY_PASSWORD_CHECKSUM, null))
+    }
+
+    @Test
     fun passwordFlow() {
         given(keyStorage.store(MockUtils.any())).willAnswer { it.arguments.first() }
         preferences.remove(PREF_KEY_PASSWORD_CHECKSUM)
