@@ -10,11 +10,11 @@ import com.google.zxing.WriterException
 import com.google.zxing.qrcode.QRCodeWriter
 
 interface QrCodeGenerator {
-    fun generateQrCodeSync(contents: String, width: Int, height: Int, @ColorInt backgroundColor: Int): Bitmap
+    fun generateQrCode(contents: String, width: Int, height: Int, @ColorInt backgroundColor: Int): Bitmap
 }
 
 class ZxingQrCodeGenerator : QrCodeGenerator {
-    override fun generateQrCodeSync(contents: String, width: Int, height: Int, @ColorInt backgroundColor: Int): Bitmap {
+    override fun generateQrCode(contents: String, width: Int, height: Int, @ColorInt backgroundColor: Int): Bitmap {
         val writer = QRCodeWriter()
         try {
             val bitMatrix = writer.encode(contents, BarcodeFormat.QR_CODE, width, height)
