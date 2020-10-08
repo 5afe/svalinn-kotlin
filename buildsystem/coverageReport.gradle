@@ -46,12 +46,12 @@ if (variants != null) {
             def kotlinTree = fileTree(dir: "${buildDir}/tmp/kotlin-classes/${variant.name}", excludes: fileFilter)
             def mainSrc = "${project.projectDir}/src/main/java"
 
-            sourceDirectories = files([mainSrc])
-            classDirectories = files([debugTree], [kotlinTree])
-            executionData = fileTree(dir: "$buildDir", includes: [
+            sourceDirectories.setFrom(files([mainSrc]))
+            classDirectories.setFrom(files([debugTree], [kotlinTree]))
+            executionData.setFrom(fileTree(dir: "$buildDir", includes: [
                     "jacoco/test${variantName}UnitTest.exec",
                     "outputs/code-coverage/connected/*coverage.ec"
-            ])
+            ]))
         }
     }
 }

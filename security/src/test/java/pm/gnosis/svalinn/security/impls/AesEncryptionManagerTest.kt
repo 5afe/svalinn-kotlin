@@ -1,46 +1,39 @@
 package pm.gnosis.svalinn.security.impls
 
 import android.app.Application
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.observers.TestObserver
-import org.junit.Assert.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.BDDMockito.*
+import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.then
 import org.mockito.Mock
-import org.mockito.invocation.InvocationOnMock
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.stubbing.Answer
-import pm.gnosis.crypto.utils.Sha3Utils
 import pm.gnosis.svalinn.common.PreferencesManager
-import pm.gnosis.svalinn.security.*
-import pm.gnosis.tests.utils.ImmediateSchedulersRule
+import pm.gnosis.svalinn.security.KeyStorage
+import pm.gnosis.tests.utils.MainCoroutineScopeRule
 import pm.gnosis.tests.utils.MockUtils
-import pm.gnosis.tests.utils.TestCompletable
+import pm.gnosis.tests.utils.TestLifecycleRule
 import pm.gnosis.tests.utils.TestPreferences
-import pm.gnosis.utils.toHexString
-import pm.gnosis.utils.utf8String
-import java.security.AlgorithmParameters
-import javax.crypto.Cipher
-import javax.crypto.spec.IvParameterSpec
 
+@ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class AesEncryptionManagerTest {
-    @JvmField
-    @Rule
-    val rule = ImmediateSchedulersRule()
+
+    @get:Rule
+    val coroutineScope = MainCoroutineScopeRule()
+
+    @get:Rule
+    val instantExecutorRule = TestLifecycleRule()
 
     @Mock
     private lateinit var application: Application
-
-    @Mock
-    private lateinit var fingerprintHelperMock: FingerprintHelper
 
     @Mock
     private lateinit var keyStorage: KeyStorage
@@ -54,279 +47,68 @@ class AesEncryptionManagerTest {
     fun setup() {
         given(application.getSharedPreferences(anyString(), anyInt())).willReturn(preferences)
         preferencesManager = PreferencesManager(application)
-        manager = AesEncryptionManager(application, preferencesManager, fingerprintHelperMock, keyStorage)
+        manager = AesEncryptionManager(application, preferencesManager, keyStorage)
     }
 
     @Test
     fun initialized() {
         preferences.remove(PREF_KEY_PASSWORD_ENCRYPTED_APP_KEY)
-        val uninitializedObserver = TestObserver<Boolean>()
-        manager.initialized().subscribe(uninitializedObserver)
-        uninitializedObserver.assertNoErrors().assertValue(false)
+        assertFalse(manager.initialized())
 
         preferences.putString(PREF_KEY_PASSWORD_ENCRYPTED_APP_KEY, "TEST")
-        val initializedObserver = TestObserver<Boolean>()
-        manager.initialized().subscribe(initializedObserver)
-        initializedObserver.assertNoErrors().assertValue(true)
+        assertTrue(manager.initialized())
+    }
+
+    @Test
+    fun removePassword() {
+        preferences.putString(PREF_KEY_PASSWORD_ENCRYPTED_APP_KEY, "TEST")
+        preferences.putString(PREF_KEY_PASSWORD_CHECKSUM, "TEST")
+
+        manager.removePassword()
+
+        assertFalse(manager.initialized())
+        assertEquals(null, preferences.getString(PREF_KEY_PASSWORD_ENCRYPTED_APP_KEY, null))
+        assertEquals(null, preferences.getString(PREF_KEY_PASSWORD_CHECKSUM, null))
     }
 
     @Test
     fun passwordFlow() {
         given(keyStorage.store(MockUtils.any())).willAnswer { it.arguments.first() }
-        val setupObserver = TestObserver<Boolean>()
         preferences.remove(PREF_KEY_PASSWORD_CHECKSUM)
 
         // Setup with "test"
-        manager.setupPassword("test".toByteArray()).subscribe(setupObserver)
+        assertTrue(manager.setupPassword("test".toByteArray()))
         then(keyStorage).should().store(MockUtils.any())
-        setupObserver.assertNoErrors().assertValue(true)
 
         // Check that it is unlocked
-        val unlockedObserver = TestObserver<Boolean>()
-        manager.unlocked().subscribe(unlockedObserver)
-        unlockedObserver.assertNoErrors().assertValue(true)
+        assertTrue(manager.unlocked())
 
         // Check that data can be en- and decrypted
         val encryptedData = manager.encrypt("Hello World".toByteArray())
         assertEquals("Hello World", String(manager.decrypt(encryptedData)))
 
         // Check that password cannot be changed if one is already set
-        val invalidChangeObserver = TestObserver<Boolean>()
-        manager.setupPassword("test2".toByteArray()).subscribe(invalidChangeObserver)
-        invalidChangeObserver.assertNoErrors().assertValue(false)
+        assertFalse(manager.setupPassword("test2".toByteArray()))
 
         // Check that password can be changed with old password
-        val validChangeObserver = TestObserver<Boolean>()
-        manager.setupPassword("test2".toByteArray(), "test".toByteArray()).subscribe(validChangeObserver)
-        validChangeObserver.assertNoErrors().assertValue(true)
+        assertTrue(manager.setupPassword("test2".toByteArray(), "test".toByteArray()))
 
         // Check that device can be locked
         manager.lock()
-        val lockedObserver = TestObserver<Boolean>()
-        manager.unlocked().subscribe(lockedObserver)
-        lockedObserver.assertNoErrors().assertValue(false)
+        assertFalse(manager.unlocked())
 
         // Check that device cannot be unlocked with wrong password
-        val wrongPasswordObserver = TestObserver<Boolean>()
-        manager.unlockWithPassword(("invalid".toByteArray())).subscribe(wrongPasswordObserver)
-        wrongPasswordObserver.assertNoErrors().assertValue(false)
+        assertFalse(manager.unlockWithPassword(("invalid".toByteArray())))
 
-        // Check that device can be unlocked with new password
-        val unlockObserver = TestObserver<Boolean>()
-        manager.unlockWithPassword(("test2".toByteArray())).subscribe(unlockObserver)
-        unlockObserver.assertNoErrors().assertValue(true)
+        // Check that device can be unlocked with old password
+        assertTrue(manager.unlockWithPassword(("test2".toByteArray())))
 
         // Check that data encrypted with old password can still be decrypted
         assertEquals("Hello World", String(manager.decrypt(encryptedData)))
     }
 
-    @Test
-    fun fingerprintFlow() {
-        given(keyStorage.store(MockUtils.any())).willAnswer { it.arguments.first() }
-        val cipherMock = mock(Cipher::class.java)
-        val algorithmParametersMock = mock(AlgorithmParameters::class.java)
-        val ivParameterSpecMock = mock(IvParameterSpec::class.java)
-        val authenticationResult = AuthenticationResultSuccess(cipherMock)
-
-        given(fingerprintHelperMock.removeKey()).willReturn(Completable.complete())
-        given(fingerprintHelperMock.authenticate()).willReturn(Observable.just(authenticationResult))
-        given(cipherMock.parameters).willReturn(algorithmParametersMock)
-        given(algorithmParametersMock.getParameterSpec(IvParameterSpec::class.java)).willReturn(ivParameterSpecMock)
-        given(ivParameterSpecMock.iv).willReturn(byteArrayOf(0x0))
-        given(fingerprintHelperMock.authenticate(MockUtils.any())).willReturn(Observable.just(authenticationResult))
-
-        // Setup password to generate app key
-        val passwordInput = byteArrayOf(0x0)
-        manager.setupPassword(passwordInput).subscribe(TestObserver())
-
-        // Encrypt data
-        val data = "Merry Christmas".toByteArray()
-        val encryptedData = manager.encrypt(data)
-
-        // Setup encryption mock for fingerprint setup
-        val encryptDoFinalAnswer = CachedAnswer<ByteArray, ByteArray>("ENCRYPTED_KEY".toByteArray())
-        given(cipherMock.doFinal(MockUtils.any())).will(encryptDoFinalAnswer)
-
-        // Setup fingerprint
-        val setupObserver = TestObserver.create<Boolean>()
-        manager.observeFingerprintForSetup().subscribe(setupObserver)
-        setupObserver.assertResult(true)
-        assertNotNull("App key should not be null", encryptDoFinalAnswer.input)
-        then(fingerprintHelperMock).should().authenticate()
-
-        // Check that correct data is stored
-        val cryptoDataString = preferences.getString(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY, null)
-        val cryptoDataExpected = EncryptionManager.CryptoData(encryptDoFinalAnswer.output, ivParameterSpecMock.iv)
-        assertEquals(cryptoDataExpected.toString(), cryptoDataString)
-
-        // Lock device
-        manager.lock()
-
-        // Setup encryption mock for fingerprint unlock
-        val decryptDoFinalAnswer = CachedAnswer<ByteArray, ByteArray>(encryptDoFinalAnswer.input!!)
-        given(cipherMock.doFinal(MockUtils.any())).will(decryptDoFinalAnswer)
-
-        // Unlock with fingerprint
-        val unlockObserver = TestObserver.create<FingerprintUnlockResult>()
-        manager.observeFingerprintForUnlock().subscribe(unlockObserver)
-        unlockObserver.assertSubscribed()
-            .assertValue { it is FingerprintUnlockSuccessful }
-            .assertNoErrors()
-            .assertComplete()
-        assertEquals(
-            "Encrypted app key should the same that has be returned on setup",
-            encryptDoFinalAnswer.output.toHexString(),
-            decryptDoFinalAnswer.input?.toHexString()
-        )
-        then(fingerprintHelperMock).should().authenticate(ivParameterSpecMock.iv)
-
-        // Check that decrypted data is correct
-        val decryptedData = manager.decrypt(encryptedData)
-        assertEquals("Data was not correctly decryted", data.utf8String(), decryptedData.utf8String())
-
-        // Check that the fingerprint can be removed
-        val clearObserver = TestObserver<Any>()
-        manager.clearFingerprintData().subscribe(clearObserver)
-        clearObserver.assertResult()
-        then(fingerprintHelperMock).should().removeKey()
-        assertNull("Fingerprint encrypted app key should have been removed.", preferences.getString(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY, null))
-
-
-        // Check that we don't make unnecessary call to the fingerprint manager
-        then(fingerprintHelperMock).shouldHaveNoMoreInteractions()
-    }
-
-    @Test
-    fun clearFingerprintData() {
-        val testCompletable = TestCompletable()
-        given(fingerprintHelperMock.removeKey()).willReturn(testCompletable)
-        preferences.putString(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY, "testKey")
-
-        manager.clearFingerprintData().subscribe(TestObserver<Any>())
-
-        then(fingerprintHelperMock).should().removeKey()
-        then(fingerprintHelperMock).shouldHaveNoMoreInteractions()
-        assertEquals(1, testCompletable.callCount)
-        assertNull(preferences.getString(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY, null))
-    }
-
-    @Test
-    fun clearFingerprintDataError() {
-        val exception = Exception()
-        val testObservable = TestObserver<Any>()
-        given(fingerprintHelperMock.removeKey()).willReturn(Completable.error(exception))
-        preferences.putString(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY, "testKey")
-
-        manager.clearFingerprintData().subscribe(testObservable)
-
-        then(fingerprintHelperMock).should().removeKey()
-        then(fingerprintHelperMock).shouldHaveNoMoreInteractions()
-        testObservable.assertError(exception)
-        assertNull(preferences.getString(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY, null))
-    }
-
-    @Test
-    fun isFingerprintSet() {
-        val testObserver = TestObserver<Boolean>()
-        preferences.putString(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY, "testKey")
-        given(fingerprintHelperMock.isKeySet()).willReturn(Single.just(true))
-
-        manager.isFingerPrintSet().subscribe(testObserver)
-
-        then(fingerprintHelperMock).should().isKeySet()
-        then(fingerprintHelperMock).shouldHaveNoMoreInteractions()
-        testObserver.assertResult(true)
-    }
-
-    @Test
-    fun isFingerprintNotSet() {
-        val testObserver = TestObserver<Boolean>()
-        preferences.putString(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY, "testKey")
-        given(fingerprintHelperMock.isKeySet()).willReturn(Single.just(false))
-
-        manager.isFingerPrintSet().subscribe(testObserver)
-
-        then(fingerprintHelperMock).should().isKeySet()
-        then(fingerprintHelperMock).shouldHaveNoMoreInteractions()
-        testObserver.assertResult(false)
-    }
-
-    @Test
-    fun isFingerprintSetError() {
-        val testObserver = TestObserver<Boolean>()
-        val exception = Exception()
-        preferences.putString(PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY, "testKey")
-        given(fingerprintHelperMock.isKeySet()).willReturn(Single.error(exception))
-
-        manager.isFingerPrintSet().subscribe(testObserver)
-
-        then(fingerprintHelperMock).should().isKeySet()
-        then(fingerprintHelperMock).shouldHaveNoMoreInteractions()
-        testObserver.assertResult(false)
-    }
-
-    @Test
-    fun canSetupFingerprint() {
-        given(fingerprintHelperMock.systemHasFingerprintsEnrolled()).willReturn(true)
-
-        val result = manager.canSetupFingerprint()
-
-        then(fingerprintHelperMock).should().systemHasFingerprintsEnrolled()
-        then(fingerprintHelperMock).shouldHaveNoMoreInteractions()
-        assertTrue(result)
-    }
-
-    @Test
-    fun cannotSetupFingerprint() {
-        given(fingerprintHelperMock.systemHasFingerprintsEnrolled()).willReturn(false)
-
-        val result = manager.canSetupFingerprint()
-
-        then(fingerprintHelperMock).should().systemHasFingerprintsEnrolled()
-        then(fingerprintHelperMock).shouldHaveNoMoreInteractions()
-        assertFalse(result)
-    }
-
-    @Test
-    fun testObserveFingerprintForSetupPasswordNotSet() {
-        val cipherMock = mock(Cipher::class.java)
-        val authenticationResult = AuthenticationResultSuccess(cipherMock)
-        val testObserver = TestObserver.create<Boolean>()
-        given(fingerprintHelperMock.authenticate()).willReturn(Observable.just(authenticationResult))
-
-        manager.observeFingerprintForSetup().subscribe(testObserver)
-
-        then(fingerprintHelperMock).should().authenticate()
-        then(fingerprintHelperMock).shouldHaveNoMoreInteractions()
-        testObserver.assertResult(false)
-    }
-
-    @Test
-    fun testObserveFingerprintForSetupFingerprintError() {
-        val testObserver = TestObserver<Boolean>()
-        val exception = Exception()
-        given(fingerprintHelperMock.authenticate()).willReturn(Observable.error(exception))
-
-        manager.observeFingerprintForSetup().subscribe(testObserver)
-
-        then(fingerprintHelperMock).should().authenticate()
-        then(fingerprintHelperMock).shouldHaveNoMoreInteractions()
-        testObserver.assertError(exception)
-    }
-
-    private class CachedAnswer<I, O>(val output: O) : Answer<O> {
-        var input: I? = null
-
-        override fun answer(invocation: InvocationOnMock): O {
-            // It should only be set once (the mock call will invoke it too .... )
-            input = input ?: invocation.getArgument<I>(0)
-            return output
-        }
-    }
-
     companion object {
         private const val PREF_KEY_PASSWORD_ENCRYPTED_APP_KEY = "encryption_manager.string.password_encrypted_app_key"
         private const val PREF_KEY_PASSWORD_CHECKSUM = "encryption_manager.string.password_checksum"
-        private const val PREF_KEY_FINGERPRINT_ENCRYPTED_APP_KEY = "encryption_manager.string.fingerprint_encrypted_app_key"
     }
 }

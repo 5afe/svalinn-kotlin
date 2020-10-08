@@ -1,28 +1,39 @@
 package pm.gnosis.svalinn.security
 
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
 import pm.gnosis.utils.hexStringToByteArrayOrNull
 import pm.gnosis.utils.toHexString
 
 interface EncryptionManager {
     fun decrypt(data: CryptoData): ByteArray
     fun encrypt(data: ByteArray): CryptoData
-    fun unlocked(): Single<Boolean>
-    fun unlockWithPassword(password: ByteArray): Single<Boolean>
+    fun unlocked(): Boolean
+    fun unlockWithPassword(password: ByteArray): Boolean
     fun lock()
-    fun setupPassword(newPassword: ByteArray, oldPassword: ByteArray? = null): Single<Boolean>
-    fun initialized(): Single<Boolean>
-    fun observeFingerprintForSetup(): Observable<Boolean>
-    fun observeFingerprintForUnlock(): Observable<FingerprintUnlockResult>
-    fun clearFingerprintData(): Completable
-    fun isFingerPrintSet(): Single<Boolean>
-    fun canSetupFingerprint(): Boolean
+    fun setupPassword(newPassword: ByteArray, oldPassword: ByteArray? = null): Boolean
+    fun removePassword()
+    fun initialized(): Boolean
 
     class CryptoData(val data: ByteArray, val iv: ByteArray) {
         override fun toString(): String {
             return "${data.toHexString()}$SEPARATOR${iv.toHexString()}"
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as CryptoData
+
+            if (!data.contentEquals(other.data)) return false
+            if (!iv.contentEquals(other.iv)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = data.contentHashCode()
+            result = 31 * result + iv.contentHashCode()
+            return result
         }
 
         companion object {
@@ -53,9 +64,3 @@ interface KeyStorage {
      */
     fun retrieve(id: ByteArray): ByteArray?
 }
-
-sealed class FingerprintUnlockResult
-class FingerprintUnlockSuccessful : FingerprintUnlockResult()
-class FingerprintUnlockFailed : FingerprintUnlockResult()
-class FingerprintUnlockError : IllegalArgumentException()
-class FingerprintUnlockHelp(val message: CharSequence?) : FingerprintUnlockResult()

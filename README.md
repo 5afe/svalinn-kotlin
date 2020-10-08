@@ -96,7 +96,7 @@ implementation 'com.github.gnosis:svalinn-kotlin:models:<version>'
 
 **Security Module**
 
-Android utils to encrypt/decrypt data and manage app security features such as unlocked status and fingerprint registry.
+Android utils to encrypt/decrypt data and manage app security features such as unlocked status.
 
 ```
 implementation 'com.github.gnosis:svalinn-kotlin:security:<version>'

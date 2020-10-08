@@ -3,7 +3,7 @@ package pm.gnosis.tests.utils
 import org.junit.Assert
 
 object Asserts {
-    fun assertThrow(test: () -> Unit, message: String? = null, throwablePredicate: ((Throwable) -> Boolean)? = null) {
+    inline fun assertThrow(test: () -> Unit, message: String? = null, noinline throwablePredicate: ((Throwable) -> Boolean)? = null) {
         var success = false
         try {
             test()

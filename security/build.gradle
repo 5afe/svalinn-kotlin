@@ -27,8 +27,9 @@ dependencies {
     //Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
 
-    //Rx
-    implementation "io.reactivex.rxjava2:rxjava:$versions.rxjava"
+    // Coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.kotlinx_coroutines"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.kotlinx_coroutines"
 
     //AndroidX
     implementation "androidx.core:core:$versions.androidx_core"
@@ -37,4 +38,5 @@ dependencies {
     testImplementation "org.mockito:mockito-core:$versions.mockito"
     testImplementation "org.mockito:mockito-inline:$versions.mockito"
     testImplementation project(":utils-testing")
+    testImplementation project(":utils-testing-coroutines")
 }
