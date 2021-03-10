@@ -6,6 +6,8 @@ import pm.gnosis.utils.toHexString
 interface EncryptionManager {
     fun decrypt(data: CryptoData): ByteArray
     fun encrypt(data: ByteArray): CryptoData
+    fun decrypt(key: ByteArray, data: CryptoData): ByteArray
+    fun encrypt(key: ByteArray, data: ByteArray): CryptoData
     fun unlocked(): Boolean
     fun unlockWithPassword(password: ByteArray): Boolean
     fun lock()

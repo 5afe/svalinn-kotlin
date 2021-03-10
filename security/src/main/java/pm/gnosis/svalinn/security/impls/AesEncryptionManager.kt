@@ -168,11 +168,11 @@ class AesEncryptionManager(
         return encrypt(key, keyChecksum(key)).toString()
     }
 
-    fun encrypt(key: ByteArray, data: ByteArray): CryptoData {
+    override fun encrypt(key: ByteArray, data: ByteArray): CryptoData {
         return useCipher(true, key, CryptoData(data, randomIv()))
     }
 
-    fun decrypt(key: ByteArray, data: CryptoData): ByteArray {
+    override fun decrypt(key: ByteArray, data: CryptoData): ByteArray {
         return useCipher(false, key, data).data
     }
 
