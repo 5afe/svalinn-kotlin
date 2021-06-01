@@ -11,9 +11,14 @@ private interface Encrypted<out T> {
         fun create(encryptionManager: EncryptionManager, value: T): Encrypted<T>
     }
 
-    interface Converter<W : Encrypted<Any?>> {
+    interface NullableConverter<W : Encrypted<Any?>> {
         fun toStorage(wrapper: W?): String?
         fun fromStorage(value: String?): W?
+    }
+
+    interface Converter<W : Encrypted<Any>> {
+        fun toStorage(wrapper: W): String
+        fun fromStorage(value: String): W
     }
 }
 
@@ -29,7 +34,7 @@ class EncryptedByteArray private constructor(private val encryptedValue: String)
         }
     }
 
-    class Converter : Encrypted.Converter<EncryptedByteArray> {
+    class NullableConverter : Encrypted.NullableConverter<EncryptedByteArray> {
         @TypeConverter
         override fun toStorage(wrapper: EncryptedByteArray?): String? {
             return wrapper?.encryptedValue
@@ -38,6 +43,18 @@ class EncryptedByteArray private constructor(private val encryptedValue: String)
         @TypeConverter
         override fun fromStorage(value: String?): EncryptedByteArray? {
             return value?.let { EncryptedByteArray(it) }
+        }
+    }
+
+    class Converter : Encrypted.Converter<EncryptedByteArray> {
+        @TypeConverter
+        override fun toStorage(wrapper: EncryptedByteArray): String {
+            return wrapper.encryptedValue
+        }
+
+        @TypeConverter
+        override fun fromStorage(value: String): EncryptedByteArray {
+            return EncryptedByteArray(value)
         }
     }
 }
@@ -54,7 +71,7 @@ class EncryptedString private constructor(private val encryptedValue: String) : 
         }
     }
 
-    class Converter : Encrypted.Converter<EncryptedString> {
+    class NullableConverter : Encrypted.NullableConverter<EncryptedString> {
         @TypeConverter
         override fun toStorage(wrapper: EncryptedString?): String? {
             return wrapper?.encryptedValue
@@ -63,6 +80,18 @@ class EncryptedString private constructor(private val encryptedValue: String) : 
         @TypeConverter
         override fun fromStorage(value: String?): EncryptedString? {
             return value?.let { EncryptedString(it) }
+        }
+    }
+
+    class Converter : Encrypted.Converter<EncryptedString> {
+        @TypeConverter
+        override fun toStorage(wrapper: EncryptedString): String {
+            return wrapper.encryptedValue
+        }
+
+        @TypeConverter
+        override fun fromStorage(value: String): EncryptedString {
+            return EncryptedString(value)
         }
     }
 }
