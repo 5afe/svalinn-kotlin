@@ -22,5 +22,5 @@ interface AccountsRepository {
 
     fun saveMnemonic(mnemonic: String): Completable
 
-    fun loadMnemonic(): Single<String>
+    fun loadMnemonic(): Single<String?>
 }
