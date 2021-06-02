@@ -11,6 +11,11 @@ private interface Encrypted<out T> {
         fun create(encryptionManager: EncryptionManager, value: T): Encrypted<T>
     }
 
+    interface NullableConverter<W : Encrypted<Any?>> {
+        fun toStorage(wrapper: W?): String?
+        fun fromStorage(value: String?): W?
+    }
+
     interface Converter<W : Encrypted<Any>> {
         fun toStorage(wrapper: W): String
         fun fromStorage(value: String): W
@@ -26,6 +31,18 @@ class EncryptedByteArray private constructor(private val encryptedValue: String)
     companion object : Encrypted.Creator<ByteArray> {
         override fun create(encryptionManager: EncryptionManager, value: ByteArray): EncryptedByteArray {
             return EncryptedByteArray(encryptionManager.encrypt(value).toString())
+        }
+    }
+
+    class NullableConverter : Encrypted.NullableConverter<EncryptedByteArray> {
+        @TypeConverter
+        override fun toStorage(wrapper: EncryptedByteArray?): String? {
+            return wrapper?.encryptedValue
+        }
+
+        @TypeConverter
+        override fun fromStorage(value: String?): EncryptedByteArray? {
+            return value?.let { EncryptedByteArray(it) }
         }
     }
 
@@ -51,6 +68,18 @@ class EncryptedString private constructor(private val encryptedValue: String) : 
     companion object : Encrypted.Creator<String> {
         override fun create(encryptionManager: EncryptionManager, value: String): EncryptedString {
             return EncryptedString(encryptionManager.encrypt(value.toByteArray()).toString())
+        }
+    }
+
+    class NullableConverter : Encrypted.NullableConverter<EncryptedString> {
+        @TypeConverter
+        override fun toStorage(wrapper: EncryptedString?): String? {
+            return wrapper?.encryptedValue
+        }
+
+        @TypeConverter
+        override fun fromStorage(value: String?): EncryptedString? {
+            return value?.let { EncryptedString(it) }
         }
     }
 
