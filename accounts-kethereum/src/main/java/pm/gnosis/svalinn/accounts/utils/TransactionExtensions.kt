@@ -38,9 +38,9 @@ private fun Transaction.adjustV(v: Byte): Byte {
     if (chainId > BigInteger.ZERO) {
         return chainId.multiply(
             BigInteger.valueOf(2)
-        ).add(
+        ).plus(
             BigInteger.valueOf(v.toLong())
-        ).add(
+        ).plus(
             BigInteger.valueOf(8)
         ).toByte()
     }
