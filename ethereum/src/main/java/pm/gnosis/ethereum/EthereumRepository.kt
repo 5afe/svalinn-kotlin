@@ -11,6 +11,8 @@ import java.math.BigInteger
 
 interface EthereumRepository {
 
+    var rpcUrl: String
+
     suspend fun <R : BulkRequest> request(bulk: R): R
 
     suspend fun <R : EthRequest<*>> request(request: R): R

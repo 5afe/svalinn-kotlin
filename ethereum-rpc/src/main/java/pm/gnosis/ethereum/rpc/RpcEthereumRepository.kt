@@ -12,8 +12,15 @@ import pm.gnosis.models.Wei
 import java.math.BigDecimal
 
 class RpcEthereumRepository(
-    private val ethereumRpcApi: EthereumRpcConnector
+    private val ethereumRpcApi: EthereumRpcConnector,
+    rpcUrl: String
 ) : EthereumRepository {
+
+    override var rpcUrl: String = rpcUrl
+        set(value) {
+            ethereumRpcApi.rpcUrl = value
+            field = value
+        }
 
     override suspend fun <R : BulkRequest> request(bulk: R): R =
         bulk.requests.associate { it.id to it.toRpcRequest() }

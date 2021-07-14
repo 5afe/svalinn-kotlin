@@ -36,8 +36,14 @@ fun Transaction.hash(ecdsaSignature: ECDSASignature? = null) = rlp(ecdsaSignatur
 
 private fun Transaction.adjustV(v: Byte): Byte {
     if (chainId > BigInteger.ZERO) {
-        return chainId.multiply(BigInteger.valueOf(2))
-            .plus(BigInteger.valueOf(v.toLong() + 8)).toByte()
+        return chainId
+            .multiply(
+                BigInteger.valueOf(2)
+            )
+            .plus(
+                BigInteger.valueOf(v.toLong() + 8)
+            )
+            .toByte()
     }
     return v
 }
