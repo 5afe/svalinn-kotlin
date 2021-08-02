@@ -13,23 +13,23 @@ class RetrofitEthereumRpcConnectorTest {
     private lateinit var connector: RetrofitEthereumRpcConnector
 
     private val api = object : RetrofitEthereumRpcApi {
-        override suspend fun receipt(jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionReceiptResult {
+        override suspend fun receipt(rpcUrl: String, jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionReceiptResult {
             TODO("Not yet implemented")
         }
 
-        override suspend fun block(jsonRpcRequest: JsonRpcRequest): JsonRpcBlockResult {
+        override suspend fun block(rpcUrl: String, jsonRpcRequest: JsonRpcRequest): JsonRpcBlockResult {
             TODO("Not yet implemented")
         }
 
-        override suspend fun transaction(jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionResult {
+        override suspend fun transaction(rpcUrl: String, jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionResult {
             TODO("Not yet implemented")
         }
 
-        override suspend fun post(jsonRpcRequest: JsonRpcRequest): JsonRpcResult {
+        override suspend fun post(rpcUrl: String, jsonRpcRequest: JsonRpcRequest): JsonRpcResult {
             TODO("Not yet implemented")
         }
 
-        override suspend fun post(jsonRpcRequest: Collection<JsonRpcRequest>): Collection<JsonRpcResult> {
+        override suspend fun post(rpcUrl: String, jsonRpcRequest: Collection<JsonRpcRequest>): Collection<JsonRpcResult> {
             TODO("Not yet implemented")
         }
     }
@@ -40,7 +40,7 @@ class RetrofitEthereumRpcConnectorTest {
 
     @Before
     fun setUp() {
-        connector = RetrofitEthereumRpcConnector(apiSpy)
+        connector = RetrofitEthereumRpcConnector(apiSpy, "")
     }
 
     @Test
@@ -51,7 +51,7 @@ class RetrofitEthereumRpcConnectorTest {
             assert(isFailure)
             assert(exceptionOrNull() is NotImplementedError)
         }
-        coVerify(exactly = 1) { apiSpy.receipt(request) }
+        coVerify(exactly = 1) { apiSpy.receipt(any(), request) }
     }
 
     @Test
@@ -62,7 +62,7 @@ class RetrofitEthereumRpcConnectorTest {
             assert(isFailure)
             assert(exceptionOrNull() is NotImplementedError)
         }
-        coVerify(exactly = 1) { apiSpy.block(request) }
+        coVerify(exactly = 1) { apiSpy.block(any(), request) }
     }
 
     @Test
@@ -73,7 +73,7 @@ class RetrofitEthereumRpcConnectorTest {
             assert(isFailure)
             assert(exceptionOrNull() is NotImplementedError)
         }
-        coVerify(exactly = 1) { apiSpy.transaction(request) }
+        coVerify(exactly = 1) { apiSpy.transaction(any(), request) }
     }
 
     @Test
@@ -84,7 +84,7 @@ class RetrofitEthereumRpcConnectorTest {
             assert(isFailure)
             assert(exceptionOrNull() is NotImplementedError)
         }
-        coVerify(exactly = 1) { apiSpy.post(request) }
+        coVerify(exactly = 1) { apiSpy.post(any(), request) }
     }
 
     @Test
@@ -95,6 +95,6 @@ class RetrofitEthereumRpcConnectorTest {
             assert(isFailure)
             assert(exceptionOrNull() is NotImplementedError)
         }
-        coVerify(exactly = 1) { apiSpy.post(listOf(request)) }
+        coVerify(exactly = 1) { apiSpy.post(any(), listOf(request)) }
     }
 }

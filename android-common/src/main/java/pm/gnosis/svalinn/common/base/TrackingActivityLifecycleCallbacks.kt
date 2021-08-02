@@ -13,13 +13,13 @@ abstract class TrackingActivityLifecycleCallbacks : Application.ActivityLifecycl
 
     abstract fun inactive()
 
-    override fun onActivityPaused(activity: Activity?) {
+    override fun onActivityPaused(activity: Activity) {
     }
 
-    override fun onActivityResumed(activity: Activity?) {
+    override fun onActivityResumed(activity: Activity) {
     }
 
-    override fun onActivityStarted(activity: Activity?) {
+    override fun onActivityStarted(activity: Activity) {
         if (activeActivityCount == 0) {
             // We had no active activities, so we just became active
             active()
@@ -27,13 +27,13 @@ abstract class TrackingActivityLifecycleCallbacks : Application.ActivityLifecycl
         activeActivityCount++
     }
 
-    override fun onActivityDestroyed(activity: Activity?) {
+    override fun onActivityDestroyed(activity: Activity) {
     }
 
-    override fun onActivitySaveInstanceState(activity: Activity?, bundle: Bundle?) {
+    override fun onActivitySaveInstanceState(activity: Activity, bundle: Bundle) {
     }
 
-    override fun onActivityStopped(activity: Activity?) {
+    override fun onActivityStopped(activity: Activity) {
         activeActivityCount--
         if (activeActivityCount == 0) {
             // We have no more active activities, so we are inactive
@@ -41,6 +41,6 @@ abstract class TrackingActivityLifecycleCallbacks : Application.ActivityLifecycl
         }
     }
 
-    override fun onActivityCreated(activity: Activity?, bundle: Bundle?) {
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
     }
 }

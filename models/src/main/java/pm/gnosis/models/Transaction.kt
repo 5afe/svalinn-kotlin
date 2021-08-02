@@ -10,13 +10,13 @@ data class Transaction(
     var gasPrice: BigInteger? = null,
     val data: String? = null,
     var nonce: BigInteger? = null,
-    val chainId: Int = CHAIN_ID_ANY
+    val chainId: BigInteger = CHAIN_ID_ANY
 ) {
     fun signable() = nonce != null && gas != null && gasPrice != null
 
     fun parcelable() = TransactionParcelable(this)
 
     companion object {
-        const val CHAIN_ID_ANY = 0
+        val CHAIN_ID_ANY = BigInteger.ZERO
     }
 }

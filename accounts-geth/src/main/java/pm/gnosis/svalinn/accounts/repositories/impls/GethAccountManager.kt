@@ -29,7 +29,7 @@ class GethAccountManager(private val preferencesManager: PreferencesManager, pri
     fun getActiveAccount(): Account = getAccounts().first()
 
     fun getAccountPassphrase(): String {
-        var passphrase = preferencesManager.prefs.getString(PreferencesManager.Companion.PASSPHRASE_KEY, "")
+        var passphrase = preferencesManager.prefs.getString(PreferencesManager.Companion.PASSPHRASE_KEY, "")!!
         if (passphrase.isEmpty()) {
             preferencesManager.prefs.edit {
                 passphrase = generateRandomString()

@@ -44,7 +44,7 @@ class AesEncryptionManager(
 
             override fun active() {
                 lockRunnable?.let {
-                    handler.removeCallbacks(lockRunnable)
+                    handler.removeCallbacks(it)
                 }
                 lockRunnable = null
             }

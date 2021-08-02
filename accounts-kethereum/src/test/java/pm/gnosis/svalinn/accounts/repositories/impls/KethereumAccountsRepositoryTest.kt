@@ -86,7 +86,7 @@ class KethereumAccountsRepositoryTest {
         val value = Wei(BigInteger("1000000000000000000"))
         val gas = BigInteger("21000")
         val gasPrice = BigInteger("20000000000")
-        val transaction = Transaction(address = address, nonce = nonce, value = value, gas = gas, gasPrice = gasPrice, chainId = 1)
+        val transaction = Transaction(address = address, nonce = nonce, value = value, gas = gas, gasPrice = gasPrice, chainId = BigInteger.ONE)
 
         repository.signTransaction(transaction).subscribe(testObserver)
 
@@ -101,7 +101,8 @@ class KethereumAccountsRepositoryTest {
         val nonce = BigInteger("13")
         val gas = BigInteger("2034776")
         val gasPrice = BigInteger("20000000000")
-        val transaction = Transaction(address = address, nonce = nonce, data = "0xe411526d", gas = gas, gasPrice = gasPrice, chainId = 28)
+        val transaction =
+            Transaction(address = address, nonce = nonce, data = "0xe411526d", gas = gas, gasPrice = gasPrice, chainId = BigInteger.valueOf(28))
         val expectedString = "e90d8504a817c800831f0c589419fd8863ea1185d8ef7ab3f2a8f4d469dc35dd528084e411526d1c8080"
         assertEquals(expectedString, transaction.rlp().toHexString())
     }
@@ -143,7 +144,7 @@ class KethereumAccountsRepositoryTest {
         val nonce = BigInteger("13")
         val gas = BigInteger("2034776")
         val gasPrice = BigInteger("20000000000")
-        val transaction = Transaction(address = address, nonce = nonce, data = CREATE_SAFE_DATA, gas = gas, gasPrice = gasPrice, chainId = 0)
+        val transaction = Transaction(address = address, nonce = nonce, data = CREATE_SAFE_DATA, gas = gas, gasPrice = gasPrice, chainId = BigInteger.ZERO)
 
         repository.signTransaction(transaction).subscribe(testObserver)
 

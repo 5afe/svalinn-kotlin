@@ -45,7 +45,7 @@ fun Context.getSimplePlural(@PluralsRes stringId: Int, quantity: Long): String =
 
 fun Context.copyToClipboard(label: String, text: String, onCopy: (String) -> Unit = {}) {
     val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    clipboard.primaryClip = ClipData.newPlainText(label, text)
+    clipboard.setPrimaryClip(ClipData.newPlainText(label, text))
     onCopy(text)
 }
 
