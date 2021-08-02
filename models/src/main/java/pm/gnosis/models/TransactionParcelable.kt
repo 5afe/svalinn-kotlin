@@ -10,12 +10,12 @@ import pm.gnosis.utils.nullOnThrow
 data class TransactionParcelable(val transaction: Transaction) : Parcelable {
     constructor(parcel: Parcel) : this(
         Transaction(
-            parcel.readString().asEthereumAddress()!!,
-            nullOnThrow { Wei(parcel.readString().hexAsBigInteger()) },
-            nullOnThrow { parcel.readString().hexAsBigInteger() },
-            nullOnThrow { parcel.readString().hexAsBigInteger() },
+            parcel.readString()!!.asEthereumAddress()!!,
+            nullOnThrow { Wei(parcel.readString()!!.hexAsBigInteger()) },
+            nullOnThrow { parcel.readString()!!.hexAsBigInteger() },
+            nullOnThrow { parcel.readString()!!.hexAsBigInteger() },
             parcel.readString(),
-            nullOnThrow { parcel.readString().hexAsBigInteger() })
+            nullOnThrow { parcel.readString()!!.hexAsBigInteger() })
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
