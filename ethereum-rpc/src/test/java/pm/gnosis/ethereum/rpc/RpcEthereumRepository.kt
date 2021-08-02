@@ -30,7 +30,7 @@ class RpcEthereumRepositoryTest {
 
     @Before
     fun setup() {
-        repository = RpcEthereumRepository(apiMock)
+        repository = RpcEthereumRepository(apiMock, "")
     }
 
     @Test

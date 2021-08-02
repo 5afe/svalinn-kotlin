@@ -33,8 +33,10 @@ class TestPreferences : SharedPreferences, SharedPreferences.Editor {
         return this
     }
 
-    override fun putString(key: String, value: String): SharedPreferences.Editor {
-        map.put(key, value)
+    override fun putString(key: String, value: String?): SharedPreferences.Editor {
+        value?.let {
+            map.put(key, it)
+        }
         return this
     }
 

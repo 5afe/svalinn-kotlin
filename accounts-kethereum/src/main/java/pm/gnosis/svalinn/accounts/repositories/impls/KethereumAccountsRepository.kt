@@ -86,7 +86,7 @@ class KethereumAccountsRepository(
     }.subscribeOn(Schedulers.computation())
 
     override fun loadMnemonic(): Single<String> = Single.fromCallable {
-        val encryptedMnemonic = preferencesManager.prefs.getString(PreferencesManager.MNEMONIC_KEY, "")
+        val encryptedMnemonic = preferencesManager.prefs.getString(PreferencesManager.MNEMONIC_KEY, "")!!
         encryptedStringConverter.fromStorage(encryptedMnemonic).value(encryptionManager)
     }.subscribeOn(Schedulers.computation())
 }
