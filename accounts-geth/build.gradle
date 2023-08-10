@@ -19,7 +19,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:$versions.rxjava"
 
     // Bivrost
-    implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
+    implementation "com.github.5afe.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
 
     implementation "com.squareup.okio:okio:$versions.okio"
     api "org.ethereum:geth:$versions.geth"

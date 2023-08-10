@@ -6,7 +6,7 @@ dependencies {
     implementation project(":utils")
 
     // Bivrost
-    implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
+    implementation "com.github.5afe.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
 
     //Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
