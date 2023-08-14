@@ -11,7 +11,11 @@ data class TransactionCallParams(
     @Json(name = "gasPrice") val gasPrice: String? = null,
     @Json(name = "value") val value: String? = null,
     @Json(name = "data") val data: String? = null,
-    @Json(name = "nonce") val nonce: String? = null
+    @Json(name = "nonce") val nonce: String? = null,
+
+
+    @Json(name = "maxPriorityFeePerGas") val maxPriorityFeePerGas: String? = null,
+    @Json(name = "maxFeePerGas") val maxFeePerGas: String? = null
 ) {
     fun callRequest(id: Int, block: String = "latest"): JsonRpcRequest {
         return JsonRpcRequest(

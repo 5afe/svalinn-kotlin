@@ -6,6 +6,7 @@ import pm.gnosis.ethereum.models.TransactionParameters
 import pm.gnosis.ethereum.models.TransactionReceipt
 import pm.gnosis.model.Solidity
 import pm.gnosis.models.Transaction
+import pm.gnosis.models.TransactionEip1559
 import pm.gnosis.models.Wei
 import java.math.BigInteger
 
@@ -90,6 +91,13 @@ data class EthCall(
     override val id: Int = 0
 ) : EthRequest<String>(id)
 
+data class EthCallEip1559(
+    val from: Solidity.Address? = null,
+    val transaction: TransactionEip1559? = null,
+    val block: Block = Block.PENDING,
+    override val id: Int = 0
+) : EthRequest<String>(id)
+
 data class EthBalance(
     val address: Solidity.Address,
     val block: Block = Block.PENDING,
@@ -103,6 +111,12 @@ data class EthGasPrice(
 data class EthEstimateGas(
     val from: Solidity.Address? = null,
     val transaction: Transaction? = null,
+    override val id: Int = 0
+) : EthRequest<BigInteger>(id)
+
+data class EthEstimateGasEip1559(
+    val from: Solidity.Address? = null,
+    val transaction: TransactionEip1559? = null,
     override val id: Int = 0
 ) : EthRequest<BigInteger>(id)
 
