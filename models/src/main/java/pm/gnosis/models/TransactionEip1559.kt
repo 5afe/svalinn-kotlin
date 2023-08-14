@@ -4,7 +4,7 @@ import pm.gnosis.model.Solidity
 import java.math.BigInteger
 
 data class TransactionEip1559(
-    val type: Solidity.UInt64 = Solidity.UInt64(BigInteger.valueOf(2)),
+    val type: BigInteger = BigInteger.valueOf(2),
     val chainId: BigInteger,
     val from: Solidity.Address? = null,
     val to: Solidity.Address,

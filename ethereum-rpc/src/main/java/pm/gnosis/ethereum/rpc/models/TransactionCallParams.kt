@@ -2,9 +2,11 @@ package pm.gnosis.ethereum.rpc.models
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import java.math.BigInteger
 
 @JsonClass(generateAdapter = true)
 data class TransactionCallParams(
+    @Json(name = "chainId") val chainId: String? = null,
     @Json(name = "from") val from: String? = null,
     @Json(name = "to") val to: String? = null,
     @Json(name = "gas") val gas: String? = null,
@@ -14,8 +16,10 @@ data class TransactionCallParams(
     @Json(name = "nonce") val nonce: String? = null,
 
 
+    @Json(name = "type") val type: String? = null,
     @Json(name = "maxPriorityFeePerGas") val maxPriorityFeePerGas: String? = null,
-    @Json(name = "maxFeePerGas") val maxFeePerGas: String? = null
+    @Json(name = "maxFeePerGas") val maxFeePerGas: String? = null,
+    @Json(name = "accessList") val accessList: List<String> = listOf()
 ) {
     fun callRequest(id: Int, block: String = "latest"): JsonRpcRequest {
         return JsonRpcRequest(

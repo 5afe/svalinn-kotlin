@@ -14,7 +14,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
 
     // Bivrost
-    implementation "com.github.5afe.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
+    implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
 
     //Rx
     implementation "io.reactivex.rxjava2:rxjava:$versions.rxjava"

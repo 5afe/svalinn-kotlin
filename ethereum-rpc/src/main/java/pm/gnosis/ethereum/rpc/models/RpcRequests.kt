@@ -183,9 +183,11 @@ private fun Transaction?.toCallParams(from: String?) =
 
 private fun TransactionEip1559?.toCallParams(from: String?) =
     TransactionCallParams(
+        type = this?.type?.toHexString(),
+        chainId = this?.chainId?.toHexString(),
         from = from,
         to = this?.to?.asEthereumAddressString(),
-        value = this?.value?.value?.toHexString(),
+        value = this?.value?.value?.toHexString() ?: "0x0",
         data = this?.data,
         nonce = this?.nonce?.toHexString(),
         gas = this?.fee?.gas?.toHexString(),
