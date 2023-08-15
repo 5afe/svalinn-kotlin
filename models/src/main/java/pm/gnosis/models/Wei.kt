@@ -6,6 +6,8 @@ import java.math.BigInteger
 data class Wei(val value: BigInteger) {
     fun toEther(scale: Int = 18): BigDecimal = BigDecimal(value).setScale(scale).div(WEI_TO_ETHER_MULTIPLIER)
 
+    fun toGWei(scale: Int = 18): BigDecimal = BigDecimal(value).setScale(scale).divide(BigDecimal(10).pow(9)).stripTrailingZeros()
+
     fun toLong() = value.toLong()
 
     operator fun compareTo(other: Wei) = this.value.compareTo(other.value)
@@ -14,5 +16,6 @@ data class Wei(val value: BigInteger) {
         private val WEI_TO_ETHER_MULTIPLIER = BigDecimal(10).pow(18)
         val ZERO = Wei(BigInteger.ZERO)
         fun ether(value: String) = Wei((BigDecimal(value) * WEI_TO_ETHER_MULTIPLIER).toBigInteger())
+        fun fromGWei(value: BigDecimal) = Wei((value * BigDecimal(10).pow(9)).toBigInteger())
     }
 }
