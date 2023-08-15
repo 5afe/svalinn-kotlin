@@ -12,8 +12,7 @@ data class TransactionEip1559(
     val data: String? = null,
     val nonce: BigInteger? = null,
     var fee: Fee1559 = Fee1559(),
-    val hash: Solidity.Bytes32? = null,
-    var signature: Solidity.Bytes? = null
+    val hash: Solidity.Bytes32? = null
 )
 
 data class Fee1559(
