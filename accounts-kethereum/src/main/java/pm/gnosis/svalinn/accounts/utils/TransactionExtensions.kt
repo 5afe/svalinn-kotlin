@@ -34,6 +34,22 @@ fun TransactionEip1559.rlp(signature: ECDSASignature? = null): ByteArray {
     return RLPList(items).encode()
 }
 
+private fun TransactionEip1559.adjustV(v: Byte): Byte {
+    if (chainId > BigInteger.ZERO) {
+        return chainId
+            .multiply(
+                BigInteger.valueOf(2)
+            )
+            .plus(
+                BigInteger.valueOf(v.toLong() + 8)
+            )
+            .toByte()
+    }
+    return v
+}
+
+fun TransactionEip1559.hash(ecdsaSignature: ECDSASignature? = null) = rlp(ecdsaSignature).let { Sha3Utils.keccak(it) }
+
 fun Transaction.rlp(signature: ECDSASignature? = null): ByteArray {
     val items = ArrayList<RLPElement>()
     items.add(nonce!!.toRLP())
@@ -59,20 +75,6 @@ fun Transaction.rlp(signature: ECDSASignature? = null): ByteArray {
 fun Transaction.hash(ecdsaSignature: ECDSASignature? = null) = rlp(ecdsaSignature).let { Sha3Utils.keccak(it) }
 
 private fun Transaction.adjustV(v: Byte): Byte {
-    if (chainId > BigInteger.ZERO) {
-        return chainId
-            .multiply(
-                BigInteger.valueOf(2)
-            )
-            .plus(
-                BigInteger.valueOf(v.toLong() + 8)
-            )
-            .toByte()
-    }
-    return v
-}
-
-private fun TransactionEip1559.adjustV(v: Byte): Byte {
     if (chainId > BigInteger.ZERO) {
         return chainId
             .multiply(
