@@ -71,7 +71,7 @@ fun Transaction.Legacy.rlp(signature: ECDSASignature? = null): ByteArray {
 
 fun Transaction.Legacy.hash(ecdsaSignature: ECDSASignature? = null) = rlp(ecdsaSignature).let { Sha3Utils.keccak(it) }
 
-private fun Transaction.Legacy.adjustV(v: Byte): Byte {
+private fun Transaction.Legacy.adjustV(v: Byte): BigInteger {
     // requires v = {0, 1} or v = {27, 28}
     if (chainId > BigInteger.ZERO) {
         // EIP-155
@@ -81,8 +81,8 @@ private fun Transaction.Legacy.adjustV(v: Byte): Byte {
             BigInteger.valueOf(v.toLong()).plus(chainId.multiply(BigInteger.valueOf(2)).plus(BigInteger.valueOf(35))).toByte()
         } else if (v in 27..28) {
             // KeyPair signature is always 27 or 28
-            return BigInteger.valueOf(v.toLong() - 27).plus(chainId.multiply(BigInteger.valueOf(2)).plus(BigInteger.valueOf(35))).toByte()
+            return BigInteger.valueOf(v.toLong() - 27).plus(chainId.multiply(BigInteger.valueOf(2)).plus(BigInteger.valueOf(35)))
         }
     }
-    return v
+    return BigInteger.valueOf(v.toLong())
 }
