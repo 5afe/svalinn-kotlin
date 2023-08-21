@@ -79,8 +79,9 @@ class RpcEthereumRepository(
             TransactionData(
                 hash = transactionHash,
                 from = result.from,
-                transaction = Transaction(
-                    result.to,
+                transaction = Transaction.Legacy(
+                    to = result.to,
+                    from = result.from,
                     value = Wei(result.value),
                     data = result.data,
                     gas = result.gas,
@@ -122,7 +123,7 @@ class RpcEthereumRepository(
         } ?: throw BlockNotFound()
 
     override suspend fun getTransactionParameters(from: Solidity.Address, to: Solidity.Address, value: Wei?, data: String?): TransactionParameters {
-        val tx = Transaction(address = to, value = value, data = data)
+        val tx = Transaction.Legacy(to = to, from = from, value = value, data = data)
         val estimateRequest = EthEstimateGas(from, tx, 0)
         val gasPriceRequest = EthGasPrice(1)
         val nonceRequest = EthGetTransactionCount(from, id = 2)

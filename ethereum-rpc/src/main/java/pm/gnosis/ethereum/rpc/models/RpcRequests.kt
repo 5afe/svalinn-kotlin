@@ -10,7 +10,6 @@ import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.FUNCTION_GET_STORAG
 import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.FUNCTION_GET_TRANSACTION_COUNT
 import pm.gnosis.ethereum.rpc.EthereumRpcConnector.Companion.FUNCTION_SEND_RAW_TRANSACTION
 import pm.gnosis.models.Transaction
-import pm.gnosis.models.TransactionEip1559
 import pm.gnosis.models.Wei
 import pm.gnosis.utils.asEthereumAddressString
 import pm.gnosis.utils.hexAsBigIntegerOrNull
@@ -170,10 +169,10 @@ class RpcSendRawTransaction(raw: EthSendRawTransaction) : RpcRequest<EthSendRawT
     }
 }
 
-private fun Transaction?.toCallParams(from: String?) =
+private fun Transaction.Legacy?.toCallParams(from: String?) =
     TransactionCallParams(
         from = from,
-        to = this?.address?.asEthereumAddressString(),
+        to = this?.to?.asEthereumAddressString(),
         value = this?.value?.value?.toHexString(),
         data = this?.data,
         nonce = this?.nonce?.toHexString(),
@@ -181,7 +180,7 @@ private fun Transaction?.toCallParams(from: String?) =
         gasPrice = this?.gasPrice?.toHexString()
     )
 
-private fun TransactionEip1559?.toCallParams(from: String?) =
+private fun Transaction.Eip1559?.toCallParams(from: String?) =
     TransactionCallParams(
         type = this?.type?.toHexString(),
         chainId = this?.chainId?.toHexString(),
@@ -190,9 +189,9 @@ private fun TransactionEip1559?.toCallParams(from: String?) =
         value = this?.value?.value?.toHexString() ?: "0x0",
         data = this?.data,
         nonce = this?.nonce?.toHexString(),
-        gas = this?.fee?.gas?.toHexString(),
-        maxPriorityFeePerGas = this?.fee?.maxPriorityFee?.toHexString(),
-        maxFeePerGas = this?.fee?.maxFeePerGas?.toHexString()
+        gas = this?.gas?.toHexString(),
+        maxPriorityFeePerGas = this?.maxPriorityFee?.toHexString(),
+        maxFeePerGas = this?.maxFeePerGas?.toHexString()
     )
 
 private fun Block.asString() =

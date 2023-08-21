@@ -39,7 +39,7 @@ class KethereumAccountsRepository(
             .map { Account(it.address) }
     }
 
-    override fun signTransaction(transaction: Transaction): Single<String> {
+    override fun signTransaction(transaction: Transaction.Legacy): Single<String> {
         if (!transaction.signable()) return Single.error(InvalidTransactionParams())
         return keyPairFromActiveAccount()
             .map { transaction.rlp(it.sign(transaction.hash())).toHexString().addHexPrefix() }

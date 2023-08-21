@@ -8,7 +8,7 @@ import java.math.BigInteger
 data class TransactionData(
     val hash: String,
     val from: Solidity.Address,
-    val transaction: Transaction,
+    val transaction: Transaction.Legacy,
     val transactionIndex: BigInteger?,
     val blockHash: String?,
     val blockNumber: BigInteger?

@@ -22,7 +22,7 @@ class ERC67Parser {
         const val SEPARATOR = "?"
         const val QUERY_PARAM_SEPARATOR = "&"
 
-        fun parse(string: String): Transaction? {
+        fun parse(string: String): Transaction.Legacy? {
             if (!string.startsWith(SCHEMA)) return null
             val parts = string.split(SEPARATOR)
             val address = parts[0].removePrefix(SCHEMA).asEthereumAddress() ?: return null
@@ -42,13 +42,13 @@ class ERC67Parser {
                     }
                 }
             }
-            return Transaction(address, value, gas, gasPrice, data)
+            return Transaction.Legacy(to = address, value = value, gas = gas, gasPrice = gasPrice, data = data)
         }
     }
 }
 
-fun Transaction.erc67String(): String {
-    val stringBuilder = StringBuilder("${ERC67Parser.SCHEMA}${address.asEthereumAddressString()}")
+fun Transaction.Legacy.erc67String(): String {
+    val stringBuilder = StringBuilder("${ERC67Parser.SCHEMA}${to.asEthereumAddressString()}")
     val queryParams = mutableListOf<String>()
     value?.let { queryParams.add("${ERC67Parser.VALUE_KEY}${it.value}") }
     gas?.let { queryParams.add("${ERC67Parser.GAS_KEY}$it") }
@@ -63,4 +63,4 @@ fun Transaction.erc67String(): String {
     return stringBuilder.toString()
 }
 
-fun Transaction.erc67Uri(): Uri = android.net.Uri.fromParts("ethereum", erc67String().removePrefix(ERC67Parser.SCHEMA), null)
+fun Transaction.Legacy.erc67Uri(): Uri = android.net.Uri.fromParts("ethereum", erc67String().removePrefix(ERC67Parser.SCHEMA), null)
