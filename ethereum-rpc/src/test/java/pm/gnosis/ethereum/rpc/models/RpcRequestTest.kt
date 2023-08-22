@@ -43,8 +43,8 @@ class RpcRequestTest {
         private fun rpcResult(result: String? = null, id: Int = 0, error: String? = null) =
             JsonRpcResult(id, "2.0", error?.let { JsonRpcError(23, it) }, result)
 
-        private val TEST_TX = Transaction(
-            Solidity.Address(BigInteger.TEN),
+        private val TEST_TX = Transaction.Legacy(
+            to = Solidity.Address(BigInteger.TEN),
             value = Wei.ether("1"),
             data = "0x42cde4e8",
             nonce = BigInteger.valueOf(42),

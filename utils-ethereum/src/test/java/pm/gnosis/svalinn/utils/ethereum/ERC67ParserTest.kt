@@ -25,23 +25,23 @@ class ERC67ParserTest {
 
     @Test
     fun toERC67String() {
-        assertEquals("ethereum:0x0000000000000000000000000000000000000000", Transaction(Solidity.Address(BigInteger.ZERO)).erc67String())
+        assertEquals("ethereum:0x0000000000000000000000000000000000000000", Transaction.Legacy(to = Solidity.Address(BigInteger.ZERO)).erc67String())
         assertEquals(
             "ethereum:0x0000000000000000000000000000000000000000?value=1",
-            Transaction(Solidity.Address(BigInteger.ZERO), value = Wei(BigInteger.ONE)).erc67String()
+            Transaction.Legacy(to = Solidity.Address(BigInteger.ZERO), value = Wei(BigInteger.ONE)).erc67String()
         )
         assertEquals(
             "ethereum:0x0000000000000000000000000000000000000000?value=1&gas=1",
-            Transaction(Solidity.Address(BigInteger.ZERO), value = Wei(BigInteger.ONE), gas = BigInteger.ONE).erc67String()
+            Transaction.Legacy(to = Solidity.Address(BigInteger.ZERO), value = Wei(BigInteger.ONE), gas = BigInteger.ONE).erc67String()
         )
         assertEquals(
             "ethereum:0x0000000000000000000000000000000000000000?value=1&gas=1&gasPrice=10",
-            Transaction(Solidity.Address(BigInteger.ZERO), value = Wei(BigInteger.ONE), gas = BigInteger.ONE, gasPrice = BigInteger.TEN).erc67String()
+            Transaction.Legacy(to = Solidity.Address(BigInteger.ZERO), value = Wei(BigInteger.ONE), gas = BigInteger.ONE, gasPrice = BigInteger.TEN).erc67String()
         )
         assertEquals(
             "ethereum:0x0000000000000000000000000000000000000000?value=1&gas=1&gasPrice=10&data=0x10",
-            Transaction(
-                Solidity.Address(BigInteger.ZERO),
+            Transaction.Legacy(
+                to = Solidity.Address(BigInteger.ZERO),
                 value = Wei(BigInteger.ONE),
                 gas = BigInteger.ONE,
                 gasPrice = BigInteger.TEN,
@@ -52,15 +52,15 @@ class ERC67ParserTest {
 
     companion object {
         val VALID_ERC67 = listOf(
-            "ethereum:0x0" to Transaction(Solidity.Address(BigInteger.ZERO)),
-            "ethereum:0x0?" to Transaction(Solidity.Address(BigInteger.ZERO)),
-            "ethereum:0x0?value=1" to Transaction(Solidity.Address(BigInteger.ZERO), value = Wei(BigInteger.ONE)),
-            "ethereum:0x1?gas=1" to Transaction(Solidity.Address(BigInteger.ONE), gas = BigInteger.ONE),
-            "ethereum:0x0?data=0x10" to Transaction(Solidity.Address(BigInteger.ZERO), data = "0x10"),
-            "ethereum:0x0?gasPrice=10" to Transaction(Solidity.Address(BigInteger.ZERO), gasPrice = BigInteger.TEN),
-            "ethereum:0x0?value=1&gas=2" to Transaction(Solidity.Address(BigInteger.ZERO), value = Wei(BigInteger.ONE), gas = BigInteger("2")),
-            "ethereum:0x0?gasPrice=10&value=2&data=0x10" to Transaction(
-                Solidity.Address(BigInteger.ZERO),
+            "ethereum:0x0" to Transaction.Legacy(to = Solidity.Address(BigInteger.ZERO)),
+            "ethereum:0x0?" to Transaction.Legacy(to = Solidity.Address(BigInteger.ZERO)),
+            "ethereum:0x0?value=1" to Transaction.Legacy(to = Solidity.Address(BigInteger.ZERO), value = Wei(BigInteger.ONE)),
+            "ethereum:0x1?gas=1" to Transaction.Legacy(to = Solidity.Address(BigInteger.ONE), gas = BigInteger.ONE),
+            "ethereum:0x0?data=0x10" to Transaction.Legacy(to = Solidity.Address(BigInteger.ZERO), data = "0x10"),
+            "ethereum:0x0?gasPrice=10" to Transaction.Legacy(to = Solidity.Address(BigInteger.ZERO), gasPrice = BigInteger.TEN),
+            "ethereum:0x0?value=1&gas=2" to Transaction.Legacy(to = Solidity.Address(BigInteger.ZERO), value = Wei(BigInteger.ONE), gas = BigInteger("2")),
+            "ethereum:0x0?gasPrice=10&value=2&data=0x10" to Transaction.Legacy(
+                to = Solidity.Address(BigInteger.ZERO),
                 gasPrice = BigInteger.TEN,
                 value = Wei(BigInteger("2")),
                 data = "0x10"
