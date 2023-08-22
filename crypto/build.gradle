@@ -18,7 +18,7 @@ dependencies {
     implementation "com.squareup.okio:okio:$versions.okio"
 
     // Bivrost
-    implementation "com.github.5afe.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
+    implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
 
     testImplementation project(":utils-testing")
 }

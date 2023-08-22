@@ -12,7 +12,7 @@ class MappingBulkRequestTest {
     fun testSuccess() {
         val etherBalance = EthBalance(Solidity.Address(BigInteger.TEN))
         val tokenBalance = EthCall(
-            transaction = Transaction(Solidity.Address(BigInteger.ONE), data = "tokenBalanceData")
+            transaction = Transaction.Legacy(to = Solidity.Address(BigInteger.ONE), data = "tokenBalanceData")
         )
         val request = MappingBulkRequest(
             MappedRequest(etherBalance) { it?.value },
@@ -36,10 +36,10 @@ class MappingBulkRequestTest {
     fun testPartlyFailure() {
         val etherBalance = EthBalance(Solidity.Address(BigInteger.TEN))
         val tokenBalance = EthCall(
-            transaction = Transaction(Solidity.Address(BigInteger.ONE), data = "tokenBalanceData")
+            transaction = Transaction.Legacy(to = Solidity.Address(BigInteger.ONE), data = "tokenBalanceData")
         )
         val token2Balance = EthCall(
-            transaction = Transaction(Solidity.Address(BigInteger.valueOf(5)), data = "token2BalanceData")
+            transaction = Transaction.Legacy(to = Solidity.Address(BigInteger.valueOf(5)), data = "token2BalanceData")
         )
         val request = MappingBulkRequest(
             MappedRequest(etherBalance) { it?.value },

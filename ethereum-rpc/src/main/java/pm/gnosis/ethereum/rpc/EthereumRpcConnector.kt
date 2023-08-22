@@ -36,8 +36,10 @@ interface EthereumRpcConnector {
 fun <T> EthRequest<T>.toRpcRequest() =
     when (this) {
         is EthCall -> RpcCallRequest(this)
+        is EthCallEip1559 -> RpcCallEip1559Request(this)
         is EthBalance -> RpcBalanceRequest(this)
         is EthEstimateGas -> RpcEstimateGasRequest(this)
+        is EthEstimateGasEip1559 -> RpcEstimateGasEip1559Request(this)
         is EthGasPrice -> RpcGasPriceRequest(this)
         is EthGetTransactionCount -> RpcTransactionCountRequest(this)
         is EthSendRawTransaction -> RpcSendRawTransaction(this)

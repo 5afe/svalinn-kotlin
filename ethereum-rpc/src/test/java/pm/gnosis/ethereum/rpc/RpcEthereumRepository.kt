@@ -48,7 +48,7 @@ class RpcEthereumRepositoryTest {
                 )
 
 
-        val tx = Transaction(Solidity.Address(BigInteger.TEN), value = Wei.ether("0.001"))
+        val tx = Transaction.Legacy(to = Solidity.Address(BigInteger.TEN), value = Wei.ether("0.001"))
         val bulk = BulkRequest(
             EthCall(Solidity.Address(BigInteger.ONE), tx, id = 0),
             EthBalance(Solidity.Address(BigInteger.ONE), id = 1),
@@ -90,7 +90,7 @@ class RpcEthereumRepositoryTest {
                     )
                 )
 
-        val tx = Transaction(Solidity.Address(BigInteger.TEN), value = Wei.ether("0.001"))
+        val tx = Transaction.Legacy(to = Solidity.Address(BigInteger.TEN), value = Wei.ether("0.001"))
         val bulk = BulkRequest(
             EthCall(Solidity.Address(BigInteger.ONE), tx, id = 0),
             EthSendRawTransaction("some_signed_data", 0)
@@ -120,7 +120,7 @@ class RpcEthereumRepositoryTest {
                     rpcResult("0x", 2, error = "revert; But I won't tell you why")
                 )
 
-        val tx = Transaction(Solidity.Address(BigInteger.TEN), value = Wei.ether("0.001"))
+        val tx = Transaction.Legacy(to = Solidity.Address(BigInteger.TEN), value = Wei.ether("0.001"))
         val bulk = BulkRequest(
             EthCall(Solidity.Address(BigInteger.ONE), tx, id = 0),
             EthBalance(Solidity.Address(BigInteger.ONE), id = 1),
@@ -353,13 +353,14 @@ class RpcEthereumRepositoryTest {
             TransactionData(
                 transactionHash,
                 "0x32".asEthereumAddress()!!,
-                Transaction(
-                    "0x55".asEthereumAddress()!!,
-                    Wei(BigInteger.ONE),
-                    BigInteger.valueOf(115),
-                    BigInteger.valueOf(11),
-                    data,
-                    BigInteger.valueOf(23)
+                Transaction.Legacy(
+                    to = "0x55".asEthereumAddress()!!,
+                    from = "0x32".asEthereumAddress()!!,
+                    value = Wei(BigInteger.ONE),
+                    gas = BigInteger.valueOf(115),
+                    gasPrice = BigInteger.valueOf(11),
+                    data = data,
+                    nonce = BigInteger.valueOf(23)
                 ),
                 BigInteger.valueOf(32),
                 "block-hash",
@@ -500,10 +501,10 @@ class RpcEthereumRepositoryTest {
                     rpcResult("0x0a", 2)
                 )
 
-        val transaction = Transaction(Solidity.Address(BigInteger.ONE), value = Wei.ether("1"), data = "0x42cde4e8")
+        val transaction = Transaction.Legacy(to = Solidity.Address(BigInteger.ONE), value = Wei.ether("1"), data = "0x42cde4e8")
         val actual = repository.getTransactionParameters(
             Solidity.Address(BigInteger.TEN),
-            transaction.address,
+            transaction.to,
             transaction.value,
             transaction.data
         )
@@ -564,11 +565,11 @@ class RpcEthereumRepositoryTest {
     private suspend fun testTransactionParametersFailure(rpcResults: List<JsonRpcResult>) {
         coEvery { apiMock.post(any<Collection<JsonRpcRequest>>()) } returns rpcResults
 
-        val transaction = Transaction(Solidity.Address(BigInteger.ONE), value = Wei.ether("1"), data = "0x42cde4e8")
+        val transaction = Transaction.Legacy(to = Solidity.Address(BigInteger.ONE), value = Wei.ether("1"), data = "0x42cde4e8")
         val result = runCatching {
             repository.getTransactionParameters(
                 Solidity.Address(BigInteger.TEN),
-                transaction.address,
+                transaction.to,
                 transaction.value,
                 transaction.data
             )

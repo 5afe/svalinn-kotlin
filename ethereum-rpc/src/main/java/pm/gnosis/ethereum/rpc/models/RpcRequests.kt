@@ -39,6 +39,24 @@ class RpcCallRequest(raw: EthCall) : RpcRequest<EthCall>(raw) {
     }
 }
 
+class RpcCallEip1559Request(raw: EthCallEip1559) : RpcRequest<EthCallEip1559>(raw) {
+    override fun request() =
+        JsonRpcRequest(
+            method = FUNCTION_CALL,
+            params = listOf(
+                raw.transaction.toCallParams(raw.from?.asEthereumAddressString()),
+                raw.block.asString()
+            ),
+            id = raw.id
+        )
+
+    override fun parse(response: JsonRpcResult) {
+        raw.response = response.error?.let { EthRequest.Response.Failure<String>(it.message) }
+            ?: response.result?.let { EthRequest.Response.Success(response.result) }
+                    ?: EthRequest.Response.Failure("Missing result")
+    }
+}
+
 class RpcBalanceRequest(raw: EthBalance) : RpcRequest<EthBalance>(raw) {
     override fun request() =
         JsonRpcRequest(
@@ -69,6 +87,23 @@ class RpcEstimateGasRequest(raw: EthEstimateGas) : RpcRequest<EthEstimateGas>(ra
         raw.response = response.error?.let { EthRequest.Response.Failure<BigInteger>(it.message) }
                 ?: response.result?.hexAsBigIntegerOrNull()?.let { EthRequest.Response.Success(it) }
                 ?: EthRequest.Response.Failure("Invalid estimate!")
+    }
+}
+
+class RpcEstimateGasEip1559Request(raw: EthEstimateGasEip1559) : RpcRequest<EthEstimateGasEip1559>(raw) {
+    override fun request() =
+        JsonRpcRequest(
+            method = FUNCTION_ESTIMATE_GAS,
+            params = listOf(
+                raw.transaction.toCallParams(raw.from?.asEthereumAddressString())
+            ),
+            id = raw.id
+        )
+
+    override fun parse(response: JsonRpcResult) {
+        raw.response = response.error?.let { EthRequest.Response.Failure<BigInteger>(it.message) }
+            ?: response.result?.hexAsBigIntegerOrNull()?.let { EthRequest.Response.Success(it) }
+                    ?: EthRequest.Response.Failure("Invalid estimate!")
     }
 }
 
@@ -134,15 +169,29 @@ class RpcSendRawTransaction(raw: EthSendRawTransaction) : RpcRequest<EthSendRawT
     }
 }
 
-private fun Transaction?.toCallParams(from: String?) =
+private fun Transaction.Legacy?.toCallParams(from: String?) =
     TransactionCallParams(
         from = from,
-        to = this?.address?.asEthereumAddressString(),
+        to = this?.to?.asEthereumAddressString(),
         value = this?.value?.value?.toHexString(),
         data = this?.data,
         nonce = this?.nonce?.toHexString(),
         gas = this?.gas?.toHexString(),
         gasPrice = this?.gasPrice?.toHexString()
+    )
+
+private fun Transaction.Eip1559?.toCallParams(from: String?) =
+    TransactionCallParams(
+        type = this?.type?.toHexString(),
+        chainId = this?.chainId?.toHexString(),
+        from = from,
+        to = this?.to?.asEthereumAddressString(),
+        value = this?.value?.value?.toHexString() ?: "0x0",
+        data = this?.data,
+        nonce = this?.nonce?.toHexString(),
+        gas = this?.gas?.toHexString(),
+        maxPriorityFeePerGas = this?.maxPriorityFee?.toHexString(),
+        maxFeePerGas = this?.maxFeePerGas?.toHexString()
     )
 
 private fun Block.asString() =

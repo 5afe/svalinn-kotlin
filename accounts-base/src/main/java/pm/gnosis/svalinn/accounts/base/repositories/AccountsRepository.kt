@@ -10,7 +10,7 @@ import pm.gnosis.svalinn.accounts.base.models.Signature
 interface AccountsRepository {
     fun loadActiveAccount(): Single<Account>
 
-    fun signTransaction(transaction: Transaction): Single<String>
+    fun signTransaction(transaction: Transaction.Legacy): Single<String>
 
     fun sign(data: ByteArray): Single<Signature>
 

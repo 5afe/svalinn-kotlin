@@ -36,7 +36,7 @@ class GethAccountsRepository(
         }.map { Account(it.address.hex.asEthereumAddress()!!) }
     }
 
-    override fun signTransaction(transaction: Transaction): Single<String> {
+    override fun signTransaction(transaction: Transaction.Legacy): Single<String> {
         return Single.fromCallable {
             val account = gethAccountManager.getActiveAccount()
 
@@ -46,7 +46,7 @@ class GethAccountsRepository(
 
             val tx = Geth.newTransaction(
                 transaction.nonce!!.toLong(),
-                Address(transaction.address.asEthereumAddressString()),
+                Address(transaction.to.asEthereumAddressString()),
                 BigInt(transaction.value?.toLong() ?: 0),
                 BigInt(transaction.gas!!.toLong()),
                 BigInt(transaction.gasPrice!!.toLong()),

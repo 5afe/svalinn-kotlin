@@ -36,7 +36,7 @@ dependencies {
     implementation "com.github.walleth.kethereum:rlp:$versions.kethereum"
 
     // Bivrost
-    implementation "com.github.5afe.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
+    implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:$versions.bivrost"
 
     testImplementation "org.mockito:mockito-core:$versions.mockito"
     testImplementation "org.mockito:mockito-inline:$versions.mockito"

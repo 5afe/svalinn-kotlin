@@ -31,6 +31,6 @@ ext {
             // Test dependencies
             espresso              : '3.5.1',
             junit                 : '4.12',
-            mockito               : '3.5.5',
+            mockito               : '5.0.0',
     ]
 }
