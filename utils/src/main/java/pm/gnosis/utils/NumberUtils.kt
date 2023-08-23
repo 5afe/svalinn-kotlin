@@ -19,6 +19,8 @@ fun ByteArray.asBigInteger() = BigInteger(1, this)
 
 fun BigInteger.toHexString() = this.toString(16).addHexPrefix()
 
+fun Byte.toHexString() = this.toString(16).addHexPrefix()
+
 
 fun BigInteger.isValidEthereumAddress() = this <= BigInteger.valueOf(2).pow(160).minus(BigInteger.ONE)
 
