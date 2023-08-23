@@ -13,7 +13,6 @@ import java.math.BigInteger
 
 fun Transaction.Eip1559.rlp(signature: ECDSASignature? = null): ByteArray {
     val items = ArrayList<RLPType>()
-    items.add(type.toRLP())
     items.add(chainId.toRLP())
     items.add(nonce!!.toRLP())
     items.add((maxPriorityFee ?: BigInteger.ZERO).toRLP())
@@ -46,7 +45,7 @@ private fun Transaction.Eip1559.adjustV(v: Byte): BigInteger {
     return BigInteger.valueOf(v.toLong() - 27)
 }
 
-fun Transaction.Eip1559.hash(ecdsaSignature: ECDSASignature? = null) = rlp(ecdsaSignature).let { Sha3Utils.keccak(it) }
+fun Transaction.Eip1559.hash(ecdsaSignature: ECDSASignature? = null) = byteArrayOf(type, *rlp(ecdsaSignature)).let { Sha3Utils.keccak(it) }
 
 fun Transaction.Legacy.rlp(signature: ECDSASignature? = null): ByteArray {
     val items = ArrayList<RLPElement>()
