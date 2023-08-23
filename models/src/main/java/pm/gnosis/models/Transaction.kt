@@ -41,7 +41,7 @@ sealed class Transaction {
         val accessList: List<Pair<String, List<String>>> = emptyList()
     ) : Transaction() {
         // Type of a transaction with priority fee. Defined in EIP-1559
-        val type: BigInteger = "0x02".hexAsBigInteger()
+        val type: Byte = "0x02".hexAsBigInteger().toByte()
     }
 
     companion object {
