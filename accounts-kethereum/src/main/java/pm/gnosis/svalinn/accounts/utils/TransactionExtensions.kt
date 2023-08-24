@@ -77,7 +77,7 @@ private fun Transaction.Legacy.adjustV(v: Byte): BigInteger {
         // If you do, then the v of the signature MUST be set to {0,1} + CHAIN_ID * 2 + 35
         // otherwise then v continues to be set to {0,1} + 27 as previously.
         if (v in 0..1) {
-            BigInteger.valueOf(v.toLong()).plus(chainId.multiply(BigInteger.valueOf(2)).plus(BigInteger.valueOf(35))).toByte()
+            return BigInteger.valueOf(v.toLong()).plus(chainId.multiply(BigInteger.valueOf(2)).plus(BigInteger.valueOf(35)))
         } else if (v in 27..28) {
             // KeyPair signature is always 27 or 28
             return BigInteger.valueOf(v.toLong() - 27).plus(chainId.multiply(BigInteger.valueOf(2)).plus(BigInteger.valueOf(35)))
