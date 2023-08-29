@@ -56,7 +56,7 @@ fun Transaction.Legacy.rlp(signature: ECDSASignature? = null): ByteArray {
     items.add((value?.value ?: BigInteger.ZERO).toRLP())
     items.add((data?.hexStringToByteArray() ?: ByteArray(0)).toRLP())
     if (signature != null) {
-        items.add(if(chainId > BigInteger.ZERO) adjustV(signature.v).toRLP() else signature.v.toRLP())
+        items.add(adjustV(signature.v).toRLP())
         items.add(signature.r.toRLP())
         items.add(signature.s.toRLP())
     } else if (chainId > BigInteger.ZERO) {
