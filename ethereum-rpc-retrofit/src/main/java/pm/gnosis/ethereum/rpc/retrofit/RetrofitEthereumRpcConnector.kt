@@ -6,7 +6,7 @@ import pm.gnosis.ethereum.rpc.models.*
 class RetrofitEthereumRpcConnector(private val api: RetrofitEthereumRpcApi, override var rpcUrl: String) : EthereumRpcConnector {
 
     override suspend fun receipt(jsonRpcRequest: JsonRpcRequest): JsonRpcTransactionReceiptResult {
-        return api.receipt(rpcUrl,jsonRpcRequest)
+        return api.receipt(rpcUrl, jsonRpcRequest)
     }
 
     override suspend fun block(jsonRpcRequest: JsonRpcRequest): JsonRpcBlockResult {

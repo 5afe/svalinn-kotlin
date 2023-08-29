@@ -1,5 +1,6 @@
 package pm.gnosis.svalinn.accounts.utils
 
+import androidx.annotation.VisibleForTesting
 import org.kethereum.functions.rlp.RLPElement
 import org.kethereum.functions.rlp.RLPList
 import org.kethereum.functions.rlp.RLPType
@@ -13,7 +14,6 @@ import java.math.BigInteger
 
 fun Transaction.Eip1559.rlp(signature: ECDSASignature? = null): ByteArray {
     val items = ArrayList<RLPType>()
-    items.add(type.toRLP())
     items.add(chainId.toRLP())
     items.add(nonce!!.toRLP())
     items.add((maxPriorityFee ?: BigInteger.ZERO).toRLP())
@@ -46,7 +46,7 @@ private fun Transaction.Eip1559.adjustV(v: Byte): BigInteger {
     return BigInteger.valueOf(v.toLong() - 27)
 }
 
-fun Transaction.Eip1559.hash(ecdsaSignature: ECDSASignature? = null) = rlp(ecdsaSignature).let { Sha3Utils.keccak(it) }
+fun Transaction.Eip1559.hash(ecdsaSignature: ECDSASignature? = null) = byteArrayOf(type, *rlp(ecdsaSignature)).let { Sha3Utils.keccak(it) }
 
 fun Transaction.Legacy.rlp(signature: ECDSASignature? = null): ByteArray {
     val items = ArrayList<RLPElement>()
@@ -60,7 +60,7 @@ fun Transaction.Legacy.rlp(signature: ECDSASignature? = null): ByteArray {
         items.add(adjustV(signature.v).toRLP())
         items.add(signature.r.toRLP())
         items.add(signature.s.toRLP())
-    } else {
+    } else if (chainId > BigInteger.ZERO) {
         items.add(chainId.toRLP())
         items.add(0.toRLP())
         items.add(0.toRLP())
@@ -71,14 +71,15 @@ fun Transaction.Legacy.rlp(signature: ECDSASignature? = null): ByteArray {
 
 fun Transaction.Legacy.hash(ecdsaSignature: ECDSASignature? = null) = rlp(ecdsaSignature).let { Sha3Utils.keccak(it) }
 
-private fun Transaction.Legacy.adjustV(v: Byte): BigInteger {
+@VisibleForTesting
+fun Transaction.Legacy.adjustV(v: Byte): BigInteger {
     // requires v = {0, 1} or v = {27, 28}
     if (chainId > BigInteger.ZERO) {
         // EIP-155
         // If you do, then the v of the signature MUST be set to {0,1} + CHAIN_ID * 2 + 35
         // otherwise then v continues to be set to {0,1} + 27 as previously.
         if (v in 0..1) {
-            BigInteger.valueOf(v.toLong()).plus(chainId.multiply(BigInteger.valueOf(2)).plus(BigInteger.valueOf(35))).toByte()
+            return BigInteger.valueOf(v.toLong()).plus(chainId.multiply(BigInteger.valueOf(2)).plus(BigInteger.valueOf(35)))
         } else if (v in 27..28) {
             // KeyPair signature is always 27 or 28
             return BigInteger.valueOf(v.toLong() - 27).plus(chainId.multiply(BigInteger.valueOf(2)).plus(BigInteger.valueOf(35)))
