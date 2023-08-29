@@ -1,5 +1,6 @@
 package pm.gnosis.svalinn.accounts.utils
 
+import androidx.annotation.VisibleForTesting
 import org.kethereum.functions.rlp.RLPElement
 import org.kethereum.functions.rlp.RLPList
 import org.kethereum.functions.rlp.RLPType
@@ -70,7 +71,8 @@ fun Transaction.Legacy.rlp(signature: ECDSASignature? = null): ByteArray {
 
 fun Transaction.Legacy.hash(ecdsaSignature: ECDSASignature? = null) = rlp(ecdsaSignature).let { Sha3Utils.keccak(it) }
 
-private fun Transaction.Legacy.adjustV(v: Byte): BigInteger {
+@VisibleForTesting
+fun Transaction.Legacy.adjustV(v: Byte): BigInteger {
     // requires v = {0, 1} or v = {27, 28}
     if (chainId > BigInteger.ZERO) {
         // EIP-155

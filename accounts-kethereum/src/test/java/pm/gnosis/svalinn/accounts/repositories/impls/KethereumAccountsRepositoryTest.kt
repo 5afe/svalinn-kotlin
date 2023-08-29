@@ -19,6 +19,7 @@ import pm.gnosis.svalinn.accounts.base.models.Signature
 import pm.gnosis.svalinn.accounts.data.db.AccountDao
 import pm.gnosis.svalinn.accounts.data.db.AccountsDatabase
 import pm.gnosis.svalinn.accounts.repositories.impls.models.db.AccountDb
+import pm.gnosis.svalinn.accounts.utils.adjustV
 import pm.gnosis.svalinn.accounts.utils.hash
 import pm.gnosis.svalinn.accounts.utils.rlp
 import pm.gnosis.svalinn.common.PreferencesManager
@@ -93,6 +94,31 @@ class KethereumAccountsRepositoryTest {
         val expectedTx =
             "0xf86c098504a817c800825208943535353535353535353535353535353535353535880de0b6b3a76400008025a028ef61340bd939bc2195fe537567866003e1a15d3c71ff63e1590620aa636276a067cbe9d8997f761aecb703304b3800ccf555c9f3dc64214b297fb1966a3b6d83"
         testObserver.assertResult(expectedTx)
+    }
+
+    @Test
+    fun rlpTransactionLegacyAdjustV() {
+        val tx = Transaction.Legacy(
+            to = Solidity.Address(BigInteger.ZERO),
+            nonce = BigInteger.ZERO,
+            data = "",
+            gas =  BigInteger.ZERO,
+            gasPrice =  BigInteger.ZERO,
+            chainId = BigInteger.valueOf(1)
+        )
+
+        val v1 = 0
+        val v1Adjusted = tx.adjustV(v1.toByte())
+        assertEquals(BigInteger.valueOf(37), v1Adjusted)
+
+        val v2 = 27
+        val v2Adjusted = tx.adjustV(v2.toByte())
+        assertEquals(BigInteger.valueOf(37), v2Adjusted)
+
+        val txZeroChainId = tx.copy(chainId = BigInteger.ZERO)
+        val v3 = 0
+        val v3Adjusted = txZeroChainId.adjustV(v3.toByte())
+        assertEquals(BigInteger.ZERO, v3Adjusted)
     }
 
     @Test
